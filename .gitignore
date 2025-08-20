@@ -1,0 +1,18 @@
+# Ambiente virtual
+venv/
+
+# Base de dados SQLite
+db.sqlite3
+
+# Arquivos temporários
+__pycache__/
+*.pyc
+*.pyo
+*.log
+
+# Arquivos de ambiente
+.env
+
+# Diretórios de build/static
+staticfiles/
+logs/

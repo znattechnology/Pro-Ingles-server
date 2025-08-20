@@ -1,0 +1,808 @@
+ERROR 2025-08-19 00:04:31,173 signals 76963 8544362688 Error creating default metrics: no such table: analytics_metriccategory
+INFO 2025-08-19 00:08:22,207 autoreload 77523 8544362688 Watching for file changes with StatReloader
+ERROR 2025-08-19 00:08:40,589 log 77523 6127595520 Internal Server Error: /api/v1/analytics/categories/
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 503, in dispatch
+    self.initial(request, *args, **kwargs)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 421, in initial
+    self.check_permissions(request)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 339, in check_permissions
+    self.permission_denied(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 180, in permission_denied
+    raise exceptions.NotAuthenticated()
+rest_framework.exceptions.NotAuthenticated: As credenciais de autenticação não foram fornecidas.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/request.py", line 422, in __getattr__
+    return getattr(_request, attr)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WSGIRequest' object has no attribute 'get'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 472, in handle_exception
+    response = exception_handler(exc, context)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/exceptions.py", line 51, in custom_exception_handler
+    f"Path: {context.get('request', {}).get('path', 'Unknown')}"
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/request.py", line 424, in __getattr__
+    raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{attr}'")
+AttributeError: 'Request' object has no attribute 'get'
+ERROR 2025-08-19 00:08:40,590 basehttp 77523 6127595520 "GET /api/v1/analytics/categories/ HTTP/1.1" 500 116738
+INFO 2025-08-19 00:08:56,944 autoreload 77523 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/exceptions.py changed, reloading.
+INFO 2025-08-19 00:08:58,045 autoreload 77646 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-19 00:09:08,074 autoreload 77698 8544362688 Watching for file changes with StatReloader
+WARNING 2025-08-19 07:36:32,640 log 90330 8544362688 Bad Request: /api/v1/auth/oauth/google/url/
+WARNING 2025-08-19 07:36:32,763 services 90330 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:36:32,923 exceptions 90330 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:36:32,923 log 90330 8544362688 Bad Request: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:36:33,167 services 90330 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:33,647 services 90330 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:36:33,767 exceptions 90330 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:36:33,767 log 90330 8544362688 Bad Request: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:36:34,008 services 90330 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:34,129 services 90330 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:34,368 services 90330 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:34,489 services 90330 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:34,610 services 90330 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:34,731 services 90330 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:34,880 services 90330 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:36:34,903 exceptions 90330 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-19 07:36:34,903 log 90330 8544362688 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-19 07:36:35,026 services 90330 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:52,493 log 90400 8544362688 Bad Request: /api/v1/auth/oauth/google/url/
+WARNING 2025-08-19 07:36:52,617 services 90400 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:36:52,743 exceptions 90400 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:36:52,743 log 90400 8544362688 Bad Request: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:36:52,984 services 90400 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:53,464 services 90400 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:36:53,584 exceptions 90400 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:36:53,585 log 90400 8544362688 Bad Request: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:36:53,826 services 90400 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:53,946 services 90400 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:54,189 services 90400 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:54,310 services 90400 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:54,431 services 90400 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:54,553 services 90400 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:36:54,686 services 90400 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:36:54,709 exceptions 90400 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-19 07:36:54,709 log 90400 8544362688 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-19 07:36:54,831 services 90400 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:37:09,372 log 90467 8544362688 Bad Request: /api/v1/auth/oauth/google/url/
+WARNING 2025-08-19 07:37:09,496 services 90467 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:37:09,620 exceptions 90467 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:37:09,620 log 90467 8544362688 Bad Request: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:37:09,862 services 90467 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:37:10,345 services 90467 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:37:10,465 exceptions 90467 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:37:10,465 log 90467 8544362688 Bad Request: /api/v1/auth/change-password/
+WARNING 2025-08-19 07:37:10,705 services 90467 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:37:10,827 services 90467 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:37:11,068 services 90467 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:37:11,189 services 90467 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:37:11,310 services 90467 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:37:11,432 services 90467 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 07:37:11,565 services 90467 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 07:37:11,588 exceptions 90467 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-19 07:37:11,588 log 90467 8544362688 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-19 07:37:11,710 services 90467 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:09,695 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:09,820 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:09,941 services 92511 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:03:09,973 exceptions 92511 8544362688 API Error: Resource not found - Status: 404 - Path: /api/v1/chat/conversations/02bf897d-b8ee-4bbf-89ca-e2ec14925042/
+WARNING 2025-08-19 11:03:09,974 log 92511 8544362688 Not Found: /api/v1/chat/conversations/02bf897d-b8ee-4bbf-89ca-e2ec14925042/
+WARNING 2025-08-19 11:03:10,099 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:10,221 services 92511 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:03:10,994 log 92511 8544362688 Internal Server Error: /api/v1/chat/stats/
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/chat/views.py", line 284, in chat_stats
+    ).annotate(
+      ^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/query.py", line 1649, in annotate
+    return self._annotate(args, kwargs, select=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/query.py", line 1701, in _annotate
+    clone.query.add_annotation(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1218, in add_annotation
+    annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/aggregates.py", line 176, in resolve_expression
+    result = super().resolve_expression(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/aggregates.py", line 63, in resolve_expression
+    c = super().resolve_expression(query, allow_joins, reuse, summarize)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/expressions.py", line 298, in resolve_expression
+    source_expressions = [
+                         ^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/expressions.py", line 300, in <listcomp>
+    expr.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/query_utils.py", line 91, in resolve_expression
+    clause, joins = query._add_q(
+                    ^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1678, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1588, in build_filter
+    condition = self.build_lookup(lookups, col, value)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1409, in build_lookup
+    lhs = self.try_transform(lhs, lookup_name)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1458, in try_transform
+    raise FieldError(
+django.core.exceptions.FieldError: Unsupported lookup 'ne' for ForeignKey or join on the field not permitted.
+WARNING 2025-08-19 11:03:11,119 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:11,240 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:11,365 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:11,485 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:11,608 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:11,728 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:11,854 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:11,975 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:12,115 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:12,235 services 92511 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:03:12,859 log 92511 8544362688 Internal Server Error: /api/v1/chat/conversations/f0229c6a-11c4-4056-a935-6d7ac44f06f0/messages/create/
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/redis/asyncio/connection.py", line 281, in connect
+    await self.retry.call_with_retry(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/redis/asyncio/retry.py", line 59, in call_with_retry
+    return await do()
+           ^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/redis/asyncio/connection.py", line 697, in _connect
+    reader, writer = await asyncio.open_connection(
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.13/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/streams.py", line 48, in open_connection
+    transport, _ = await loop.create_connection(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.13/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/base_events.py", line 1094, in create_connection
+    raise OSError('Multiple exceptions: {}'.format(
+OSError: Multiple exceptions: [Errno 61] Connect call failed ('::1', 6379, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 6379)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/chat/views.py", line 152, in create
+    message = serializer.save()
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/chat/serializers.py", line 285, in create
+    message = Message.objects.create(
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/query.py", line 663, in create
+    obj.save(force_insert=True, using=self.db)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/base.py", line 902, in save
+    self.save_base(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/base.py", line 1023, in save_base
+    post_save.send(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/dispatch/dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/chat/signals.py", line 48, in handle_new_message
+    async_to_sync(channel_layer.group_send)(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/asgiref/sync.py", line 262, in __call__
+    return call_result.result()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.13/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.11/3.11.13/Frameworks/Python.framework/Versions/3.11/lib/python3.11/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/asgiref/sync.py", line 302, in main_wrap
+    result = await awaitable
+             ^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/channels_redis/core.py", line 518, in group_send
+    await connection.zremrangebyscore(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/redis/asyncio/client.py", line 611, in execute_command
+    conn = self.connection or await pool.get_connection(command_name, **options)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/redis/asyncio/connection.py", line 1064, in get_connection
+    await self.ensure_connection(connection)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/redis/asyncio/connection.py", line 1097, in ensure_connection
+    await connection.connect()
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/redis/asyncio/connection.py", line 289, in connect
+    raise ConnectionError(self._error_message(e))
+redis.exceptions.ConnectionError: Error Multiple exceptions: [Errno 61] Connect call failed ('::1', 6379, 0, 0), [Errno 61] Connect call failed ('127.0.0.1', 6379) connecting to localhost:6379.
+WARNING 2025-08-19 11:03:12,982 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:13,102 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:13,225 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:13,345 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:13,468 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:13,588 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:13,711 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:13,831 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:13,960 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:14,080 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:14,204 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:14,324 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:14,446 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:14,566 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:14,688 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:14,808 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:14,930 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:15,050 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:15,174 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:15,294 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:15,418 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:15,539 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:15,664 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:15,784 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:15,908 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:16,029 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:16,153 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:16,273 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:16,398 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:16,518 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:16,639 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:16,760 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:16,881 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,002 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,124 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,244 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,365 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,485 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,607 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,727 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,848 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:17,970 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:18,091 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:18,212 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:18,332 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:18,453 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:18,574 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:18,694 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:19,194 services 92511 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:03:19,197 upload 92511 8544362688 Image optimization failed: [Errno 2] No such file or directory: '/fake/path/test.jpg'
+WARNING 2025-08-19 11:03:19,197 upload 92511 8544362688 Image optimization failed for uploads/general/user_123/test.jpg: [Errno 2] No such file or directory: '/fake/path/test.jpg'
+INFO 2025-08-19 11:03:19,197 upload 92511 8544362688 File uploaded successfully: uploads/general/user_123/test.jpg
+WARNING 2025-08-19 11:03:19,318 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:19,440 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:19,563 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:19,563 log 92511 8544362688 Bad Request: /api/v1/upload/general/
+WARNING 2025-08-19 11:03:19,685 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:19,806 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:19,928 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:20,049 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:20,171 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:20,291 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:20,412 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:20,533 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:20,654 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:20,775 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:20,896 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,017 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,138 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,259 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,380 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,501 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,625 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,750 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,874 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:21,998 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:22,121 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:22,244 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:22,368 services 92511 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:03:22,482 log 92511 8544362688 Internal Server Error: /api/v1/promotions/my/stats/
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/promotions/views.py", line 412, in user_promotion_stats
+    total=models.Sum('discount_amount')
+          ^^^^^^
+UnboundLocalError: cannot access local variable 'models' where it is not associated with a value
+WARNING 2025-08-19 11:03:22,604 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:22,727 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:22,729 log 92511 8544362688 Not Found: /api/v1/promotions/coupons/validate/
+WARNING 2025-08-19 11:03:22,734 log 92511 8544362688 Bad Request: /api/v1/auth/oauth/google/url/
+WARNING 2025-08-19 11:03:22,854 services 92511 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:03:22,975 exceptions 92511 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/change-password/
+WARNING 2025-08-19 11:03:22,975 log 92511 8544362688 Bad Request: /api/v1/auth/change-password/
+WARNING 2025-08-19 11:03:23,215 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:23,695 services 92511 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:03:23,815 exceptions 92511 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/change-password/
+WARNING 2025-08-19 11:03:23,815 log 92511 8544362688 Bad Request: /api/v1/auth/change-password/
+WARNING 2025-08-19 11:03:24,056 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:24,176 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:24,417 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:24,537 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:24,658 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:24,780 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:24,902 services 92511 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:03:24,925 exceptions 92511 8544362688 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-19 11:03:24,925 log 92511 8544362688 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-19 11:03:25,047 services 92511 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:56,735 services 92701 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:56,859 services 92701 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:57,099 services 92701 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:03:57,221 services 92701 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:04:48,478 services 92839 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:04:48,605 services 92839 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:04:48,847 services 92839 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:04:48,968 services 92839 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:23,042 services 92928 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:23,167 services 92928 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:23,407 services 92928 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:23,528 services 92928 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:23,650 services 92928 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:23,770 services 92928 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:23,892 services 92928 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:24,013 services 92928 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:54,697 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:54,821 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:54,944 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:55,066 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:55,187 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:55,308 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:55,428 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:55,550 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:55,684 services 92990 8544362688 Metric 'new_user_registrations' not found
+ERROR 2025-08-19 11:05:55,795 upload 92990 8544362688 Image optimization failed: [Errno 2] No such file or directory: '/fake/path/test.jpg'
+WARNING 2025-08-19 11:05:55,795 upload 92990 8544362688 Image optimization failed for uploads/general/user_123/test.jpg: [Errno 2] No such file or directory: '/fake/path/test.jpg'
+INFO 2025-08-19 11:05:55,795 upload 92990 8544362688 File uploaded successfully: uploads/general/user_123/test.jpg
+WARNING 2025-08-19 11:05:55,918 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:56,040 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:56,176 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:56,178 log 92990 8544362688 Bad Request: /api/v1/upload/general/
+WARNING 2025-08-19 11:05:56,301 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:56,422 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:56,544 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:56,665 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:56,788 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:56,909 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:57,029 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:57,152 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:57,275 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:57,396 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:57,518 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:57,640 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:57,761 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:58,001 services 92990 8544362688 Metric 'new_user_registrations' not found
+WARNING 2025-08-19 11:05:58,123 services 92990 8544362688 Metric 'new_user_registrations' not found
+INFO 2025-08-20 00:20:52,671 autoreload 15907 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 00:22:18,021 basehttp 15907 6160740352 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+WARNING 2025-08-20 00:22:18,042 log 15907 6160740352 Not Found: /api/auth/login/
+WARNING 2025-08-20 00:22:18,042 basehttp 15907 6160740352 "POST /api/auth/login/ HTTP/1.1" 404 4109
+INFO 2025-08-20 00:23:00,773 basehttp 15907 6160740352 "OPTIONS /api/auth/register/ HTTP/1.1" 200 0
+WARNING 2025-08-20 00:23:00,803 log 15907 6160740352 Not Found: /api/auth/register/
+WARNING 2025-08-20 00:23:00,803 basehttp 15907 6160740352 "POST /api/auth/register/ HTTP/1.1" 404 4118
+INFO 2025-08-20 00:25:18,260 basehttp 15907 6160740352 "OPTIONS /api/v1/auth/register/ HTTP/1.1" 200 0
+ERROR 2025-08-20 00:25:18,287 exceptions 15907 6160740352 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 00:25:18,287 log 15907 6160740352 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 00:25:18,288 basehttp 15907 6160740352 "POST /api/v1/auth/register/ HTTP/1.1" 400 124
+INFO 2025-08-20 00:27:32,817 basehttp 15907 6160740352 "OPTIONS /api/v1/auth/login/ HTTP/1.1" 200 0
+ERROR 2025-08-20 00:27:32,918 exceptions 15907 6160740352 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 00:27:32,918 log 15907 6160740352 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 00:27:32,918 basehttp 15907 6160740352 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+INFO 2025-08-20 00:28:09,012 basehttp 15907 6160740352 "OPTIONS /api/v1/auth/register/ HTTP/1.1" 200 0
+ERROR 2025-08-20 00:28:09,025 exceptions 15907 6160740352 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 00:28:09,026 log 15907 6160740352 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 00:28:09,026 basehttp 15907 6160740352 "POST /api/v1/auth/register/ HTTP/1.1" 400 222
+ERROR 2025-08-20 00:28:16,485 exceptions 15907 6160740352 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 00:28:16,486 log 15907 6160740352 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 00:28:16,486 basehttp 15907 6160740352 "POST /api/v1/auth/register/ HTTP/1.1" 400 222
+INFO 2025-08-20 00:30:45,301 autoreload 15907 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/serializers.py changed, reloading.
+INFO 2025-08-20 00:30:47,003 autoreload 17792 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 00:30:55,052 autoreload 17792 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/serializers.py changed, reloading.
+INFO 2025-08-20 00:30:56,683 autoreload 17829 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 00:31:02,526 autoreload 17829 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/serializers.py changed, reloading.
+INFO 2025-08-20 00:31:04,012 autoreload 17860 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 00:31:25,278 autoreload 17860 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 00:31:26,895 autoreload 17900 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 00:34:00,602 basehttp 17900 6125776896 "POST /api/v1/auth/register/ HTTP/1.1" 201 790
+INFO 2025-08-20 00:36:21,396 basehttp 17900 6125776896 "OPTIONS /api/v1/auth/me/ HTTP/1.1" 200 0
+WARNING 2025-08-20 00:36:21,426 log 17900 6125776896 Not Found: /api/v1/auth/me/
+WARNING 2025-08-20 00:36:21,426 basehttp 17900 6125776896 "GET /api/v1/auth/me/ HTTP/1.1" 404 17804
+INFO 2025-08-20 00:36:21,516 basehttp 17900 6125776896 "OPTIONS /api/v1/auth/logout/ HTTP/1.1" 200 0
+WARNING 2025-08-20 00:36:21,526 log 17900 6125776896 Not Found: /api/v1/auth/logout/
+WARNING 2025-08-20 00:36:21,527 basehttp 17900 6125776896 "POST /api/v1/auth/logout/ HTTP/1.1" 404 17817
+INFO 2025-08-20 00:44:19,015 basehttp 17900 6125776896 "POST /api/v1/auth/login/ HTTP/1.1" 200 961
+WARNING 2025-08-20 00:44:25,283 log 17900 6125776896 Not Found: /api/v1/auth/logout/
+WARNING 2025-08-20 00:44:25,283 basehttp 17900 6125776896 "POST /api/v1/auth/logout/ HTTP/1.1" 404 17817
+INFO 2025-08-20 00:44:40,545 basehttp 17900 6125776896 "POST /api/v1/auth/login/ HTTP/1.1" 200 961
+WARNING 2025-08-20 00:48:44,857 log 17900 6125776896 Not Found: /api/v1/auth/me/
+WARNING 2025-08-20 00:48:44,864 basehttp 17900 6125776896 "GET /api/v1/auth/me/ HTTP/1.1" 404 17804
+WARNING 2025-08-20 00:48:44,898 log 17900 6125776896 Not Found: /api/v1/auth/logout/
+WARNING 2025-08-20 00:48:44,899 basehttp 17900 6125776896 "POST /api/v1/auth/logout/ HTTP/1.1" 404 17817
+INFO 2025-08-20 00:51:23,909 basehttp 17900 6125776896 "POST /api/v1/auth/login/ HTTP/1.1" 200 961
+WARNING 2025-08-20 00:53:00,527 log 17900 6125776896 Not Found: /api/v1/auth/me/
+WARNING 2025-08-20 00:53:00,529 basehttp 17900 6125776896 "GET /api/v1/auth/me/ HTTP/1.1" 404 17804
+WARNING 2025-08-20 00:53:00,574 log 17900 6125776896 Not Found: /api/v1/auth/logout/
+WARNING 2025-08-20 00:53:00,574 basehttp 17900 6125776896 "POST /api/v1/auth/logout/ HTTP/1.1" 404 17817
+INFO 2025-08-20 00:56:23,466 basehttp 17900 6125776896 "POST /api/v1/auth/login/ HTTP/1.1" 200 961
+WARNING 2025-08-20 00:56:38,750 log 17900 6125776896 Not Found: /api/v1/auth/logout/
+WARNING 2025-08-20 00:56:38,750 basehttp 17900 6125776896 "POST /api/v1/auth/logout/ HTTP/1.1" 404 17817
+INFO 2025-08-20 01:00:47,193 autoreload 17900 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/models.py changed, reloading.
+INFO 2025-08-20 01:00:49,804 autoreload 22074 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 01:01:51,823 autoreload 22074 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 01:01:53,573 autoreload 22261 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 01:02:03,053 autoreload 22261 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 01:02:05,555 autoreload 22289 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 01:02:20,615 autoreload 22289 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/serializers.py changed, reloading.
+INFO 2025-08-20 01:02:23,045 autoreload 22344 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 01:02:36,758 autoreload 22344 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 01:02:38,984 autoreload 22399 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 01:02:48,800 autoreload 22399 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 01:02:50,956 autoreload 22452 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 01:07:49,686 basehttp 22452 6129643520 "POST /api/v1/auth/register/ HTTP/1.1" 201 144
+INFO 2025-08-20 01:08:05,544 basehttp 22452 6129643520 "POST /api/v1/auth/verify-email/ HTTP/1.1" 200 783
+INFO 2025-08-20 01:08:22,353 basehttp 22452 6129643520 "POST /api/v1/auth/login/ HTTP/1.1" 200 938
+INFO 2025-08-20 01:08:41,457 basehttp 22452 6129643520 "POST /api/v1/auth/register/ HTTP/1.1" 201 145
+ERROR 2025-08-20 01:08:49,053 exceptions 22452 6129643520 API Error: Validation error - Status: 400 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 01:08:49,053 log 22452 6129643520 Bad Request: /api/v1/auth/login/
+WARNING 2025-08-20 01:08:49,054 basehttp 22452 6129643520 "POST /api/v1/auth/login/ HTTP/1.1" 400 161
+INFO 2025-08-20 01:10:28,150 basehttp 22452 6129643520 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 01:10:28,166 basehttp 22452 6129643520 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+INFO 2025-08-20 01:10:28,195 basehttp 22452 6146469888 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2929
+INFO 2025-08-20 01:10:28,196 basehttp 22452 6163296256 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2694
+INFO 2025-08-20 01:10:28,197 basehttp 22452 6129643520 "GET /static/admin/css/base.css HTTP/1.1" 200 21310
+INFO 2025-08-20 01:10:28,197 basehttp 22452 6213775360 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2025-08-20 01:10:28,198 basehttp 22452 6180122624 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2025-08-20 01:10:28,198 basehttp 22452 6163296256 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2025-08-20 01:10:28,198 basehttp 22452 6196948992 "GET /static/admin/css/responsive.css HTTP/1.1" 200 18559
+WARNING 2025-08-20 01:10:28,259 log 22452 6196948992 Not Found: /favicon.ico
+WARNING 2025-08-20 01:10:28,259 basehttp 22452 6196948992 "GET /favicon.ico HTTP/1.1" 404 4096
+INFO 2025-08-20 01:10:50,847 basehttp 22452 6196948992 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4373
+INFO 2025-08-20 01:11:54,500 basehttp 22452 6196948992 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4366
+INFO 2025-08-20 01:14:12,310 basehttp 22452 16983814144 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4366
+INFO 2025-08-20 01:14:22,517 basehttp 22452 17574260736 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4366
+INFO 2025-08-20 01:14:35,900 basehttp 22452 17864814592 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 01:14:35,992 basehttp 22452 17864814592 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+ERROR 2025-08-20 01:15:59,991 exceptions 22452 21026467840 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 01:16:00,049 log 22452 21026467840 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 01:16:00,178 basehttp 22452 21026467840 "POST /api/v1/auth/register/ HTTP/1.1" 400 215
+INFO 2025-08-20 10:26:16,822 basehttp 22452 26488598528 "POST /api/v1/auth/register/ HTTP/1.1" 201 145
+ERROR 2025-08-20 10:31:21,492 exceptions 22452 31928659968 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 10:31:21,556 log 22452 31928659968 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 10:31:21,645 basehttp 22452 31928659968 "POST /api/v1/auth/register/ HTTP/1.1" 400 215
+INFO 2025-08-20 10:35:15,445 autoreload 25771 8544362688 Watching for file changes with StatReloader
+ERROR 2025-08-20 10:35:31,643 exceptions 25771 6163296256 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 10:35:31,646 log 25771 6163296256 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 10:35:31,646 basehttp 25771 6163296256 "POST /api/v1/auth/register/ HTTP/1.1" 400 245
+INFO 2025-08-20 10:35:51,123 basehttp 25771 6163296256 "POST /api/v1/auth/register/ HTTP/1.1" 201 140
+ERROR 2025-08-20 10:38:34,852 exceptions 25771 6163296256 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 10:38:34,852 log 25771 6163296256 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 10:38:34,853 basehttp 25771 6163296256 "POST /api/v1/auth/register/ HTTP/1.1" 400 245
+ERROR 2025-08-20 10:40:16,341 exceptions 25771 6163296256 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 10:40:16,341 log 25771 6163296256 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 10:40:16,341 basehttp 25771 6163296256 "POST /api/v1/auth/register/ HTTP/1.1" 400 117
+ERROR 2025-08-20 10:43:03,269 exceptions 25771 6163296256 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 10:43:03,270 log 25771 6163296256 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 10:43:03,270 basehttp 25771 6163296256 "POST /api/v1/auth/register/ HTTP/1.1" 400 117
+INFO 2025-08-20 10:53:32,298 basehttp 25771 32692580352 - Broken pipe from ('127.0.0.1', 62368)
+INFO 2025-08-20 10:53:32,350 basehttp 25771 32692580352 - Broken pipe from ('127.0.0.1', 62414)
+INFO 2025-08-20 10:53:32,422 basehttp 25771 32743059456 - Broken pipe from ('127.0.0.1', 62518)
+INFO 2025-08-20 10:53:32,449 basehttp 25771 32709406720 - Broken pipe from ('127.0.0.1', 62411)
+INFO 2025-08-20 10:53:32,480 basehttp 25771 32760934400 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 10:53:34,413 basehttp 25771 32675753984 - Broken pipe from ('127.0.0.1', 62366)
+INFO 2025-08-20 10:53:34,424 basehttp 25771 32694677504 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+INFO 2025-08-20 10:53:34,579 basehttp 25771 32694677504 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-20 10:53:34,597 basehttp 25771 32824897536 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-20 10:53:34,626 basehttp 25771 32694677504 "GET /static/admin/css/login.css HTTP/1.1" 304 0
+INFO 2025-08-20 10:53:34,652 basehttp 25771 32841723904 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-20 10:53:34,685 basehttp 25771 32824897536 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-20 10:53:34,731 basehttp 25771 32694677504 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-20 10:53:34,748 basehttp 25771 32841723904 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-20 10:54:12,233 autoreload 27159 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 11:06:10,908 autoreload 28100 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 11:06:45,628 basehttp 28100 6190886912 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 11:06:45,642 basehttp 28100 6190886912 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+WARNING 2025-08-20 11:06:45,698 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:06:45,698 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:06:49,074 basehttp 28100 6190886912 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+WARNING 2025-08-20 11:06:49,086 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:06:49,087 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:07:15,819 basehttp 28100 6190886912 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4364
+WARNING 2025-08-20 11:07:15,835 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:07:15,836 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:07:53,796 basehttp 28100 6190886912 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4364
+WARNING 2025-08-20 11:07:53,820 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:07:53,820 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:09:28,577 basehttp 28100 6190886912 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4371
+WARNING 2025-08-20 11:09:28,594 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:09:28,596 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:09:46,194 basehttp 28100 6190886912 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4371
+WARNING 2025-08-20 11:09:46,211 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:09:46,212 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:09:48,981 basehttp 28100 6190886912 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4371
+WARNING 2025-08-20 11:09:48,994 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:09:48,995 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:09:49,912 basehttp 28100 6190886912 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4371
+WARNING 2025-08-20 11:09:49,931 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:09:49,932 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:09:50,427 basehttp 28100 6190886912 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4371
+WARNING 2025-08-20 11:09:50,452 log 28100 6190886912 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+WARNING 2025-08-20 11:09:50,452 basehttp 28100 6190886912 "GET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1" 404 4207
+INFO 2025-08-20 11:10:00,243 basehttp 28100 6190886912 "POST /admin/login/?next=/admin/ HTTP/1.1" 200 4371
+INFO 2025-08-20 11:10:09,950 basehttp 28100 6190886912 "GET /admin HTTP/1.1" 301 0
+INFO 2025-08-20 11:10:09,951 basehttp 28100 6207713280 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 11:10:09,954 basehttp 28100 6207713280 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+ERROR 2025-08-20 11:16:35,510 log 28100 24127762432 Internal Server Error: /api/v1/auth/register/
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: UNIQUE constraint failed: users.username
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/decorators/csrf.py", line 56, in wrapper_view
+    return view_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/views/generic/base.py", line 105, in view
+    return self.dispatch(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/generics.py", line 194, in post
+    return self.create(request, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py", line 42, in create
+    user = serializer.save()
+           ^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/rest_framework/serializers.py", line 210, in save
+    self.instance = self.create(validated_data)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/serializers.py", line 50, in create
+    user = User.objects.create_user(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/managers.py", line 26, in create_user
+    user.save(using=self._db)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/models.py", line 168, in save
+    super().save(*args, **kwargs)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/contrib/auth/base_user.py", line 76, in save
+    super().save(*args, **kwargs)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/base.py", line 814, in save
+    self.save_base(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/base.py", line 877, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/base.py", line 1020, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/base.py", line 1061, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/query.py", line 1805, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/models/sql/compiler.py", line 1822, in execute_sql
+    cursor.execute(sql, params)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/backends/utils.py", line 102, in execute
+    return super().execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/backends/utils.py", line 67, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/backends/utils.py", line 80, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/backends/utils.py", line 84, in _execute
+    with self.db.wrap_database_errors:
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/backends/utils.py", line 89, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/db/backends/sqlite3/base.py", line 328, in execute
+    return super().execute(query, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: UNIQUE constraint failed: users.username
+ERROR 2025-08-20 11:16:35,633 basehttp 28100 24127762432 "POST /api/v1/auth/register/ HTTP/1.1" 500 237843
+ERROR 2025-08-20 11:20:57,267 exceptions 28100 32470331392 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 11:20:57,307 log 28100 32470331392 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 11:20:57,345 basehttp 28100 32470331392 "POST /api/v1/auth/register/ HTTP/1.1" 400 117
+INFO 2025-08-20 11:23:29,855 basehttp 28100 32550072320 "POST /api/v1/auth/register/ HTTP/1.1" 201 153
+INFO 2025-08-20 11:30:12,207 basehttp 28100 37538197504 - Broken pipe from ('127.0.0.1', 55651)
+INFO 2025-08-20 11:30:12,218 basehttp 28100 37555023872 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 11:30:12,348 basehttp 28100 37555023872 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+ERROR 2025-08-20 11:30:22,786 exceptions 28100 38015397888 API Error: Validation error - Status: 400 - Path: /api/v1/auth/register/
+WARNING 2025-08-20 11:30:22,824 log 28100 38015397888 Bad Request: /api/v1/auth/register/
+WARNING 2025-08-20 11:30:22,868 basehttp 28100 38015397888 "POST /api/v1/auth/register/ HTTP/1.1" 400 117
+INFO 2025-08-20 11:36:34,815 autoreload 30628 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 11:37:55,299 basehttp 30628 6173175808 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 11:37:56,428 basehttp 30628 6173175808 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+INFO 2025-08-20 11:44:20,688 autoreload 31787 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 11:45:34,956 basehttp 31787 6192771072 "GET /admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 11:45:34,981 basehttp 31787 6192771072 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4184
+INFO 2025-08-20 11:45:58,084 basehttp 31787 6192771072 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2025-08-20 11:45:58,216 basehttp 31787 6192771072 "GET /admin/ HTTP/1.1" 200 43685
+INFO 2025-08-20 11:45:58,237 basehttp 31787 6192771072 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2025-08-20 11:45:58,243 basehttp 31787 6209597440 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2025-08-20 11:45:58,243 basehttp 31787 6192771072 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+INFO 2025-08-20 11:45:58,243 basehttp 31787 6226423808 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+INFO 2025-08-20 11:46:18,699 basehttp 31787 6226423808 "GET /admin/users/user/ HTTP/1.1" 200 47457
+INFO 2025-08-20 11:46:18,710 basehttp 31787 6226423808 "GET /static/admin/css/changelists.css HTTP/1.1" 200 6566
+INFO 2025-08-20 11:46:18,716 basehttp 31787 6243250176 "GET /static/admin/js/core.js HTTP/1.1" 200 5682
+INFO 2025-08-20 11:46:18,717 basehttp 31787 6209597440 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2025-08-20 11:46:18,718 basehttp 31787 6260076544 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 8943
+INFO 2025-08-20 11:46:18,720 basehttp 31787 6276902912 "GET /static/admin/js/actions.js HTTP/1.1" 200 7872
+INFO 2025-08-20 11:46:18,722 basehttp 31787 6243250176 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2025-08-20 11:46:18,724 basehttp 31787 6209597440 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2025-08-20 11:46:18,725 basehttp 31787 6276902912 "GET /static/admin/img/search.svg HTTP/1.1" 200 458
+INFO 2025-08-20 11:46:18,727 basehttp 31787 6243250176 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+INFO 2025-08-20 11:46:18,727 basehttp 31787 6226423808 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 11:46:18,729 basehttp 31787 6276902912 "GET /static/admin/img/icon-no.svg HTTP/1.1" 200 560
+INFO 2025-08-20 11:46:18,730 basehttp 31787 6260076544 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 232381
+INFO 2025-08-20 11:46:18,731 basehttp 31787 6192771072 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 292458
+INFO 2025-08-20 11:46:18,732 basehttp 31787 6192771072 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2025-08-20 11:46:18,743 basehttp 31787 6260076544 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+INFO 2025-08-20 11:46:18,743 basehttp 31787 6192771072 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+INFO 2025-08-20 11:46:37,121 basehttp 31787 6260076544 "POST /admin/users/user/ HTTP/1.1" 200 35582
+INFO 2025-08-20 11:46:37,134 basehttp 31787 6260076544 "GET /static/admin/js/cancel.js HTTP/1.1" 200 884
+INFO 2025-08-20 11:46:39,076 basehttp 31787 6260076544 "POST /admin/users/user/ HTTP/1.1" 302 0
+INFO 2025-08-20 11:46:39,094 basehttp 31787 6260076544 "GET /admin/users/user/ HTTP/1.1" 200 46863
+INFO 2025-08-20 11:46:39,107 basehttp 31787 6260076544 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 11:47:26,172 basehttp 31787 6260076544 "GET /admin/braiders/braider/ HTTP/1.1" 200 38885
+INFO 2025-08-20 11:47:26,185 basehttp 31787 6260076544 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 11:47:37,657 basehttp 31787 6260076544 "GET /admin/users/user/ HTTP/1.1" 200 46722
+INFO 2025-08-20 11:47:37,671 basehttp 31787 6260076544 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 11:48:24,300 basehttp 31787 6293729280 "OPTIONS /api/v1/auth/register/ HTTP/1.1" 200 0
+INFO 2025-08-20 11:48:24,421 basehttp 31787 6293729280 "POST /api/v1/auth/register/ HTTP/1.1" 201 151
+INFO 2025-08-20 11:48:50,338 basehttp 31787 6260076544 "GET /admin/users/user/ HTTP/1.1" 200 47428
+INFO 2025-08-20 11:48:50,350 basehttp 31787 6260076544 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 11:53:02,793 autoreload 31787 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/core/settings.py changed, reloading.
+INFO 2025-08-20 11:53:04,502 autoreload 32311 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 11:53:14,321 autoreload 32382 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 11:55:34,717 basehttp 32382 6136672256 "POST /admin/users/user/ HTTP/1.1" 200 35711
+INFO 2025-08-20 11:55:36,830 basehttp 32382 6136672256 "POST /admin/users/user/ HTTP/1.1" 302 0
+INFO 2025-08-20 11:55:36,855 basehttp 32382 6136672256 "GET /admin/users/user/ HTTP/1.1" 200 46863
+INFO 2025-08-20 11:55:36,868 basehttp 32382 6136672256 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 11:56:11,432 basehttp 32382 6170324992 "POST /api/v1/auth/register/ HTTP/1.1" 201 151
+INFO 2025-08-20 11:56:44,505 basehttp 32382 6170324992 "OPTIONS /api/v1/auth/verify-email/ HTTP/1.1" 200 0
+INFO 2025-08-20 11:56:44,519 basehttp 32382 6170324992 "POST /api/v1/auth/verify-email/ HTTP/1.1" 200 789
+INFO 2025-08-20 11:57:13,854 basehttp 32382 6170324992 "OPTIONS /api/v1/auth/logout/ HTTP/1.1" 200 0
+WARNING 2025-08-20 11:57:13,863 log 32382 6170324992 Not Found: /api/v1/auth/logout/
+WARNING 2025-08-20 11:57:13,863 basehttp 32382 6170324992 "POST /api/v1/auth/logout/ HTTP/1.1" 404 17817
+INFO 2025-08-20 11:57:25,333 basehttp 32382 6136672256 "GET /admin/users/user/ HTTP/1.1" 200 47428
+INFO 2025-08-20 11:57:25,344 basehttp 32382 6136672256 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 12:02:30,756 autoreload 32382 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/email_service.py changed, reloading.
+INFO 2025-08-20 12:02:32,353 autoreload 33171 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 12:02:45,240 autoreload 33171 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/email_service.py changed, reloading.
+INFO 2025-08-20 12:02:46,803 autoreload 33209 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 12:02:56,528 autoreload 33209 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/email_service.py changed, reloading.
+INFO 2025-08-20 12:02:58,040 autoreload 33250 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 12:03:30,474 autoreload 33250 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 12:03:32,093 autoreload 33358 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 12:07:12,971 autoreload 33358 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/email_service.py changed, reloading.
+INFO 2025-08-20 12:07:14,608 autoreload 34032 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 12:07:22,282 autoreload 34032 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/email_service.py changed, reloading.
+INFO 2025-08-20 12:07:23,810 autoreload 34084 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 12:07:31,412 autoreload 34084 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 12:07:33,018 autoreload 34124 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 12:09:30,736 basehttp 34124 6137655296 "POST /admin/users/user/ HTTP/1.1" 200 35711
+INFO 2025-08-20 12:09:30,751 basehttp 34124 6154481664 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-20 12:09:30,751 basehttp 34124 6137655296 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-20 12:09:30,751 basehttp 34124 6171308032 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-20 12:09:30,752 basehttp 34124 6188134400 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-20 12:09:30,754 basehttp 34124 6188134400 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-20 12:09:30,759 basehttp 34124 6188134400 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-20 12:09:32,313 basehttp 34124 6188134400 "POST /admin/users/user/ HTTP/1.1" 302 0
+INFO 2025-08-20 12:09:32,337 basehttp 34124 6188134400 "GET /admin/users/user/ HTTP/1.1" 200 46863
+INFO 2025-08-20 12:09:32,351 basehttp 34124 6188134400 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 12:10:02,416 basehttp 34124 6204960768 "POST /api/v1/auth/register/ HTTP/1.1" 201 151
+INFO 2025-08-20 12:10:49,014 basehttp 34124 6204960768 "POST /api/v1/auth/verify-email/ HTTP/1.1" 200 811
+INFO 2025-08-20 12:16:25,397 basehttp 34124 6137655296 "OPTIONS /api/v1/auth/me/ HTTP/1.1" 200 0
+WARNING 2025-08-20 12:16:25,419 log 34124 6137655296 Not Found: /api/v1/auth/me/
+WARNING 2025-08-20 12:16:25,419 basehttp 34124 6137655296 "GET /api/v1/auth/me/ HTTP/1.1" 404 17804
+WARNING 2025-08-20 12:16:25,473 log 34124 6137655296 Not Found: /api/v1/auth/logout/
+WARNING 2025-08-20 12:16:25,473 basehttp 34124 6137655296 "POST /api/v1/auth/logout/ HTTP/1.1" 404 17817
+INFO 2025-08-20 12:16:57,200 autoreload 34124 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 12:16:58,971 autoreload 35051 8544362688 Watching for file changes with StatReloader

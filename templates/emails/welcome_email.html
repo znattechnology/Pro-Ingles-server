@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo(a) ao Tuwi!</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2f3e46;
+            background-color: #f8faf9;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(52, 79, 111, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #52796f 0%, #84a98c 50%, #0ea5e9 100%);
+            padding: 50px 30px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: sparkle 8s linear infinite;
+        }
+        
+        @keyframes sparkle {
+            0% { transform: rotate(0deg) translate(0, 0); }
+            100% { transform: rotate(360deg) translate(10px, 10px); }
+        }
+        
+        .welcome-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .brand-name {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+            letter-spacing: 1.5px;
+            color: #7dd3fc;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header-title {
+            position: relative;
+            z-index: 1;
+            font-size: 28px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .header-subtitle {
+            position: relative;
+            z-index: 1;
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .content {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2f3e46;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .welcome-message {
+            font-size: 16px;
+            color: #52796f;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            text-align: center;
+        }
+        
+        .features-section {
+            background: linear-gradient(135deg, #f0f4f1 0%, #f0f9ff 100%);
+            border-radius: 16px;
+            padding: 35px 25px;
+            margin: 30px 0;
+        }
+        
+        .features-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2f3e46;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .features-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .feature-item {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(52, 79, 111, 0.08);
+            border-left: 4px solid #84a98c;
+        }
+        
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2f3e46;
+            margin-bottom: 8px;
+        }
+        
+        .feature-description {
+            font-size: 14px;
+            color: #52796f;
+            line-height: 1.5;
+        }
+        
+        .cta-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            border-radius: 16px;
+        }
+        
+        .cta-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2f3e46;
+            margin-bottom: 15px;
+        }
+        
+        .cta-description {
+            font-size: 14px;
+            color: #52796f;
+            margin-bottom: 25px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #0ea5e9 0%, #52796f 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            margin: 5px 10px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+        }
+        
+        .cta-button.secondary {
+            background: linear-gradient(135deg, #84a98c 0%, #52796f 100%);
+            box-shadow: 0 4px 15px rgba(132, 169, 140, 0.3);
+        }
+        
+        .tips-section {
+            background-color: #f0f4f1;
+            padding: 30px;
+            border-radius: 12px;
+            margin: 30px 0;
+            border: 1px solid #c8d6cc;
+        }
+        
+        .tips-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2f3e46;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .tips-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tips-list li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: #52796f;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .tips-list li::before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+            top: 8px;
+        }
+        
+        .social-proof {
+            background: linear-gradient(135deg, #fff 0%, #f0f9ff 100%);
+            padding: 25px;
+            border-radius: 12px;
+            margin: 30px 0;
+            text-align: center;
+            border: 1px solid #bae6fd;
+        }
+        
+        .social-proof-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2f3e46;
+            margin-bottom: 10px;
+        }
+        
+        .social-proof-text {
+            font-size: 14px;
+            color: #52796f;
+            margin-bottom: 15px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        
+        .stat {
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0ea5e9;
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #52796f;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .footer {
+            background-color: #2f3e46;
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+        
+        .footer-brand {
+            font-size: 24px;
+            font-weight: 700;
+            color: #7dd3fc;
+            margin-bottom: 15px;
+        }
+        
+        .footer-message {
+            font-size: 16px;
+            color: #c8d6cc;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .contact-info {
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #354f52;
+            border-radius: 12px;
+        }
+        
+        .contact-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #84a98c;
+        }
+        
+        .contact-item {
+            font-size: 14px;
+            color: #c8d6cc;
+            margin: 5px 0;
+        }
+        
+        .social-links {
+            margin: 25px 0;
+        }
+        
+        .social-link {
+            display: inline-block;
+            margin: 0 15px;
+            color: #84a98c;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        
+        .social-link:hover {
+            color: #7dd3fc;
+        }
+        
+        .copyright {
+            font-size: 12px;
+            color: #a8bfad;
+            border-top: 1px solid #52796f;
+            padding-top: 25px;
+            margin-top: 25px;
+        }
+        
+        .unsubscribe {
+            font-size: 11px;
+            color: #84a98c;
+            margin-top: 15px;
+        }
+        
+        .unsubscribe a {
+            color: #84a98c;
+            text-decoration: none;
+        }
+        
+        @media only screen and (max-width: 600px) {
+            .email-container { margin: 10px; }
+            .header { padding: 40px 20px; }
+            .content { padding: 30px 20px; }
+            .footer { padding: 30px 20px; }
+            .stats { flex-direction: column; gap: 15px; }
+            .cta-button { display: block; margin: 10px 0; }
+            .brand-name { font-size: 24px; }
+            .greeting { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="welcome-icon">🎉</div>
+            <h1 class="brand-name">TUWI</h1>
+            <h2 class="header-title">Bem-vindo(a) à nossa família!</h2>
+            <p class="header-subtitle">Sua conta foi ativada com sucesso</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="content">
+            <div class="greeting">Olá {{ user_name }}! 👋</div>
+            
+            <div class="welcome-message">
+                É com imenso prazer que te damos as boas-vindas ao <strong>Tuwi</strong>! 
+                Sua jornada no mundo das tranças mais belas começa agora. ✨
+            </div>
+            
+            <!-- Features Section -->
+            <div class="features-section">
+                <h3 class="features-title">🌟 O que você pode fazer agora:</h3>
+                
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <span class="feature-icon">👩‍🦱</span>
+                        <div class="feature-title">Encontre Profissionais</div>
+                        <div class="feature-description">
+                            Descubra as melhores trancistas da sua região com avaliações reais
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <span class="feature-icon">📅</span>
+                        <div class="feature-title">Agende Facilmente</div>
+                        <div class="feature-description">
+                            Marque seus horários de forma rápida e prática, direto pelo app
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <span class="feature-icon">💬</span>
+                        <div class="feature-title">Chat Direto</div>
+                        <div class="feature-description">
+                            Converse diretamente com as profissionais para tirar suas dúvidas
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <span class="feature-icon">⭐</span>
+                        <div class="feature-title">Avalie & Compartilhe</div>
+                        <div class="feature-description">
+                            Compartilhe sua experiência e ajude outras pessoas a encontrar o melhor
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CTA Section -->
+            <div class="cta-section">
+                <h3 class="cta-title">Pronto para começar?</h3>
+                <p class="cta-description">
+                    Explore nossa plataforma e encontre a profissional perfeita para você!
+                </p>
+                <a href="{{ platform_url }}" class="cta-button">
+                    🚀 Explorar Profissionais
+                </a>
+                <a href="{{ profile_url }}" class="cta-button secondary">
+                    👤 Completar Perfil
+                </a>
+            </div>
+            
+            <!-- Tips Section -->
+            <div class="tips-section">
+                <h3 class="tips-title">💡 Dicas para começar bem:</h3>
+                <ul class="tips-list">
+                    <li>Complete seu perfil com foto e informações pessoais</li>
+                    <li>Navegue pelos portfólios das profissionais</li>
+                    <li>Leia as avaliações de outros clientes</li>
+                    <li>Use o chat para esclarecer dúvidas antes de agendar</li>
+                    <li>Não esqueça de avaliar após o serviço!</li>
+                </ul>
+            </div>
+            
+            <!-- Social Proof -->
+            <div class="social-proof">
+                <h3 class="social-proof-title">Você fez a escolha certa! 🎯</h3>
+                <p class="social-proof-text">
+                    Junte-se a milhares de pessoas que já transformaram seu visual conosco
+                </p>
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-number">5000+</span>
+                        <span class="stat-label">Clientes Felizes</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">300+</span>
+                        <span class="stat-label">Profissionais</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">4.9⭐</span>
+                        <span class="stat-label">Avaliação</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-brand">TUWI</div>
+            <div class="footer-message">
+                Conectando você com as melhores profissionais de tranças.<br>
+                Beleza, estilo e tradição em suas mãos. 💫
+            </div>
+            
+            <div class="contact-info">
+                <div class="contact-title">📞 Precisa de ajuda?</div>
+                <div class="contact-item">📧 Email: contact@tuwi.pt</div>
+                <div class="contact-item">💬 WhatsApp: (11) 99999-9999</div>
+                <div class="contact-item">🕒 Seg-Sex: 8h às 18h | Sáb: 8h às 14h</div>
+            </div>
+            
+            <div class="social-links">
+                <a href="#" class="social-link">📱 Instagram</a>
+                <a href="#" class="social-link">📘 Facebook</a>
+                <a href="#" class="social-link">💬 WhatsApp</a>
+                <a href="#" class="social-link">🎵 TikTok</a>
+            </div>
+            
+            <div class="copyright">
+                © {{ current_year }} Tuwi. Todos os direitos reservados.<br>
+                Este email foi enviado para {{ user_email }}
+            </div>
+            
+            <div class="unsubscribe">
+                Se você não deseja mais receber esses emails, 
+                <a href="#">clique aqui para cancelar</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
