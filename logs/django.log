@@ -806,3 +806,64 @@ WARNING 2025-08-20 12:16:25,473 log 34124 6137655296 Not Found: /api/v1/auth/log
 WARNING 2025-08-20 12:16:25,473 basehttp 34124 6137655296 "POST /api/v1/auth/logout/ HTTP/1.1" 404 17817
 INFO 2025-08-20 12:16:57,200 autoreload 34124 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
 INFO 2025-08-20 12:16:58,971 autoreload 35051 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 15:14:54,674 autoreload 35051 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 15:14:56,568 autoreload 44687 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 15:15:04,614 autoreload 44687 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/urls.py changed, reloading.
+INFO 2025-08-20 15:15:06,061 autoreload 44748 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 15:17:18,956 basehttp 44748 6167834624 "OPTIONS /api/v1/auth/login/ HTTP/1.1" 200 0
+ERROR 2025-08-20 15:17:19,081 exceptions 44748 6167834624 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 15:17:19,082 log 44748 6167834624 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 15:17:19,083 basehttp 44748 6167834624 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+INFO 2025-08-20 15:17:37,390 basehttp 44748 6167834624 "POST /api/v1/auth/login/ HTTP/1.1" 200 960
+INFO 2025-08-20 15:17:54,389 basehttp 44748 6167834624 "POST /api/v1/auth/logout/ HTTP/1.1" 200 43
+ERROR 2025-08-20 15:19:51,998 exceptions 44748 6167834624 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 15:19:52,000 log 44748 6167834624 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 15:19:52,000 basehttp 44748 6167834624 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+ERROR 2025-08-20 15:20:00,645 exceptions 44748 6167834624 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 15:20:00,646 log 44748 6167834624 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 15:20:00,646 basehttp 44748 6167834624 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+ERROR 2025-08-20 15:20:12,179 exceptions 44748 6167834624 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 15:20:12,181 log 44748 6167834624 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 15:20:12,181 basehttp 44748 6167834624 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+ERROR 2025-08-20 15:21:34,096 exceptions 44748 6167834624 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 15:21:34,098 log 44748 6167834624 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 15:21:34,098 basehttp 44748 6167834624 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+INFO 2025-08-20 15:32:33,311 basehttp 44748 6167834624 "GET /admin/users/user/ HTTP/1.1" 200 47457
+INFO 2025-08-20 15:32:33,331 basehttp 44748 6184660992 "GET /static/admin/css/base.css HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,331 basehttp 44748 6235140096 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,332 basehttp 44748 6201487360 "GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,332 basehttp 44748 6218313728 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,334 basehttp 44748 6251966464 "GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,334 basehttp 44748 6235140096 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,335 basehttp 44748 6184660992 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,336 basehttp 44748 6201487360 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,336 basehttp 44748 6218313728 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,336 basehttp 44748 6251966464 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,337 basehttp 44748 6235140096 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,338 basehttp 44748 6167834624 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 15:32:33,339 basehttp 44748 6184660992 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,339 basehttp 44748 6201487360 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,339 basehttp 44748 6251966464 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,340 basehttp 44748 6235140096 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,347 basehttp 44748 6251966464 "GET /static/admin/js/theme.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,348 basehttp 44748 6235140096 "GET /static/admin/img/icon-no.svg HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,351 basehttp 44748 6235140096 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,351 basehttp 44748 6251966464 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,353 basehttp 44748 6251966464 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,354 basehttp 44748 6235140096 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+INFO 2025-08-20 15:32:33,354 basehttp 44748 6251966464 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+INFO 2025-08-20 15:36:01,266 autoreload 44748 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 15:36:03,110 autoreload 46745 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 15:36:32,551 autoreload 46745 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/email_service.py changed, reloading.
+INFO 2025-08-20 15:36:34,208 autoreload 46813 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 15:38:38,279 autoreload 46813 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 15:38:40,127 autoreload 47105 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 15:43:43,635 basehttp 47105 6161969152 "POST /api/v1/auth/password-reset/ HTTP/1.1" 200 114
+INFO 2025-08-20 15:44:21,225 basehttp 47105 6161969152 "POST /api/v1/auth/verify-email/ HTTP/1.1" 200 811
+WARNING 2025-08-20 15:45:14,252 log 47105 6161969152 Bad Request: /api/v1/auth/password-reset-confirm/
+WARNING 2025-08-20 15:45:14,252 basehttp 47105 6161969152 "POST /api/v1/auth/password-reset-confirm/ HTTP/1.1" 400 48
+INFO 2025-08-20 15:46:50,526 autoreload 47105 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 15:46:52,307 autoreload 48028 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 15:47:50,174 basehttp 48028 6127104000 "POST /api/v1/auth/password-reset/ HTTP/1.1" 200 114
+INFO 2025-08-20 15:48:40,406 basehttp 48028 6127104000 "POST /api/v1/auth/password-reset-confirm/ HTTP/1.1" 200 41
+INFO 2025-08-20 15:49:14,085 basehttp 48028 6127104000 "POST /api/v1/auth/login/ HTTP/1.1" 200 960

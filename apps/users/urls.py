@@ -13,6 +13,7 @@ urlpatterns = [
     # Authentication
     path('register/', views.UserRegistrationView.as_view(), name='register'),
     path('login/', views.CustomTokenObtainPairView.as_view(), name='login'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
     path('refresh-token/', TokenRefreshView.as_view(), name='refresh_token'),
     
     # Profile management

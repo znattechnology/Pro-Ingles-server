@@ -271,3 +271,50 @@ class EmailVerificationService:
         except Exception as e:
             print(f"Error sending welcome email: {e}")
             return False
+    
+    @staticmethod
+    def send_password_reset_email(verification):
+        """
+        Send password reset email with 6-digit code.
+        
+        Args:
+            verification: EmailVerification instance
+            
+        Returns:
+            bool: True if email sent successfully
+        """
+        try:
+            subject = 'Redefinir Senha - Tuwi'
+            
+            # Create email context
+            context = {
+                'user_name': verification.user.name,
+                'user_email': verification.email,
+                'verification_code': verification.code,
+                'verification_url': f"{settings.FRONTEND_URL}/reset-password/verify?email={verification.email}",
+                'current_year': timezone.now().year,
+                'frontend_url': settings.FRONTEND_URL,
+            }
+            
+            # Render HTML template (reuse verification template for now)
+            html_message = render_to_string('emails/password_reset.html', context)
+            # Create plain text version
+            text_message = strip_tags(html_message)
+            
+            # Create email message
+            msg = EmailMultiAlternatives(
+                subject=subject,
+                body=text_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[verification.email],
+            )
+            msg.attach_alternative(html_message, "text/html")
+            
+            # Send email
+            msg.send()
+            
+            return True
+            
+        except Exception as e:
+            print(f"Error sending password reset email: {e}")
+            return False

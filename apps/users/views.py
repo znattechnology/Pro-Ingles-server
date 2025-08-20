@@ -153,7 +153,7 @@ class NotificationSettingsView(generics.RetrieveUpdateAPIView):
 
 class PasswordResetRequestView(generics.GenericAPIView):
     """
-    View for password reset request.
+    View for password reset request - now using 6-digit codes like email verification.
     """
     serializer_class = PasswordResetRequestSerializer
     permission_classes = [permissions.AllowAny]
@@ -168,80 +168,103 @@ class PasswordResetRequestView(generics.GenericAPIView):
                 is_active=True
             )
             
-            # Generate password reset token
-            user.reset_password_token = secrets.token_urlsafe(32)
-            user.reset_password_expires = timezone.now() + timedelta(hours=24)
-            user.save()
+            # Create password reset code using EmailVerificationService
+            from .models import EmailVerification
             
-            # Send password reset email
-            self.send_password_reset_email(user)
+            # Invalidate any existing password reset codes for this user
+            EmailVerification.objects.filter(
+                user=user,
+                email=user.email,
+                is_used=False,
+                code__isnull=False
+            ).update(is_used=True)
+            
+            # Generate new 6-digit code
+            code = EmailVerificationService.generate_verification_code()
+            expires_at = timezone.now() + timedelta(minutes=30)  # 30 minutes expiry
+            
+            # Create verification record for password reset
+            verification = EmailVerification.objects.create(
+                user=user,
+                code=code,
+                email=user.email,
+                expires_at=expires_at
+            )
+            
+            # Send password reset email with code
+            EmailVerificationService.send_password_reset_email(verification)
             
         except User.DoesNotExist:
             pass  # Don't reveal if email exists
         
         return Response({
-            'message': 'If your email is registered, you will receive password reset instructions.'
+            'message': 'Se o email estiver cadastrado, você receberá um código de verificação para redefinir sua senha.'
         })
-    
-    def send_password_reset_email(self, user):
-        """
-        Send password reset email.
-        """
-        reset_url = f"{settings.FRONTEND_URL}/reset-password/{user.reset_password_token}/"
-        
-        subject = 'Reset your Tuwi password'
-        message = f"""
-        Hello {user.name},
-        
-        You requested to reset your password. Click the link below to create a new password:
-        {reset_url}
-        
-        This link will expire in 24 hours.
-        
-        If you didn't request this, please ignore this email.
-        """
-        
-        send_mail(
-            subject,
-            message,
-            settings.DEFAULT_FROM_EMAIL,
-            [user.email],
-            fail_silently=False,
-        )
 
 
 class PasswordResetConfirmView(generics.GenericAPIView):
     """
-    View for password reset confirmation.
+    View for password reset confirmation using 6-digit code.
     """
-    serializer_class = PasswordResetConfirmSerializer
     permission_classes = [permissions.AllowAny]
     
     def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        email = request.data.get('email')
+        code = request.data.get('code')
+        new_password = request.data.get('newPassword')
         
+        if not email or not code or not new_password:
+            return Response({
+                'error': 'Email, código e nova senha são obrigatórios.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Verify the code manually without marking as used
         try:
-            user = User.objects.get(
-                reset_password_token=serializer.validated_data['token'],
-                reset_password_expires__gt=timezone.now(),
-                is_active=True
-            )
+            from .models import EmailVerification
+            
+            # Find the verification record
+            verification = EmailVerification.objects.filter(
+                email=email,
+                code=code,
+                is_used=False
+            ).order_by('-created_at').first()
+            
+            if not verification:
+                return Response({
+                    'error': 'Código inválido ou não encontrado'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Check if code is expired
+            if verification.is_expired():
+                return Response({
+                    'error': 'Código expirado. Solicite um novo código.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Check max attempts
+            if verification.attempts >= verification.max_attempts:
+                return Response({
+                    'error': 'Muitas tentativas. Solicite um novo código.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            user = verification.user
             
             # Reset password
-            user.set_password(serializer.validated_data['new_password'])
-            user.reset_password_token = ''
-            user.reset_password_expires = None
+            user.set_password(new_password)
             user.save()
             
+            # Mark the verification code as used
+            verification.is_used = True
+            verification.save()
+            
             return Response({
-                'message': 'Password reset successfully.'
+                'message': 'Senha alterada com sucesso.'
             })
             
-        except User.DoesNotExist:
+        except Exception as e:
+            print(f"Error in password reset confirm: {e}")
             return Response({
-                'error': 'Invalid or expired reset token.'
-            }, status=status.HTTP_400_BAD_REQUEST)
+                'error': 'Erro ao alterar a senha. Tente novamente.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class EmailVerificationView(generics.GenericAPIView):
@@ -390,3 +413,25 @@ class GoogleOAuthLoginView(generics.GenericAPIView):
             return Response({
                 'error': f'Authentication failed: {str(e)}'
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LogoutView(generics.GenericAPIView):
+    """
+    View for user logout - blacklists the refresh token.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh_token")
+            if refresh_token:
+                token = RefreshToken(refresh_token)
+                token.blacklist()
+            
+            return Response({
+                'message': 'Logout realizado com sucesso.'
+            })
+        except Exception as e:
+            return Response({
+                'message': 'Logout realizado com sucesso.'
+            })  # Always return success for logout

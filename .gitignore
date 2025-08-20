@@ -1,18 +1,26 @@
-# Ambiente virtual
-venv/
+# python cache
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Base de dados SQLite
+# ambiente virtual
+venv/
+.env/
+.venv/
+
+# IDEs e configs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# banco de dados local
 db.sqlite3
 
-# Arquivos temporários
-__pycache__/
-*.pyc
-*.pyo
+# logs
 *.log
 
-# Arquivos de ambiente
-.env
-
-# Diretórios de build/static
-staticfiles/
-logs/
+# static e media gerados
+/media
+/staticfiles
