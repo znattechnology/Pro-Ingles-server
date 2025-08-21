@@ -15,6 +15,7 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
+from django.db import models
 
 from .models import User, UserAddress, NotificationSettings, EmailVerification
 from .serializers import (
@@ -435,3 +436,376 @@ class LogoutView(generics.GenericAPIView):
             return Response({
                 'message': 'Logout realizado com sucesso.'
             })  # Always return success for logout
+
+
+class AdminUsersListView(generics.ListAPIView):
+    """
+    Admin view to list all users with pagination and filtering.
+    """
+    queryset = User.objects.all().order_by('-date_joined')
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        # Check if user is admin
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        # Get query parameters
+        page = int(request.query_params.get('page', 1))
+        limit = int(request.query_params.get('limit', 20))
+        search = request.query_params.get('search', '')
+        role = request.query_params.get('role', '')
+        status_filter = request.query_params.get('status', '')  # active, inactive, all
+        
+        # Base queryset
+        queryset = User.objects.all().order_by('-date_joined')
+        
+        # Apply filters
+        if search:
+            queryset = queryset.filter(
+                models.Q(name__icontains=search) |
+                models.Q(email__icontains=search) |
+                models.Q(phone__icontains=search)
+            )
+        
+        if role and role != 'all':
+            queryset = queryset.filter(role=role)
+        
+        if status_filter == 'active':
+            queryset = queryset.filter(is_active=True)
+        elif status_filter == 'inactive':
+            queryset = queryset.filter(is_active=False)
+        
+        # Calculate pagination
+        total = queryset.count()
+        start = (page - 1) * limit
+        end = start + limit
+        users_page = queryset[start:end]
+        
+        # Serialize users
+        users_data = []
+        for user in users_page:
+            users_data.append({
+                'id': str(user.id),
+                'name': user.name,
+                'email': user.email,
+                'phone': user.phone or '',
+                'role': user.role,
+                'is_active': user.is_active,
+                'email_verified': user.email_verified,
+                'date_joined': user.date_joined.isoformat(),
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'avatar': user.avatar.url if user.avatar else None,
+            })
+        
+        # Calculate stats for dashboard
+        stats = {
+            'total_users': total,
+            'active_users': queryset.filter(is_active=True).count(),
+            'customer_users': queryset.filter(role='customer').count(),
+            'braider_users': queryset.filter(role='braider').count(),
+            'admin_users': queryset.filter(role='admin').count(),
+            'verified_users': queryset.filter(email_verified=True).count(),
+        }
+        
+        return Response({
+            'users': users_data,
+            'pagination': {
+                'page': page,
+                'limit': limit,
+                'total': total,
+                'total_pages': (total + limit - 1) // limit,
+                'has_next': end < total,
+                'has_prev': page > 1
+            },
+            'stats': stats
+        })
+
+
+class AdminUserDetailView(generics.RetrieveAPIView):
+    """
+    Admin view to get user details by ID.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
+    
+    def get(self, request, *args, **kwargs):
+        # Check if user is admin
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            user = self.get_object()
+            
+            user_data = {
+                'id': str(user.id),
+                'name': user.name,
+                'email': user.email,
+                'phone': user.phone or '',
+                'role': user.role,
+                'is_active': user.is_active,
+                'email_verified': user.email_verified,
+                'date_joined': user.date_joined.isoformat(),
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'avatar': user.avatar.url if user.avatar else None,
+                'google_id': user.google_id if hasattr(user, 'google_id') else None,
+            }
+            
+            return Response({'user': user_data})
+            
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class AdminUserUpdateView(generics.UpdateAPIView):
+    """
+    Admin view to update user basic information.
+    """
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
+    
+    def patch(self, request, *args, **kwargs):
+        # Check if user is admin
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            user = self.get_object()
+            
+            # Get update data
+            name = request.data.get('name')
+            email = request.data.get('email')
+            phone = request.data.get('phone')
+            
+            # Validate required fields
+            if not name or not name.strip():
+                return Response({
+                    'error': 'Name is required.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            if not email or not email.strip():
+                return Response({
+                    'error': 'Email is required.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Check if email is already taken by another user
+            if email != user.email:
+                if User.objects.filter(email=email).exclude(id=user.id).exists():
+                    return Response({
+                        'error': 'This email is already registered by another user.'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Update user data
+            user.name = name.strip()
+            user.email = email.strip()
+            user.phone = phone.strip() if phone else None
+            user.save()
+            
+            # Return updated user data
+            user_data = {
+                'id': str(user.id),
+                'name': user.name,
+                'email': user.email,
+                'phone': user.phone or '',
+                'role': user.role,
+                'is_active': user.is_active,
+                'email_verified': user.email_verified,
+                'date_joined': user.date_joined.isoformat(),
+                'last_login': user.last_login.isoformat() if user.last_login else None,
+                'avatar': user.avatar.url if user.avatar else None,
+            }
+            
+            return Response({
+                'message': 'User updated successfully.',
+                'user': user_data
+            })
+            
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class AdminUserRoleUpdateView(generics.UpdateAPIView):
+    """
+    Admin view to update user role.
+    """
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
+    
+    def patch(self, request, *args, **kwargs):
+        # Check if user is admin
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            user = self.get_object()
+            new_role = request.data.get('role')
+            
+            # Validate role
+            valid_roles = ['customer', 'braider', 'admin']
+            if not new_role or new_role not in valid_roles:
+                return Response({
+                    'error': f'Invalid role. Must be one of: {", ".join(valid_roles)}'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Prevent admin from changing their own role
+            if user.id == request.user.id:
+                return Response({
+                    'error': 'You cannot change your own role.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Update role
+            old_role = user.role
+            user.role = new_role
+            user.save()
+            
+            return Response({
+                'message': f'User role updated from {old_role} to {new_role}.',
+                'user': {
+                    'id': str(user.id),
+                    'name': user.name,
+                    'email': user.email,
+                    'role': user.role,
+                    'is_active': user.is_active,
+                }
+            })
+            
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class AdminUserToggleStatusView(generics.UpdateAPIView):
+    """
+    Admin view to toggle user active status.
+    """
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
+    
+    def patch(self, request, *args, **kwargs):
+        # Check if user is admin
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            user = self.get_object()
+            
+            # Prevent admin from deactivating themselves
+            if user.id == request.user.id:
+                return Response({
+                    'error': 'You cannot deactivate your own account.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Toggle status
+            old_status = user.is_active
+            user.is_active = not user.is_active
+            user.save()
+            
+            action = 'activated' if user.is_active else 'deactivated'
+            
+            return Response({
+                'message': f'User {action} successfully.',
+                'user': {
+                    'id': str(user.id),
+                    'name': user.name,
+                    'email': user.email,
+                    'role': user.role,
+                    'is_active': user.is_active,
+                }
+            })
+            
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class AdminUserDeleteView(generics.DestroyAPIView):
+    """
+    Admin view to delete user with cascade handling.
+    """
+    queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = 'id'
+    
+    def delete(self, request, *args, **kwargs):
+        # Check if user is admin
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            user = self.get_object()
+            
+            # Prevent admin from deleting themselves
+            if user.id == request.user.id:
+                return Response({
+                    'error': 'You cannot delete your own account.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Store user info for response
+            user_info = {
+                'id': str(user.id),
+                'name': user.name,
+                'email': user.email,
+                'role': user.role,
+            }
+            
+            # Check for related braider profile
+            braider_info = None
+            try:
+                from apps.braiders.models import Braider
+                braider = Braider.objects.get(user_id=user.id)
+                braider_info = {
+                    'id': str(braider.id),
+                    'name': braider.name,
+                    'status': braider.status,
+                }
+            except Braider.DoesNotExist:
+                braider_info = None
+            except ImportError:
+                # Braiders app not available
+                braider_info = None
+            
+            # Delete user (should cascade to related objects)
+            user.delete()
+            
+            # Prepare cascade test result
+            cascade_result = {
+                'user_deleted': True,
+                'user_info': user_info,
+                'had_braider_profile': braider_info is not None,
+                'braider_info': braider_info,
+            }
+            
+            return Response({
+                'message': f'User {user_info["name"]} deleted successfully.',
+                'cascade_test': cascade_result
+            })
+            
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User not found.'
+            }, status=status.HTTP_404_NOT_FOUND)

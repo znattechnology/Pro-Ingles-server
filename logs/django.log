@@ -867,3 +867,1389 @@ INFO 2025-08-20 15:46:52,307 autoreload 48028 8544362688 Watching for file chang
 INFO 2025-08-20 15:47:50,174 basehttp 48028 6127104000 "POST /api/v1/auth/password-reset/ HTTP/1.1" 200 114
 INFO 2025-08-20 15:48:40,406 basehttp 48028 6127104000 "POST /api/v1/auth/password-reset-confirm/ HTTP/1.1" 200 41
 INFO 2025-08-20 15:49:14,085 basehttp 48028 6127104000 "POST /api/v1/auth/login/ HTTP/1.1" 200 960
+WARNING 2025-08-20 16:01:08,593 log 48028 6127104000 Bad Request: /api/v1/auth/oauth/google/url/
+WARNING 2025-08-20 16:01:08,595 basehttp 48028 6127104000 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 400 83
+INFO 2025-08-20 16:01:32,666 autoreload 50330 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 16:02:46,048 basehttp 50330 6134853632 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:03:07,787 basehttp 50330 6134853632 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+ERROR 2025-08-20 16:04:42,179 services 50330 6134853632 Error exchanging code for tokens: 400 Client Error: Bad Request for url: https://oauth2.googleapis.com/token
+WARNING 2025-08-20 16:04:42,180 log 50330 6134853632 Bad Request: /api/v1/auth/oauth/google/login/
+WARNING 2025-08-20 16:04:42,181 basehttp 50330 6134853632 "POST /api/v1/auth/oauth/google/login/ HTTP/1.1" 400 87
+WARNING 2025-08-20 16:05:56,970 log 50330 6134853632 Not Found: /api/v1/auth/me/
+WARNING 2025-08-20 16:05:56,971 basehttp 50330 6134853632 "GET /api/v1/auth/me/ HTTP/1.1" 404 17985
+INFO 2025-08-20 16:05:57,075 basehttp 50330 6134853632 "OPTIONS /api/v1/auth/logout/ HTTP/1.1" 200 0
+INFO 2025-08-20 16:05:57,111 basehttp 50330 6134853632 "POST /api/v1/auth/logout/ HTTP/1.1" 200 43
+INFO 2025-08-20 16:06:05,530 basehttp 50330 6134853632 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:07:52,687 basehttp 50330 6134853632 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:08:46,216 basehttp 50330 6134853632 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:08:53,669 basehttp 50330 6134853632 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:09:54,622 autoreload 51438 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 16:10:04,732 basehttp 51438 6192525312 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:10:19,643 basehttp 51438 6192525312 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:10:41,451 basehttp 51438 6192525312 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:11:03,112 basehttp 51438 6192525312 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:12:31,277 basehttp 51438 6192525312 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:21:06,329 basehttp 51438 6192525312 "POST /api/v1/auth/oauth/google/url/ HTTP/1.1" 200 441
+INFO 2025-08-20 16:22:01,476 basehttp 51438 6192525312 "GET /admin/users/user/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/change/ HTTP/1.1" 200 50181
+INFO 2025-08-20 16:22:01,497 basehttp 51438 6192525312 "GET /static/admin/css/forms.css HTTP/1.1" 200 9090
+INFO 2025-08-20 16:22:01,498 basehttp 51438 6243004416 "GET /static/admin/js/collapse.js HTTP/1.1" 200 1803
+INFO 2025-08-20 16:22:01,498 basehttp 51438 6226178048 "GET /static/admin/js/calendar.js HTTP/1.1" 200 8466
+INFO 2025-08-20 16:22:01,499 basehttp 51438 6276657152 "GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+INFO 2025-08-20 16:22:01,499 basehttp 51438 6259830784 "GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 200 19319
+INFO 2025-08-20 16:22:01,500 basehttp 51438 6192525312 "GET /static/admin/css/widgets.css HTTP/1.1" 200 11921
+INFO 2025-08-20 16:22:01,502 basehttp 51438 6192525312 "GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+INFO 2025-08-20 16:22:01,503 basehttp 51438 6209351680 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 16:22:17,892 basehttp 51438 6192525312 "POST /admin/users/user/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/change/ HTTP/1.1" 302 0
+INFO 2025-08-20 16:22:18,045 basehttp 51438 6192525312 "GET /admin/users/user/ HTTP/1.1" 200 47726
+INFO 2025-08-20 16:22:18,063 basehttp 51438 6192525312 "GET /admin/jsi18n/ HTTP/1.1" 200 7162
+INFO 2025-08-20 16:22:41,037 basehttp 51438 6192525312 "POST /api/v1/auth/login/ HTTP/1.1" 200 949
+INFO 2025-08-20 16:27:15,278 autoreload 51438 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 16:27:17,275 autoreload 52647 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 16:27:42,680 autoreload 52647 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 16:27:44,258 autoreload 52716 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 16:27:52,985 autoreload 52716 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/urls.py changed, reloading.
+INFO 2025-08-20 16:27:54,521 autoreload 52766 8544362688 Watching for file changes with StatReloader
+ERROR 2025-08-20 16:28:27,650 exceptions 52766 6162853888 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 16:28:27,650 log 52766 6162853888 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 16:28:27,651 basehttp 52766 6162853888 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+ERROR 2025-08-20 16:28:27,666 exceptions 52766 6162853888 API Error: Validation error - Status: 401 - Path: /api/v1/auth/admin/users/
+WARNING 2025-08-20 16:28:27,666 log 52766 6162853888 Unauthorized: /api/v1/auth/admin/users/
+WARNING 2025-08-20 16:28:27,666 basehttp 52766 6162853888 "GET /api/v1/auth/admin/users/ HTTP/1.1" 401 244
+INFO 2025-08-20 16:31:23,573 basehttp 52766 6162853888 "GET /api/v1/auth/admin/users/?page=1&limit=10&search=&role=&status= HTTP/1.1" 200 2771
+INFO 2025-08-20 16:31:40,095 basehttp 52766 6162853888 "GET /api/v1/auth/admin/users/?page=1&limit=10&search=&role=&status= HTTP/1.1" 200 2771
+INFO 2025-08-20 16:35:25,151 autoreload 52766 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 16:35:26,781 autoreload 54044 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 16:36:06,432 autoreload 54044 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/views.py changed, reloading.
+INFO 2025-08-20 16:36:07,985 autoreload 54138 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-20 16:36:18,725 autoreload 54138 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/users/urls.py changed, reloading.
+INFO 2025-08-20 16:36:20,269 autoreload 54194 8544362688 Watching for file changes with StatReloader
+ERROR 2025-08-20 16:36:42,211 exceptions 54194 6193213440 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 16:36:42,212 log 54194 6193213440 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 16:36:42,213 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+ERROR 2025-08-20 16:36:42,229 exceptions 54194 6193213440 API Error: Validation error - Status: 401 - Path: /api/v1/auth/admin/users/
+WARNING 2025-08-20 16:36:42,230 log 54194 6193213440 Unauthorized: /api/v1/auth/admin/users/
+WARNING 2025-08-20 16:36:42,230 basehttp 54194 6193213440 "GET /api/v1/auth/admin/users/ HTTP/1.1" 401 244
+ERROR 2025-08-20 16:37:01,229 exceptions 54194 6193213440 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-20 16:37:01,230 log 54194 6193213440 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-20 16:37:01,230 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+INFO 2025-08-20 16:37:43,180 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 200 887
+INFO 2025-08-20 16:37:43,197 basehttp 54194 6193213440 "GET /api/v1/auth/admin/users/?page=1&limit=5 HTTP/1.1" 200 1528
+INFO 2025-08-20 16:37:51,911 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 200 887
+INFO 2025-08-20 16:37:51,927 basehttp 54194 6193213440 "GET /api/v1/auth/admin/users/?page=1&limit=1 HTTP/1.1" 200 503
+INFO 2025-08-20 16:37:51,940 basehttp 54194 6193213440 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 16:38:00,827 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 200 887
+INFO 2025-08-20 16:38:00,841 basehttp 54194 6193213440 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2801
+INFO 2025-08-20 16:38:00,855 basehttp 54194 6193213440 "PATCH /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/role/ HTTP/1.1" 200 199
+INFO 2025-08-20 16:38:18,067 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 200 887
+INFO 2025-08-20 16:38:18,081 basehttp 54194 6193213440 "PATCH /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/status/ HTTP/1.1" 200 187
+INFO 2025-08-20 16:38:18,094 basehttp 54194 6193213440 "PATCH /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/status/ HTTP/1.1" 200 184
+INFO 2025-08-20 16:38:34,711 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 200 887
+INFO 2025-08-20 16:38:34,725 basehttp 54194 6193213440 "PATCH /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/update/ HTTP/1.1" 200 362
+INFO 2025-08-20 16:41:53,787 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 200 887
+INFO 2025-08-20 16:41:56,307 basehttp 54194 6193213440 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 16:42:04,063 basehttp 54194 6193213440 "POST /api/v1/auth/login/ HTTP/1.1" 200 887
+INFO 2025-08-20 16:42:06,314 basehttp 54194 6193213440 "PATCH /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/role/ HTTP/1.1" 200 219
+ERROR 2025-08-20 16:47:29,974 log 54194 6193213440 Internal Server Error: /api/v1/auth/profile/
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 118, in __call__
+    self.prepare(request)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 203, in prepare
+    logger.info("request_started", **log_kwargs)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 144, in meth
+    return self._proxy_to_logger(name, event, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_base.py", line 223, in _proxy_to_logger
+    return getattr(self._logger, method_name)(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_output.py", line 218, in msg
+    self._flush()
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/utils/deprecation.py", line 134, in __call__
+    response = response or self.get_response(request)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 57, in inner
+    response = response_for_exception(request, exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 140, in response_for_exception
+    signals.got_request_exception.send(sender=None, request=request)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/dispatch/dispatcher.py", line 176, in send
+    return [
+           ^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/dispatch/dispatcher.py", line 177, in <listcomp>
+    (receiver, receiver(signal=self, sender=sender, **named))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 253, in process_got_request_exception
+    self._process_exception(request, ex[1])
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 275, in _process_exception
+    logger.exception(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 46, in exception
+    return self.error(event, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 144, in meth
+    return self._proxy_to_logger(name, event, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_base.py", line 223, in _proxy_to_logger
+    return getattr(self._logger, method_name)(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_output.py", line 218, in msg
+    self._flush()
+BrokenPipeError: [Errno 32] Broken pipe
+ERROR 2025-08-20 16:47:29,976 basehttp 54194 6193213440 "GET /api/v1/auth/profile/ HTTP/1.1" 500 30436
+ERROR 2025-08-20 16:47:35,176 log 54194 6193213440 Internal Server Error: /api/v1/
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 118, in __call__
+    self.prepare(request)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 203, in prepare
+    logger.info("request_started", **log_kwargs)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 144, in meth
+    return self._proxy_to_logger(name, event, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_base.py", line 223, in _proxy_to_logger
+    return getattr(self._logger, method_name)(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_output.py", line 218, in msg
+    self._flush()
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/utils/deprecation.py", line 134, in __call__
+    response = response or self.get_response(request)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 57, in inner
+    response = response_for_exception(request, exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 140, in response_for_exception
+    signals.got_request_exception.send(sender=None, request=request)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/dispatch/dispatcher.py", line 176, in send
+    return [
+           ^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/dispatch/dispatcher.py", line 177, in <listcomp>
+    (receiver, receiver(signal=self, sender=sender, **named))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 253, in process_got_request_exception
+    self._process_exception(request, ex[1])
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 275, in _process_exception
+    logger.exception(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 46, in exception
+    return self.error(event, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 144, in meth
+    return self._proxy_to_logger(name, event, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_base.py", line 223, in _proxy_to_logger
+    return getattr(self._logger, method_name)(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_output.py", line 218, in msg
+    self._flush()
+BrokenPipeError: [Errno 32] Broken pipe
+ERROR 2025-08-20 16:47:35,177 basehttp 54194 6193213440 "HEAD /api/v1/ HTTP/1.1" 500 0
+INFO 2025-08-20 16:48:24,321 autoreload 58276 8544362688 Watching for file changes with StatReloader
+ERROR 2025-08-20 16:48:33,856 log 54194 6193213440 Internal Server Error: /api/v1/auth/register/
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 118, in __call__
+    self.prepare(request)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 203, in prepare
+    logger.info("request_started", **log_kwargs)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 144, in meth
+    return self._proxy_to_logger(name, event, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_base.py", line 223, in _proxy_to_logger
+    return getattr(self._logger, method_name)(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_output.py", line 218, in msg
+    self._flush()
+BrokenPipeError: [Errno 32] Broken pipe
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/utils/deprecation.py", line 134, in __call__
+    response = response or self.get_response(request)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 57, in inner
+    response = response_for_exception(request, exc)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/core/handlers/exception.py", line 140, in response_for_exception
+    signals.got_request_exception.send(sender=None, request=request)
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/dispatch/dispatcher.py", line 176, in send
+    return [
+           ^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django/dispatch/dispatcher.py", line 177, in <listcomp>
+    (receiver, receiver(signal=self, sender=sender, **named))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 253, in process_got_request_exception
+    self._process_exception(request, ex[1])
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/django_structlog/middlewares/request.py", line 275, in _process_exception
+    logger.exception(
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 46, in exception
+    return self.error(event, *args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_native.py", line 144, in meth
+    return self._proxy_to_logger(name, event, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_base.py", line 223, in _proxy_to_logger
+    return getattr(self._logger, method_name)(*args, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/venv/lib/python3.11/site-packages/structlog/_output.py", line 217, in msg
+    self._write(message + "\n")
+BrokenPipeError: [Errno 32] Broken pipe
+ERROR 2025-08-20 16:48:33,857 basehttp 54194 6193213440 "GET /api/v1/auth/register/ HTTP/1.1" 500 30473
+INFO 2025-08-20 16:48:54,047 autoreload 58368 8544362688 Watching for file changes with StatReloader
+WARNING 2025-08-20 16:49:02,569 log 58368 6130741248 Not Found: /api/v1/
+WARNING 2025-08-20 16:49:02,569 basehttp 58368 6130741248 "HEAD /api/v1/ HTTP/1.1" 404 0
+INFO 2025-08-20 16:49:08,651 basehttp 58368 6130741248 "HEAD /api/docs/ HTTP/1.1" 200 0
+WARNING 2025-08-20 16:49:13,313 log 58368 6130741248 Not Found: /api/v1/auth/users/
+WARNING 2025-08-20 16:49:13,314 basehttp 58368 6130741248 "HEAD /api/v1/auth/users/ HTTP/1.1" 404 0
+INFO 2025-08-20 16:50:59,019 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/me/ HTTP/1.1" 200 0
+WARNING 2025-08-20 16:50:59,030 log 58368 6130741248 Not Found: /api/v1/auth/me/
+WARNING 2025-08-20 16:50:59,031 basehttp 58368 6130741248 "GET /api/v1/auth/me/ HTTP/1.1" 404 19284
+INFO 2025-08-20 16:50:59,104 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/logout/ HTTP/1.1" 200 0
+INFO 2025-08-20 16:50:59,128 basehttp 58368 6130741248 "POST /api/v1/auth/logout/ HTTP/1.1" 200 43
+INFO 2025-08-20 16:51:18,887 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/login/ HTTP/1.1" 200 0
+INFO 2025-08-20 16:51:19,394 basehttp 58368 6130741248 "POST /api/v1/auth/login/ HTTP/1.1" 200 949
+INFO 2025-08-20 16:51:29,117 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/?page=1&limit=100&search=&role=&status= HTTP/1.1" 200 3115
+INFO 2025-08-20 16:51:29,118 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10&search=&role=&status= HTTP/1.1" 200 2836
+INFO 2025-08-20 16:51:29,142 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100&search=&role=&status= HTTP/1.1" 200 3115
+INFO 2025-08-20 16:51:29,146 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/?page=1&limit=10&search=&role=&status= HTTP/1.1" 200 2836
+WARNING 2025-08-20 16:51:43,109 log 58368 6130741248 Not Found: /api/v1/auth/me/
+WARNING 2025-08-20 16:51:43,111 basehttp 58368 6130741248 "GET /api/v1/auth/me/ HTTP/1.1" 404 19284
+INFO 2025-08-20 16:51:43,125 basehttp 58368 6130741248 "POST /api/v1/auth/logout/ HTTP/1.1" 200 43
+INFO 2025-08-20 16:55:21,464 basehttp 58368 6130741248 "OPTIONS /api/v1/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 0
+WARNING 2025-08-20 16:55:21,477 log 58368 6130741248 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:55:21,477 basehttp 58368 6130741248 "GET /api/v1/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 404 15206
+INFO 2025-08-20 16:55:21,490 basehttp 58368 6147567616 "OPTIONS /api/v1/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 0
+WARNING 2025-08-20 16:55:21,504 log 58368 6147567616 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:55:21,504 basehttp 58368 6147567616 "GET /api/v1/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 404 15207
+WARNING 2025-08-20 16:55:36,398 log 58368 6147567616 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:55:36,398 basehttp 58368 6147567616 "GET /api/v1/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 404 15206
+WARNING 2025-08-20 16:55:43,681 log 58368 6147567616 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:55:43,682 basehttp 58368 6147567616 "GET /api/v1/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 404 15206
+WARNING 2025-08-20 16:56:07,359 log 58368 6147567616 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:56:07,359 basehttp 58368 6147567616 "GET /api/v1/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 404 15206
+INFO 2025-08-20 16:56:52,744 basehttp 58368 6147567616 "POST /api/v1/auth/login/ HTTP/1.1" 200 949
+WARNING 2025-08-20 16:57:08,292 log 58368 6130741248 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:57:08,293 log 58368 6147567616 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:57:08,294 basehttp 58368 6130741248 "GET /api/v1/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 404 15207
+WARNING 2025-08-20 16:57:08,294 basehttp 58368 6147567616 "GET /api/v1/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 404 15206
+WARNING 2025-08-20 16:57:08,304 log 58368 6130741248 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:57:08,304 log 58368 6147567616 Not Found: /api/v1/v1/auth/admin/users/
+WARNING 2025-08-20 16:57:08,305 basehttp 58368 6130741248 "GET /api/v1/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 404 15206
+WARNING 2025-08-20 16:57:08,306 basehttp 58368 6147567616 "GET /api/v1/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 404 15207
+INFO 2025-08-20 16:58:38,845 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 0
+INFO 2025-08-20 16:58:38,851 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 16:59:05,500 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/profile/ HTTP/1.1" 200 0
+INFO 2025-08-20 16:59:05,513 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 16:59:05,514 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 16:59:05,769 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 0
+INFO 2025-08-20 16:59:05,780 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 16:59:10,080 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 16:59:10,081 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 16:59:10,312 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 16:59:37,927 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:03:41,559 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 0
+INFO 2025-08-20 17:03:41,577 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 17:03:41,582 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:03:44,893 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 17:03:45,069 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 17:04:35,321 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:04:35,324 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:04:35,405 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:04:43,004 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 17:04:43,004 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:04:54,023 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:04:54,026 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:04:54,135 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:07:31,087 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:07:31,088 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 17:07:33,279 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:07:33,279 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:07:33,291 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:07:33,291 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:09:29,486 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:09:29,493 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:09:29,589 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:09:46,141 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:09:46,142 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 17:09:55,337 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:09:55,341 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:09:55,434 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:09:57,915 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:09:57,918 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:09:58,005 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:09:59,645 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:09:59,648 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:09:59,742 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:10:07,671 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:10:15,508 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:10:15,508 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:10:15,522 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:10:15,522 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:10:20,934 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:10:20,934 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 17:10:34,630 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:10:34,631 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:10:34,645 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:10:34,645 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:11:20,611 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:11:20,611 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/ HTTP/1.1" 200 305
+INFO 2025-08-20 17:11:31,310 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/admin/users/undefined/status/ HTTP/1.1" 200 0
+WARNING 2025-08-20 17:11:31,316 log 58368 6147567616 Not Found: /api/v1/auth/admin/users/undefined/status/
+WARNING 2025-08-20 17:11:31,316 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/undefined/status/ HTTP/1.1" 404 19364
+INFO 2025-08-20 17:11:43,251 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:11:43,253 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:11:43,334 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:15:25,873 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:15:36,936 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:15:40,418 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:15:43,003 basehttp 58368 6147567616 "POST /api/v1/auth/logout/ HTTP/1.1" 200 43
+INFO 2025-08-20 17:16:09,200 basehttp 58368 6147567616 "POST /api/v1/auth/login/ HTTP/1.1" 200 949
+INFO 2025-08-20 17:16:16,994 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:16:16,997 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:16:17,013 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 17:16:17,013 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 17:16:26,683 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 0
+INFO 2025-08-20 17:16:26,695 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 17:16:26,695 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 17:16:33,878 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 200 0
+WARNING 2025-08-20 17:16:33,892 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 17:16:33,893 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+ERROR 2025-08-20 20:01:30,261 exceptions 58368 6130741248 API Error: As credenciais de autenticação não foram fornecidas. - Status: 401 - Path: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:01:30,262 log 58368 6130741248 Unauthorized: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:01:30,263 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=1 HTTP/1.1" 401 179
+ERROR 2025-08-20 20:03:15,765 exceptions 58368 6130741248 API Error: Validation error - Status: 401 - Path: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:03:15,766 log 58368 6130741248 Unauthorized: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:03:15,766 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=1 HTTP/1.1" 401 244
+INFO 2025-08-20 20:06:57,460 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/profile/ HTTP/1.1" 200 0
+INFO 2025-08-20 20:06:57,461 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 0
+ERROR 2025-08-20 20:06:57,469 exceptions 58368 6147567616 API Error: Validation error - Status: 401 - Path: /api/v1/auth/profile/
+ERROR 2025-08-20 20:06:57,475 exceptions 58368 6130741248 API Error: Validation error - Status: 401 - Path: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:06:57,476 log 58368 6147567616 Unauthorized: /api/v1/auth/profile/
+WARNING 2025-08-20 20:06:57,479 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 401 244
+WARNING 2025-08-20 20:06:57,478 log 58368 6130741248 Unauthorized: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:06:57,481 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 401 244
+INFO 2025-08-20 20:06:57,497 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/refresh/ HTTP/1.1" 200 0
+INFO 2025-08-20 20:06:57,500 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/refresh/ HTTP/1.1" 200 0
+WARNING 2025-08-20 20:06:57,515 log 58368 6147567616 Not Found: /api/v1/auth/refresh/
+WARNING 2025-08-20 20:06:57,522 basehttp 58368 6147567616 "POST /api/v1/auth/refresh/ HTTP/1.1" 404 19300
+WARNING 2025-08-20 20:06:57,522 log 58368 6130741248 Not Found: /api/v1/auth/refresh/
+WARNING 2025-08-20 20:06:57,523 basehttp 58368 6130741248 "POST /api/v1/auth/refresh/ HTTP/1.1" 404 19300
+INFO 2025-08-20 20:06:57,535 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/logout/ HTTP/1.1" 200 0
+ERROR 2025-08-20 20:06:57,540 exceptions 58368 6130741248 API Error: As credenciais de autenticação não foram fornecidas. - Status: 401 - Path: /api/v1/auth/logout/
+WARNING 2025-08-20 20:06:57,540 log 58368 6130741248 Unauthorized: /api/v1/auth/logout/
+WARNING 2025-08-20 20:06:57,541 basehttp 58368 6130741248 "POST /api/v1/auth/logout/ HTTP/1.1" 401 179
+INFO 2025-08-20 20:17:19,249 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/login/ HTTP/1.1" 200 0
+INFO 2025-08-20 20:17:19,340 basehttp 58368 6130741248 "POST /api/v1/auth/login/ HTTP/1.1" 200 949
+INFO 2025-08-20 20:17:27,444 basehttp 58368 6164393984 "OPTIONS /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 0
+INFO 2025-08-20 20:17:27,444 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 0
+INFO 2025-08-20 20:17:27,460 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:17:27,460 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:17:27,475 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:17:27,476 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:17:37,663 basehttp 58368 6164393984 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:17:37,664 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:17:45,297 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/admin/users/undefined/status/ HTTP/1.1" 200 0
+WARNING 2025-08-20 20:17:45,303 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/status/
+WARNING 2025-08-20 20:17:45,303 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/status/ HTTP/1.1" 404 19364
+WARNING 2025-08-20 20:17:48,482 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:17:48,482 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+WARNING 2025-08-20 20:17:50,247 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:17:50,248 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+INFO 2025-08-20 20:23:10,266 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 0
+INFO 2025-08-20 20:23:10,288 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:23:10,288 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:23:20,589 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:23:20,589 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:23:24,746 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 200 0
+WARNING 2025-08-20 20:23:24,768 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:23:24,769 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+INFO 2025-08-20 20:23:30,428 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:23:30,432 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:23:30,436 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:23:30,440 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:23:30,524 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:23:38,431 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:23:43,209 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:23:43,209 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:23:43,225 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:23:43,226 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:23:50,498 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:23:50,498 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+WARNING 2025-08-20 20:23:53,448 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:23:53,448 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+WARNING 2025-08-20 20:24:50,528 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:24:50,529 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+WARNING 2025-08-20 20:24:52,559 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:24:52,559 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+WARNING 2025-08-20 20:25:00,325 log 58368 6130741248 Not Found: /api/v1/auth/admin/users/undefined/status/
+WARNING 2025-08-20 20:25:00,325 basehttp 58368 6130741248 "PATCH /api/v1/auth/admin/users/undefined/status/ HTTP/1.1" 404 19364
+ERROR 2025-08-20 20:27:30,759 exceptions 58368 6164393984 API Error: Validation error - Status: 401 - Path: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:27:30,759 log 58368 6164393984 Unauthorized: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:27:30,760 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/?page=1&limit=2 HTTP/1.1" 401 244
+ERROR 2025-08-20 20:27:55,783 exceptions 58368 6164393984 API Error: Validation error - Status: 401 - Path: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:27:55,783 log 58368 6164393984 Unauthorized: /api/v1/auth/admin/users/
+WARNING 2025-08-20 20:27:55,783 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/?page=1&limit=2 HTTP/1.1" 401 244
+INFO 2025-08-20 20:28:13,284 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/?page=1&limit=1 HTTP/1.1" 200 503
+INFO 2025-08-20 20:28:50,900 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:30:24,174 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:30:24,174 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+WARNING 2025-08-20 20:30:30,869 log 58368 6147567616 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:30:30,869 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+WARNING 2025-08-20 20:30:34,052 log 58368 6147567616 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:30:34,052 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+WARNING 2025-08-20 20:30:35,996 log 58368 6147567616 Not Found: /api/v1/auth/admin/users/undefined/status/
+WARNING 2025-08-20 20:30:35,996 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/undefined/status/ HTTP/1.1" 404 19364
+INFO 2025-08-20 20:31:00,921 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:31:00,954 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:31:00,965 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:31:00,979 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:31:09,791 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/admin/users/d79e5788-33a4-4413-a3d8-014aa23316de/ HTTP/1.1" 200 0
+INFO 2025-08-20 20:31:09,805 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:31:09,805 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/d79e5788-33a4-4413-a3d8-014aa23316de/ HTTP/1.1" 200 281
+WARNING 2025-08-20 20:31:12,276 log 58368 6147567616 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:31:12,276 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+WARNING 2025-08-20 20:31:14,108 log 58368 6147567616 Not Found: /api/v1/auth/admin/users/undefined/status/
+WARNING 2025-08-20 20:31:14,108 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/undefined/status/ HTTP/1.1" 404 19364
+INFO 2025-08-20 20:33:52,607 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/d79e5788-33a4-4413-a3d8-014aa23316de/ HTTP/1.1" 200 281
+INFO 2025-08-20 20:33:52,625 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+WARNING 2025-08-20 20:33:59,388 log 58368 6147567616 Not Found: /api/v1/auth/admin/users/undefined/role/
+WARNING 2025-08-20 20:33:59,389 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/undefined/role/ HTTP/1.1" 404 19358
+WARNING 2025-08-20 20:34:03,168 log 58368 6147567616 Not Found: /api/v1/auth/admin/users/undefined/status/
+WARNING 2025-08-20 20:34:03,168 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/undefined/status/ HTTP/1.1" 404 19364
+INFO 2025-08-20 20:38:41,127 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:38:45,745 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:38:45,745 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:38:45,758 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:38:45,759 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:41:32,615 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:41:32,615 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:41:36,350 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:41:36,354 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:41:36,584 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:41:49,317 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:41:49,317 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:42:56,447 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/?page=1&limit=1 HTTP/1.1" 200 503
+INFO 2025-08-20 20:44:13,961 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:44:13,965 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:44:18,337 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:44:18,339 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:44:18,564 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:44:28,970 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:44:28,974 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:44:29,207 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:45:29,568 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:45:29,569 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:48:59,967 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:49:08,278 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:49:19,095 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+ERROR 2025-08-20 20:50:14,280 exceptions 58368 6164393984 API Error: Validation error - Status: 401 - Path: /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/
+WARNING 2025-08-20 20:50:14,281 log 58368 6164393984 Unauthorized: /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/
+WARNING 2025-08-20 20:50:14,281 basehttp 58368 6164393984 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 401 244
+INFO 2025-08-20 20:50:29,910 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:52:14,906 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:52:54,936 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:52:54,944 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2836
+INFO 2025-08-20 20:52:55,050 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3115
+INFO 2025-08-20 20:53:02,695 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:53:02,695 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 341
+INFO 2025-08-20 20:53:05,224 basehttp 58368 6147567616 "OPTIONS /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/role/ HTTP/1.1" 200 0
+INFO 2025-08-20 20:53:05,239 basehttp 58368 6147567616 "PATCH /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/role/ HTTP/1.1" 200 218
+INFO 2025-08-20 20:55:19,978 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:55:27,908 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:55:32,913 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:55:44,741 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:55:53,420 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:55:58,135 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:56:05,317 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:56:09,740 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:56:19,594 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/ca7c3db7-6c45-433d-aaf4-f9dd5092c5eb/ HTTP/1.1" 200 340
+INFO 2025-08-20 20:57:02,256 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2835
+INFO 2025-08-20 20:57:02,257 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3114
+INFO 2025-08-20 20:57:02,280 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2835
+INFO 2025-08-20 20:57:02,281 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3114
+INFO 2025-08-20 20:58:02,896 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:59:12,224 basehttp 58368 6147567616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 20:59:12,229 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2835
+INFO 2025-08-20 20:59:12,336 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3114
+INFO 2025-08-20 20:59:20,995 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3114
+INFO 2025-08-20 20:59:20,996 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2835
+INFO 2025-08-20 21:04:11,659 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 21:04:15,551 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-20 21:04:27,707 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3114
+INFO 2025-08-20 21:04:27,707 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2835
+INFO 2025-08-20 21:04:27,725 basehttp 58368 6130741248 "GET /api/v1/auth/admin/users/?page=1&limit=10 HTTP/1.1" 200 2835
+INFO 2025-08-20 21:04:27,726 basehttp 58368 6147567616 "GET /api/v1/auth/admin/users/?page=1&limit=100 HTTP/1.1" 200 3114
+INFO 2025-08-20 21:04:41,219 basehttp 58368 6147567616 "POST /api/v1/auth/logout/ HTTP/1.1" 200 43
+INFO 2025-08-20 21:05:03,291 basehttp 58368 6147567616 "POST /api/v1/auth/login/ HTTP/1.1" 200 949
+ERROR 2025-08-20 22:37:49,145 exceptions 58368 6130741248 API Error: Validation error - Status: 401 - Path: /api/v1/auth/profile/
+WARNING 2025-08-20 22:37:49,147 log 58368 6130741248 Unauthorized: /api/v1/auth/profile/
+WARNING 2025-08-20 22:37:49,147 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 401 244
+INFO 2025-08-20 22:37:49,172 basehttp 58368 6130741248 "OPTIONS /api/v1/auth/refresh-token/ HTTP/1.1" 200 0
+INFO 2025-08-20 22:37:49,194 basehttp 58368 6130741248 "POST /api/v1/auth/refresh-token/ HTTP/1.1" 200 787
+INFO 2025-08-20 22:37:49,203 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+ERROR 2025-08-21 01:04:31,011 exceptions 58368 6130741248 API Error: Validation error - Status: 401 - Path: /api/v1/auth/profile/
+WARNING 2025-08-21 01:04:31,013 log 58368 6130741248 Unauthorized: /api/v1/auth/profile/
+WARNING 2025-08-21 01:04:31,014 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 401 244
+INFO 2025-08-21 01:04:31,038 basehttp 58368 6130741248 "POST /api/v1/auth/refresh-token/ HTTP/1.1" 200 787
+INFO 2025-08-21 01:04:31,050 basehttp 58368 6130741248 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:09:03,379 autoreload 58368 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/serializers.py changed, reloading.
+INFO 2025-08-21 01:09:04,941 autoreload 75221 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 01:09:12,908 autoreload 75221 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 01:09:14,299 autoreload 75262 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 01:09:31,101 basehttp 75262 6135099392 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:09:33,785 autoreload 75262 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 01:09:35,209 autoreload 75317 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 01:09:42,948 autoreload 75317 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/urls.py changed, reloading.
+INFO 2025-08-21 01:09:44,405 autoreload 75348 8544362688 Watching for file changes with StatReloader
+ERROR 2025-08-21 01:11:15,676 exceptions 75348 6126972928 API Error: As credenciais de autenticação não foram fornecidas. - Status: 401 - Path: /api/v1/auth/profile/
+WARNING 2025-08-21 01:11:15,677 log 75348 6126972928 Unauthorized: /api/v1/auth/profile/
+WARNING 2025-08-21 01:11:15,677 basehttp 75348 6126972928 "GET /api/v1/auth/profile/ HTTP/1.1" 401 179
+WARNING 2025-08-21 01:11:15,699 log 75348 6126972928 Not Found: /api/v1/ecommerce/admin/products/
+WARNING 2025-08-21 01:11:15,700 basehttp 75348 6126972928 "GET /api/v1/ecommerce/admin/products/ HTTP/1.1" 404 16254
+ERROR 2025-08-21 01:11:30,441 exceptions 75348 6126972928 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/
+WARNING 2025-08-21 01:11:30,441 log 75348 6126972928 Unauthorized: /api/v1/admin/products/
+WARNING 2025-08-21 01:11:30,441 basehttp 75348 6126972928 "GET /api/v1/admin/products/ HTTP/1.1" 401 244
+INFO 2025-08-21 01:11:40,664 basehttp 75348 6126972928 "POST /api/v1/auth/login/ HTTP/1.1" 200 887
+INFO 2025-08-21 01:11:50,475 basehttp 75348 6126972928 "GET /api/v1/admin/products/ HTTP/1.1" 200 100
+INFO 2025-08-21 01:12:07,614 basehttp 75348 6126972928 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+WARNING 2025-08-21 01:12:18,189 log 75348 6126972928 Bad Request: /api/v1/admin/products/bulk-operations/
+WARNING 2025-08-21 01:12:18,189 basehttp 75348 6126972928 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 400 63
+INFO 2025-08-21 01:12:33,853 basehttp 75348 6126972928 "GET /api/v1/admin/stats/ HTTP/1.1" 200 355
+ERROR 2025-08-21 01:12:45,764 exceptions 75348 6126972928 API Error: Método "POST" não é permitido. - Status: 405 - Path: /api/v1/categories/
+WARNING 2025-08-21 01:12:45,765 log 75348 6126972928 Method Not Allowed: /api/v1/categories/
+WARNING 2025-08-21 01:12:45,765 basehttp 75348 6126972928 "POST /api/v1/categories/ HTTP/1.1" 405 139
+INFO 2025-08-21 01:14:30,989 basehttp 75348 6126972928 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:19:30,991 basehttp 75348 6126972928 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:20:10,132 basehttp 75348 6143799296 "GET /api/v1/admin/products/ HTTP/1.1" 200 100
+INFO 2025-08-21 01:22:38,777 basehttp 75348 6143799296 "OPTIONS /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 0
+INFO 2025-08-21 01:22:38,778 basehttp 75348 6126972928 "OPTIONS /api/v1/admin/categories/ HTTP/1.1" 200 0
+INFO 2025-08-21 01:22:38,779 basehttp 75348 6160625664 "OPTIONS /api/v1/admin/categories/ HTTP/1.1" 200 0
+INFO 2025-08-21 01:22:38,779 basehttp 75348 6177452032 "OPTIONS /api/v1/admin/stats/ HTTP/1.1" 200 0
+INFO 2025-08-21 01:22:38,815 basehttp 75348 6194278400 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:22:38,818 basehttp 75348 6126972928 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:22:38,818 basehttp 75348 6143799296 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 100
+INFO 2025-08-21 01:22:38,827 basehttp 75348 6177452032 "GET /api/v1/admin/stats/ HTTP/1.1" 200 355
+INFO 2025-08-21 01:22:38,832 basehttp 75348 6143799296 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:22:38,840 basehttp 75348 6143799296 "OPTIONS /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 0
+INFO 2025-08-21 01:22:38,858 basehttp 75348 6143799296 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:22:46,908 basehttp 75348 6143799296 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:23:15,595 basehttp 75348 6143799296 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:24:43,961 autoreload 75348 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 01:24:45,500 autoreload 77038 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 01:24:55,292 autoreload 77038 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/urls.py changed, reloading.
+INFO 2025-08-21 01:24:56,733 autoreload 77078 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 01:25:29,039 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:25:29,047 basehttp 77078 6168047616 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:25:41,946 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:25:41,956 basehttp 77078 6168047616 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:27:04,940 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:27:04,941 basehttp 77078 6218526720 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:27:04,941 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 100
+INFO 2025-08-21 01:27:04,949 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:27:04,951 basehttp 77078 6201700352 "GET /api/v1/admin/stats/ HTTP/1.1" 200 355
+INFO 2025-08-21 01:27:04,959 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:27:19,745 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 2
+INFO 2025-08-21 01:27:36,348 basehttp 77078 6168047616 "POST /api/v1/admin/categories/ HTTP/1.1" 201 309
+INFO 2025-08-21 01:27:45,932 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:06,108 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:06,124 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 100
+INFO 2025-08-21 01:29:06,125 basehttp 77078 6218526720 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:29:06,131 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:06,138 basehttp 77078 6218526720 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:29:06,138 basehttp 77078 6201700352 "GET /api/v1/admin/stats/ HTTP/1.1" 200 355
+INFO 2025-08-21 01:29:10,841 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:10,846 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:15,142 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:15,149 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:15,152 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:29:15,164 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:29:19,671 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:19,680 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:26,877 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:26,884 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:29:26,887 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:29:26,904 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:29:29,462 basehttp 77078 6184873984 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:30:31,874 basehttp 77078 6168047616 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:30:50,356 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:30:50,357 basehttp 77078 6218526720 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:30:50,358 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 100
+INFO 2025-08-21 01:30:50,367 basehttp 77078 6201700352 "GET /api/v1/admin/stats/ HTTP/1.1" 200 355
+INFO 2025-08-21 01:30:50,373 basehttp 77078 6235353088 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:30:50,405 basehttp 77078 6235353088 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+ERROR 2025-08-21 01:31:10,926 exceptions 77078 6168047616 API Error: Validation error - Status: 401 - Path: /api/v1/admin/categories/
+WARNING 2025-08-21 01:31:10,927 log 77078 6168047616 Unauthorized: /api/v1/admin/categories/
+WARNING 2025-08-21 01:31:10,927 basehttp 77078 6168047616 "POST /api/v1/admin/categories/ HTTP/1.1" 401 244
+ERROR 2025-08-21 01:31:18,046 exceptions 77078 6168047616 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-21 01:31:18,047 log 77078 6168047616 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-21 01:31:18,047 basehttp 77078 6168047616 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+ERROR 2025-08-21 01:33:02,882 exceptions 77078 6168047616 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/
+WARNING 2025-08-21 01:33:02,883 log 77078 6168047616 Unauthorized: /api/v1/admin/products/
+WARNING 2025-08-21 01:33:02,883 basehttp 77078 6168047616 "GET /api/v1/admin/products/ HTTP/1.1" 401 179
+ERROR 2025-08-21 01:33:10,046 exceptions 77078 6168047616 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-21 01:33:10,046 log 77078 6168047616 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-21 01:33:10,046 basehttp 77078 6168047616 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+INFO 2025-08-21 01:34:45,901 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:34:45,913 basehttp 77078 6168047616 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:34:52,956 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:34:52,966 basehttp 77078 6168047616 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:35:50,963 basehttp 77078 6168047616 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+WARNING 2025-08-21 01:36:39,086 log 77078 6168047616 Not Found: /api/v1/ecommerce/products/create/
+WARNING 2025-08-21 01:36:39,086 basehttp 77078 6168047616 "POST /api/v1/ecommerce/products/create/ HTTP/1.1" 404 16706
+INFO 2025-08-21 01:36:53,594 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:36:53,611 basehttp 77078 6168047616 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+INFO 2025-08-21 01:36:58,669 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:36:58,701 basehttp 77078 6168047616 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 100
+ERROR 2025-08-21 01:37:06,536 exceptions 77078 6168047616 API Error: As credenciais de autenticação não foram fornecidas. - Status: 401 - Path: /api/v1/products/create/
+WARNING 2025-08-21 01:37:06,536 log 77078 6168047616 Unauthorized: /api/v1/products/create/
+WARNING 2025-08-21 01:37:06,536 basehttp 77078 6168047616 "POST /api/v1/products/create/ HTTP/1.1" 401 179
+ERROR 2025-08-21 01:37:36,206 exceptions 77078 6168047616 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-21 01:37:36,207 log 77078 6168047616 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-21 01:37:36,207 basehttp 77078 6168047616 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+ERROR 2025-08-21 01:37:36,216 exceptions 77078 6168047616 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/
+WARNING 2025-08-21 01:37:36,216 log 77078 6168047616 Unauthorized: /api/v1/admin/products/
+WARNING 2025-08-21 01:37:36,217 basehttp 77078 6168047616 "GET /api/v1/admin/products/ HTTP/1.1" 401 179
+INFO 2025-08-21 01:38:15,720 basehttp 77078 6184873984 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 849
+INFO 2025-08-21 01:38:15,728 basehttp 77078 6218526720 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:38:15,739 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:38:15,753 basehttp 77078 6168047616 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:38:15,757 basehttp 77078 6201700352 "GET /api/v1/admin/stats/ HTTP/1.1" 200 411
+INFO 2025-08-21 01:38:15,800 basehttp 77078 6201700352 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 849
+INFO 2025-08-21 01:39:50,954 autoreload 77078 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 01:39:52,477 autoreload 79091 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 01:40:01,727 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:40:01,794 basehttp 79091 6196883456 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 849
+INFO 2025-08-21 01:40:12,265 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:40:12,297 basehttp 79091 6196883456 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 849
+ERROR 2025-08-21 01:40:24,308 exceptions 79091 6196883456 API Error: Validation error - Status: 401 - Path: /api/v1/admin/stats/
+WARNING 2025-08-21 01:40:24,309 log 79091 6196883456 Unauthorized: /api/v1/admin/stats/
+WARNING 2025-08-21 01:40:24,309 basehttp 79091 6196883456 "GET /api/v1/admin/stats/ HTTP/1.1" 401 244
+ERROR 2025-08-21 01:40:33,627 exceptions 79091 6196883456 API Error: Validation error - Status: 401 - Path: /api/v1/admin/stats/
+WARNING 2025-08-21 01:40:33,628 log 79091 6196883456 Unauthorized: /api/v1/admin/stats/
+WARNING 2025-08-21 01:40:33,628 basehttp 79091 6196883456 "GET /api/v1/admin/stats/ HTTP/1.1" 401 244
+ERROR 2025-08-21 01:40:44,957 exceptions 79257 8544362688 API Error: As credenciais de autenticação não foram fornecidas. - Status: 401 - Path: /api/v1/admin/stats/
+INFO 2025-08-21 01:42:13,768 basehttp 79091 6247362560 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:42:13,799 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:42:13,833 basehttp 79091 6213709824 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 3769
+INFO 2025-08-21 01:42:13,833 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:42:13,844 basehttp 79091 6247362560 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 3769
+INFO 2025-08-21 01:42:13,847 basehttp 79091 6230536192 "GET /api/v1/admin/stats/ HTTP/1.1" 200 728
+INFO 2025-08-21 01:42:31,635 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:43:05,746 basehttp 79091 6196883456 "OPTIONS /api/v1/products/create/ HTTP/1.1" 200 0
+ERROR 2025-08-21 01:43:05,756 exceptions 79091 6196883456 API Error: Validation error - Status: 400 - Path: /api/v1/products/create/
+WARNING 2025-08-21 01:43:05,756 log 79091 6196883456 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 01:43:05,756 basehttp 79091 6196883456 "POST /api/v1/products/create/ HTTP/1.1" 400 172
+ERROR 2025-08-21 01:44:10,128 exceptions 79091 6196883456 API Error: As credenciais de autenticação não foram fornecidas. - Status: 401 - Path: /api/v1/products/create/
+WARNING 2025-08-21 01:44:10,129 log 79091 6196883456 Unauthorized: /api/v1/products/create/
+WARNING 2025-08-21 01:44:10,129 basehttp 79091 6196883456 "POST /api/v1/products/create/ HTTP/1.1" 401 179
+INFO 2025-08-21 01:44:49,269 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:44:49,299 basehttp 79091 6196883456 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 3769
+INFO 2025-08-21 01:45:16,527 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:45:16,562 basehttp 79091 6196883456 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 4451
+INFO 2025-08-21 01:45:46,033 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:45:46,061 basehttp 79091 6213709824 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 4451
+INFO 2025-08-21 01:45:46,117 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:45:46,122 basehttp 79091 6247362560 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:45:46,131 basehttp 79091 6264188928 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 4451
+INFO 2025-08-21 01:45:46,148 basehttp 79091 6230536192 "GET /api/v1/admin/stats/ HTTP/1.1" 200 775
+INFO 2025-08-21 01:45:51,049 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+ERROR 2025-08-21 01:46:24,984 exceptions 79091 6196883456 API Error: Validation error - Status: 400 - Path: /api/v1/products/create/
+WARNING 2025-08-21 01:46:24,985 log 79091 6196883456 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 01:46:24,985 basehttp 79091 6196883456 "POST /api/v1/products/create/ HTTP/1.1" 400 134
+INFO 2025-08-21 01:48:29,934 basehttp 79091 6196883456 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+ERROR 2025-08-21 01:48:41,813 exceptions 79091 6196883456 API Error: Validation error - Status: 400 - Path: /api/v1/products/create/
+WARNING 2025-08-21 01:48:41,814 log 79091 6196883456 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 01:48:41,814 basehttp 79091 6196883456 "POST /api/v1/products/create/ HTTP/1.1" 400 134
+INFO 2025-08-21 01:49:54,059 autoreload 79091 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 01:49:55,548 autoreload 80155 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 01:50:46,997 basehttp 80155 6131675136 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+ERROR 2025-08-21 01:51:46,964 exceptions 80155 6131675136 API Error: Validation error - Status: 400 - Path: /api/v1/products/create/
+WARNING 2025-08-21 01:51:46,967 log 80155 6131675136 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 01:51:46,967 basehttp 80155 6131675136 "POST /api/v1/products/create/ HTTP/1.1" 400 134
+ERROR 2025-08-21 01:52:22,351 exceptions 80155 6131675136 API Error: Validation error - Status: 400 - Path: /api/v1/products/create/
+WARNING 2025-08-21 01:52:22,351 log 80155 6131675136 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 01:52:22,352 basehttp 80155 6131675136 "POST /api/v1/products/create/ HTTP/1.1" 400 134
+INFO 2025-08-21 01:54:03,153 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:54:03,154 basehttp 80155 6182154240 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 01:54:03,172 basehttp 80155 6148501504 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 4451
+INFO 2025-08-21 01:54:03,192 basehttp 80155 6165327872 "GET /api/v1/admin/stats/ HTTP/1.1" 200 775
+INFO 2025-08-21 01:54:03,192 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:54:03,195 basehttp 80155 6182154240 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 4451
+INFO 2025-08-21 01:54:06,949 basehttp 80155 6182154240 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:54:33,522 basehttp 80155 6131675136 "POST /api/v1/products/create/ HTTP/1.1" 201 560
+INFO 2025-08-21 01:54:33,544 basehttp 80155 6131675136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5142
+INFO 2025-08-21 01:54:58,429 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:54:58,444 basehttp 80155 6148501504 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5142
+INFO 2025-08-21 01:54:58,462 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:54:58,465 basehttp 80155 6182154240 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5142
+INFO 2025-08-21 01:54:58,470 basehttp 80155 6165327872 "GET /api/v1/admin/stats/ HTTP/1.1" 200 817
+INFO 2025-08-21 01:54:58,476 basehttp 80155 6148501504 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5142
+INFO 2025-08-21 01:54:58,488 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:54:58,503 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 01:54:58,508 basehttp 80155 6165327872 "GET /api/v1/admin/stats/ HTTP/1.1" 200 817
+INFO 2025-08-21 01:54:58,523 basehttp 80155 6131675136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5142
+INFO 2025-08-21 01:55:05,261 basehttp 80155 6131675136 "OPTIONS /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 0
+INFO 2025-08-21 01:55:05,268 basehttp 80155 6131675136 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 01:55:05,320 basehttp 80155 6131675136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 4451
+INFO 2025-08-21 01:55:11,178 basehttp 80155 6131675136 "OPTIONS /api/v1/admin/products/7f81f0ca-d07b-4316-a22c-48dbec219a87/toggle-status/ HTTP/1.1" 200 0
+INFO 2025-08-21 01:55:11,184 basehttp 80155 6131675136 "PATCH /api/v1/admin/products/7f81f0ca-d07b-4316-a22c-48dbec219a87/toggle-status/ HTTP/1.1" 200 79
+INFO 2025-08-21 01:55:11,230 basehttp 80155 6131675136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 4452
+ERROR 2025-08-21 06:53:03,931 exceptions 80155 6131675136 API Error: Validation error - Status: 401 - Path: /api/v1/admin/categories/
+ERROR 2025-08-21 06:53:03,932 exceptions 80155 6148501504 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/
+WARNING 2025-08-21 06:53:03,933 log 80155 6131675136 Unauthorized: /api/v1/admin/categories/
+ERROR 2025-08-21 06:53:03,933 exceptions 80155 6165327872 API Error: Validation error - Status: 401 - Path: /api/v1/admin/stats/
+WARNING 2025-08-21 06:53:03,934 log 80155 6148501504 Unauthorized: /api/v1/admin/products/
+WARNING 2025-08-21 06:53:03,934 log 80155 6165327872 Unauthorized: /api/v1/admin/stats/
+WARNING 2025-08-21 06:53:03,934 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 401 244
+WARNING 2025-08-21 06:53:03,935 basehttp 80155 6148501504 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 401 244
+ERROR 2025-08-21 06:53:03,936 exceptions 80155 6131675136 API Error: Validation error - Status: 401 - Path: /api/v1/admin/categories/
+ERROR 2025-08-21 06:53:03,937 exceptions 80155 6182154240 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/
+WARNING 2025-08-21 06:53:03,937 basehttp 80155 6165327872 "GET /api/v1/admin/stats/ HTTP/1.1" 401 244
+ERROR 2025-08-21 06:53:03,938 exceptions 80155 6148501504 API Error: Validation error - Status: 401 - Path: /api/v1/admin/stats/
+WARNING 2025-08-21 06:53:03,938 log 80155 6131675136 Unauthorized: /api/v1/admin/categories/
+WARNING 2025-08-21 06:53:03,939 log 80155 6182154240 Unauthorized: /api/v1/admin/products/
+WARNING 2025-08-21 06:53:03,939 log 80155 6148501504 Unauthorized: /api/v1/admin/stats/
+WARNING 2025-08-21 06:53:03,939 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 401 244
+WARNING 2025-08-21 06:53:03,939 basehttp 80155 6182154240 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 401 244
+ERROR 2025-08-21 06:53:03,941 exceptions 80155 6165327872 API Error: Validation error - Status: 401 - Path: /api/v1/admin/categories/
+WARNING 2025-08-21 06:53:03,941 basehttp 80155 6148501504 "GET /api/v1/admin/stats/ HTTP/1.1" 401 244
+WARNING 2025-08-21 06:53:03,941 log 80155 6165327872 Unauthorized: /api/v1/admin/categories/
+WARNING 2025-08-21 06:53:03,941 basehttp 80155 6165327872 "GET /api/v1/admin/categories/ HTTP/1.1" 401 244
+ERROR 2025-08-21 06:53:03,942 exceptions 80155 6148501504 API Error: Validation error - Status: 401 - Path: /api/v1/admin/categories/
+WARNING 2025-08-21 06:53:03,942 log 80155 6148501504 Unauthorized: /api/v1/admin/categories/
+WARNING 2025-08-21 06:53:03,943 basehttp 80155 6148501504 "GET /api/v1/admin/categories/ HTTP/1.1" 401 244
+INFO 2025-08-21 06:53:12,344 basehttp 80155 6131675136 "OPTIONS /api/v1/auth/profile/ HTTP/1.1" 200 0
+ERROR 2025-08-21 06:53:12,345 exceptions 80155 6131675136 API Error: Validation error - Status: 401 - Path: /api/v1/auth/profile/
+WARNING 2025-08-21 06:53:12,345 log 80155 6131675136 Unauthorized: /api/v1/auth/profile/
+WARNING 2025-08-21 06:53:12,345 basehttp 80155 6131675136 "GET /api/v1/auth/profile/ HTTP/1.1" 401 244
+INFO 2025-08-21 06:53:12,352 basehttp 80155 6131675136 "POST /api/v1/auth/refresh-token/ HTTP/1.1" 200 787
+INFO 2025-08-21 06:53:12,357 basehttp 80155 6131675136 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 06:53:34,152 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:53:34,166 basehttp 80155 6148501504 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 4452
+INFO 2025-08-21 06:53:34,182 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:53:34,182 basehttp 80155 6165327872 "GET /api/v1/admin/stats/ HTTP/1.1" 200 775
+INFO 2025-08-21 06:53:34,184 basehttp 80155 6182154240 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 4452
+INFO 2025-08-21 06:53:34,190 basehttp 80155 6198980608 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 4452
+INFO 2025-08-21 06:53:34,198 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:53:34,213 basehttp 80155 6198980608 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:53:34,213 basehttp 80155 6165327872 "GET /api/v1/admin/stats/ HTTP/1.1" 200 775
+INFO 2025-08-21 06:53:34,218 basehttp 80155 6131675136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 4452
+INFO 2025-08-21 06:55:13,668 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:55:56,826 basehttp 80155 6131675136 "POST /api/v1/products/create/ HTTP/1.1" 201 568
+INFO 2025-08-21 06:55:56,836 basehttp 80155 6131675136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 06:56:43,193 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:56:43,205 basehttp 80155 6148501504 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 06:56:43,206 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:56:43,215 basehttp 80155 6165327872 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 06:56:43,229 basehttp 80155 6131675136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:56:43,240 basehttp 80155 6148501504 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 06:56:43,250 basehttp 80155 6165327872 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 06:56:43,250 basehttp 80155 6182154240 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 06:56:43,255 basehttp 80155 6198980608 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 06:56:43,292 basehttp 80155 6198980608 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 06:57:45,740 autoreload 80155 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 06:57:47,263 autoreload 81511 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 06:58:13,090 basehttp 81511 6196424704 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:00:24,795 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:00:24,813 basehttp 81511 6246903808 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:00:24,813 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:00:24,834 basehttp 81511 6230077440 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:00:24,840 basehttp 81511 6246903808 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:00:24,853 basehttp 81511 6196424704 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:00:24,876 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:00:24,883 basehttp 81511 6246903808 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:00:24,891 basehttp 81511 6263730176 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:00:24,894 basehttp 81511 6230077440 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:01:03,266 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:01:03,266 basehttp 81511 6246903808 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:01:03,276 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:01:03,282 basehttp 81511 6230077440 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:01:03,282 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:01:03,326 basehttp 81511 6196424704 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:01:10,986 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:01:10,995 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:01:16,386 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:01:16,395 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:01:16,408 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:01:16,419 basehttp 81511 6196424704 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:01:22,340 basehttp 81511 6213251072 "OPTIONS /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 0
+INFO 2025-08-21 07:01:22,340 basehttp 81511 6196424704 "OPTIONS /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 0
+INFO 2025-08-21 07:01:22,349 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:01:22,357 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:02:24,241 basehttp 81511 6196424704 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:02:29,852 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:02:29,871 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:02:29,881 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:02:29,884 basehttp 81511 6230077440 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:02:29,898 basehttp 81511 6246903808 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:02:29,899 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:02:29,901 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:02:29,909 basehttp 81511 6263730176 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:02:29,913 basehttp 81511 6246903808 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:02:29,943 basehttp 81511 6246903808 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:02:41,335 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:02:41,343 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:02:43,256 basehttp 81511 6213251072 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:02:43,260 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:03:20,468 basehttp 81511 6213251072 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:03:20,474 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:04:22,773 basehttp 81511 6213251072 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:04:22,778 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:06:14,483 basehttp 81511 6196424704 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:06:18,677 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:06:18,699 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:06:18,701 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:06:18,707 basehttp 81511 6230077440 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:06:18,709 basehttp 81511 6246903808 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:06:18,712 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:06:18,724 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:06:18,727 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:06:18,732 basehttp 81511 6246903808 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:06:18,753 basehttp 81511 6246903808 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:06:26,741 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:06:26,748 basehttp 81511 6196424704 "GET /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/ HTTP/1.1" 200 1011
+INFO 2025-08-21 07:06:59,992 basehttp 81511 6196424704 "OPTIONS /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/toggle-status/ HTTP/1.1" 200 0
+INFO 2025-08-21 07:07:00,001 basehttp 81511 6196424704 "PATCH /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/toggle-status/ HTTP/1.1" 200 79
+INFO 2025-08-21 07:07:35,735 basehttp 81511 6196424704 "PATCH /api/v1/admin/products/aeb8100b-7505-49e7-a912-973983c2375f/toggle-status/ HTTP/1.1" 200 76
+INFO 2025-08-21 07:07:43,709 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:07:43,747 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:07:43,751 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:07:43,771 basehttp 81511 6246903808 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:07:43,771 basehttp 81511 6230077440 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:07:43,782 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:07:43,787 basehttp 81511 6213251072 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:07:43,795 basehttp 81511 6196424704 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:07:43,796 basehttp 81511 6230077440 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:07:43,812 basehttp 81511 6230077440 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:11:07,849 autoreload 81511 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_views.py changed, reloading.
+INFO 2025-08-21 07:11:09,518 autoreload 82950 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 07:11:15,081 basehttp 82950 6159511552 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:11:16,373 autoreload 82950 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_urls.py changed, reloading.
+INFO 2025-08-21 07:11:17,806 autoreload 82982 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 07:13:27,773 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:13:27,827 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:13:38,638 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:13:38,651 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:14:38,991 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:14:39,007 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:14:49,928 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:14:49,954 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:16:32,654 basehttp 82982 6249295872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:16:32,657 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:16:32,670 basehttp 82982 6215643136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:16:32,671 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:16:32,696 basehttp 82982 6232469504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 825
+INFO 2025-08-21 07:16:32,711 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:16:37,686 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:17:10,479 basehttp 82982 6198816768 "POST /api/v1/products/create/ HTTP/1.1" 201 543
+INFO 2025-08-21 07:17:10,490 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:17:21,407 basehttp 82982 6198816768 "OPTIONS /api/v1/admin/products/b6a1c177-ec7b-48aa-a15c-5d4e3a60c8ac/ HTTP/1.1" 200 0
+INFO 2025-08-21 07:17:21,408 basehttp 82982 6215643136 "OPTIONS /api/v1/admin/products/b6a1c177-ec7b-48aa-a15c-5d4e3a60c8ac/ HTTP/1.1" 200 0
+INFO 2025-08-21 07:17:21,423 basehttp 82982 6198816768 "GET /api/v1/admin/products/b6a1c177-ec7b-48aa-a15c-5d4e3a60c8ac/ HTTP/1.1" 200 985
+INFO 2025-08-21 07:17:21,429 basehttp 82982 6198816768 "GET /api/v1/admin/products/b6a1c177-ec7b-48aa-a15c-5d4e3a60c8ac/ HTTP/1.1" 200 985
+INFO 2025-08-21 07:17:26,496 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:17:26,548 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:17:26,549 basehttp 82982 6249295872 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:17:26,549 basehttp 82982 6215643136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:17:26,554 basehttp 82982 6232469504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 873
+INFO 2025-08-21 07:17:26,570 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:17:26,582 basehttp 82982 6249295872 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:17:26,583 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:17:26,589 basehttp 82982 6232469504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 873
+INFO 2025-08-21 07:17:26,592 basehttp 82982 6215643136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:21:33,042 basehttp 82982 6198816768 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+ERROR 2025-08-21 07:22:56,017 exceptions 82982 6198816768 API Error: Validation error - Status: 401 - Path: /api/v1/upload/products/
+WARNING 2025-08-21 07:22:56,019 log 82982 6198816768 Unauthorized: /api/v1/upload/products/
+WARNING 2025-08-21 07:22:56,019 basehttp 82982 6198816768 "POST /api/v1/upload/products/ HTTP/1.1" 401 244
+INFO 2025-08-21 07:22:56,020 basehttp 82982 6198816768 code 400, message Bad request syntax ('d2')
+WARNING 2025-08-21 07:22:56,020 basehttp 82982 6198816768 "d2" 400 -
+INFO 2025-08-21 07:23:39,029 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:23:39,053 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:23:48,138 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:23:48,176 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:24:48,356 basehttp 82982 6249295872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:24:48,357 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:24:48,372 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:24:48,373 basehttp 82982 6215643136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:24:48,383 basehttp 82982 6232469504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 873
+INFO 2025-08-21 07:24:48,406 basehttp 82982 6215643136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5834
+INFO 2025-08-21 07:25:00,107 basehttp 82982 6198816768 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 07:25:00,160 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:25:02,230 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:25:39,708 basehttp 82982 6198816768 "POST /api/v1/products/create/ HTTP/1.1" 201 564
+INFO 2025-08-21 07:25:39,721 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5850
+INFO 2025-08-21 07:27:15,230 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:27:15,252 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5850
+ERROR 2025-08-21 07:27:45,826 exceptions 82982 6198816768 API Error: As credenciais de autenticação não foram fornecidas. - Status: 401 - Path: /api/v1/upload/products/
+WARNING 2025-08-21 07:27:45,826 log 82982 6198816768 Unauthorized: /api/v1/upload/products/
+WARNING 2025-08-21 07:27:45,826 basehttp 82982 6198816768 "POST /api/v1/upload/products/ HTTP/1.1" 401 179
+INFO 2025-08-21 07:28:26,181 basehttp 82982 6249295872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:28:26,182 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:28:26,198 basehttp 82982 6266122240 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:28:26,201 basehttp 82982 6215643136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5850
+INFO 2025-08-21 07:28:26,216 basehttp 82982 6232469504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 867
+INFO 2025-08-21 07:28:26,218 basehttp 82982 6249295872 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5850
+INFO 2025-08-21 07:28:28,296 basehttp 82982 6249295872 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:29:00,955 basehttp 82982 6198816768 "POST /api/v1/products/create/ HTTP/1.1" 201 566
+INFO 2025-08-21 07:29:00,968 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6551
+INFO 2025-08-21 07:31:37,805 basehttp 82982 6249295872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:31:37,811 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:31:37,821 basehttp 82982 6215643136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6551
+INFO 2025-08-21 07:31:37,823 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:31:37,827 basehttp 82982 6232469504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 926
+INFO 2025-08-21 07:31:37,862 basehttp 82982 6232469504 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6551
+INFO 2025-08-21 07:31:40,730 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:32:11,007 basehttp 82982 6198816768 "POST /api/v1/products/create/ HTTP/1.1" 201 555
+INFO 2025-08-21 07:32:11,020 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7242
+INFO 2025-08-21 07:35:45,838 basehttp 82982 6249295872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:35:45,840 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:35:45,857 basehttp 82982 6249295872 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:35:45,859 basehttp 82982 6215643136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 7242
+INFO 2025-08-21 07:35:45,881 basehttp 82982 6232469504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 962
+INFO 2025-08-21 07:35:45,883 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7242
+INFO 2025-08-21 07:36:02,483 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+ERROR 2025-08-21 07:36:33,017 exceptions 82982 6198816768 API Error: Validation error - Status: 400 - Path: /api/v1/products/create/
+WARNING 2025-08-21 07:36:33,018 log 82982 6198816768 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 07:36:33,018 basehttp 82982 6198816768 "POST /api/v1/products/create/ HTTP/1.1" 400 118
+ERROR 2025-08-21 07:39:41,478 exceptions 82982 6198816768 API Error: Validation error - Status: 400 - Path: /api/v1/products/create/
+WARNING 2025-08-21 07:39:41,480 log 82982 6198816768 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 07:39:41,482 basehttp 82982 6198816768 "POST /api/v1/products/create/ HTTP/1.1" 400 118
+INFO 2025-08-21 07:40:45,986 basehttp 82982 6198816768 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:41:38,333 basehttp 82982 6198816768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:41:38,357 basehttp 82982 6198816768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7242
+INFO 2025-08-21 07:41:49,890 autoreload 82982 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 07:41:51,495 autoreload 86770 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 07:45:45,995 basehttp 86770 6167261184 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+ERROR 2025-08-21 07:46:47,812 exceptions 86770 6167261184 API Error: As credenciais de autenticação não foram fornecidas. - Status: 401 - Path: /api/v1/products/create/
+WARNING 2025-08-21 07:46:47,813 log 86770 6167261184 Unauthorized: /api/v1/products/create/
+WARNING 2025-08-21 07:46:47,813 basehttp 86770 6167261184 "GET /api/v1/products/create/ HTTP/1.1" 401 179
+INFO 2025-08-21 07:48:04,522 views 86770 6167261184 [ProductCreate] Request data: {'name': 'Geração de Quadros', 'description': 'defefe', 'price': 33, 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 333, 'is_active': True, 'slug': 'geracao-de-quadros', 'sku': 'PRD-1755758884513-3TN9', 'short_description': 'defefe', 'track_inventory': True, 'requires_shipping': True, 'low_stock_threshold': 5}
+ERROR 2025-08-21 07:48:04,525 views 86770 6167261184 [ProductCreate] Validation errors: {'slug': [ErrorDetail(string='product com este slug já existe.', code='unique')]}
+WARNING 2025-08-21 07:48:04,526 log 86770 6167261184 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 07:48:04,526 basehttp 86770 6167261184 "POST /api/v1/products/create/ HTTP/1.1" 400 102
+INFO 2025-08-21 07:48:11,673 views 86770 6167261184 [ProductCreate] Request data: {'name': 'Geração de Quadros', 'description': 'defefe', 'price': 33, 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 333, 'is_active': True, 'slug': 'geracao-de-quadros', 'sku': 'PRD-1755758891662-68H4', 'short_description': 'defefe', 'track_inventory': True, 'requires_shipping': True, 'low_stock_threshold': 5}
+ERROR 2025-08-21 07:48:11,675 views 86770 6167261184 [ProductCreate] Validation errors: {'slug': [ErrorDetail(string='product com este slug já existe.', code='unique')]}
+WARNING 2025-08-21 07:48:11,675 log 86770 6167261184 Bad Request: /api/v1/products/create/
+WARNING 2025-08-21 07:48:11,675 basehttp 86770 6167261184 "POST /api/v1/products/create/ HTTP/1.1" 400 102
+INFO 2025-08-21 07:49:25,550 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:49:25,583 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7221
+INFO 2025-08-21 07:49:36,260 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:49:36,291 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7221
+INFO 2025-08-21 07:49:49,929 views 86770 6167261184 [ProductCreate] Request data: {'name': 'Geração de Quadros', 'description': 'defefe', 'price': 33, 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 333, 'is_active': True, 'slug': 'geracao-de-quadros-1755758989911-eddx', 'sku': 'PRD-1755758989911-4TOA', 'short_description': 'defefe', 'track_inventory': True, 'requires_shipping': True, 'low_stock_threshold': 5}
+INFO 2025-08-21 07:49:49,936 basehttp 86770 6167261184 "POST /api/v1/products/create/ HTTP/1.1" 201 575
+INFO 2025-08-21 07:49:49,953 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7186
+INFO 2025-08-21 07:50:45,972 basehttp 86770 6167261184 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+ERROR 2025-08-21 07:51:46,438 exceptions 86770 6167261184 API Error: No active account found with the given credentials - Status: 401 - Path: /api/v1/auth/login/
+WARNING 2025-08-21 07:51:46,439 log 86770 6167261184 Unauthorized: /api/v1/auth/login/
+WARNING 2025-08-21 07:51:46,439 basehttp 86770 6167261184 "POST /api/v1/auth/login/ HTTP/1.1" 401 169
+ERROR 2025-08-21 07:51:46,461 exceptions 86770 6167261184 API Error: Validation error - Status: 401 - Path: /api/v1/upload/products/
+WARNING 2025-08-21 07:51:46,462 log 86770 6167261184 Unauthorized: /api/v1/upload/products/
+WARNING 2025-08-21 07:51:46,462 basehttp 86770 6167261184 "POST /api/v1/upload/products/ HTTP/1.1" 401 179
+INFO 2025-08-21 07:51:46,462 basehttp 86770 6167261184 code 400, message Bad request syntax ('d2')
+WARNING 2025-08-21 07:51:46,462 basehttp 86770 6167261184 "d2" 400 -
+INFO 2025-08-21 07:52:13,652 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 312
+INFO 2025-08-21 07:52:13,682 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7186
+INFO 2025-08-21 07:52:35,957 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 312
+INFO 2025-08-21 07:52:54,839 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 07:52:54,964 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7269
+INFO 2025-08-21 07:53:02,183 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 07:53:02,337 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 7242
+INFO 2025-08-21 07:53:07,985 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 07:53:08,127 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6551
+ERROR 2025-08-21 07:53:14,129 exceptions 86770 6167261184 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/bulk-operations/
+WARNING 2025-08-21 07:53:14,129 log 86770 6167261184 Unauthorized: /api/v1/admin/products/bulk-operations/
+WARNING 2025-08-21 07:53:14,129 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 401 244
+ERROR 2025-08-21 07:53:21,976 exceptions 86770 6167261184 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/bulk-operations/
+WARNING 2025-08-21 07:53:21,976 log 86770 6167261184 Unauthorized: /api/v1/admin/products/bulk-operations/
+WARNING 2025-08-21 07:53:21,976 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 401 244
+ERROR 2025-08-21 07:53:38,044 exceptions 86770 6167261184 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/bulk-operations/
+WARNING 2025-08-21 07:53:38,045 log 86770 6167261184 Unauthorized: /api/v1/admin/products/bulk-operations/
+WARNING 2025-08-21 07:53:38,045 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 401 244
+ERROR 2025-08-21 07:53:46,821 exceptions 86770 6167261184 API Error: Validation error - Status: 401 - Path: /api/v1/admin/categories/
+WARNING 2025-08-21 07:53:46,827 log 86770 6167261184 Unauthorized: /api/v1/admin/categories/
+WARNING 2025-08-21 07:53:46,829 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 401 244
+ERROR 2025-08-21 07:53:46,839 exceptions 86770 6167261184 API Error: Validation error - Status: 401 - Path: /api/v1/admin/categories/
+WARNING 2025-08-21 07:53:46,840 log 86770 6167261184 Unauthorized: /api/v1/admin/categories/
+WARNING 2025-08-21 07:53:46,840 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 401 244
+ERROR 2025-08-21 07:53:46,846 exceptions 86770 6184087552 API Error: Validation error - Status: 401 - Path: /api/v1/admin/products/
+WARNING 2025-08-21 07:53:46,846 log 86770 6184087552 Unauthorized: /api/v1/admin/products/
+WARNING 2025-08-21 07:53:46,846 basehttp 86770 6184087552 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 401 244
+ERROR 2025-08-21 07:53:46,852 exceptions 86770 6200913920 API Error: Validation error - Status: 401 - Path: /api/v1/admin/stats/
+WARNING 2025-08-21 07:53:46,852 log 86770 6200913920 Unauthorized: /api/v1/admin/stats/
+WARNING 2025-08-21 07:53:46,852 basehttp 86770 6200913920 "GET /api/v1/admin/stats/ HTTP/1.1" 401 244
+ERROR 2025-08-21 07:53:46,861 exceptions 86770 6217740288 API Error: Validation error - Status: 401 - Path: /api/v1/auth/profile/
+WARNING 2025-08-21 07:53:46,862 log 86770 6217740288 Unauthorized: /api/v1/auth/profile/
+WARNING 2025-08-21 07:53:46,862 basehttp 86770 6217740288 "GET /api/v1/auth/profile/ HTTP/1.1" 401 244
+INFO 2025-08-21 07:53:46,891 basehttp 86770 6217740288 "OPTIONS /api/v1/auth/refresh-token/ HTTP/1.1" 200 0
+INFO 2025-08-21 07:53:46,927 basehttp 86770 6217740288 "POST /api/v1/auth/refresh-token/ HTTP/1.1" 200 787
+INFO 2025-08-21 07:53:46,999 basehttp 86770 6217740288 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 07:54:03,322 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:54:03,327 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:54:06,096 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:54:06,104 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:54:06,123 basehttp 86770 6184087552 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6551
+INFO 2025-08-21 07:54:06,137 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6551
+INFO 2025-08-21 07:54:14,030 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 07:54:14,083 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5850
+INFO 2025-08-21 07:54:19,468 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 07:54:19,526 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5155
+INFO 2025-08-21 07:54:25,014 basehttp 86770 6167261184 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 07:54:25,067 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 4452
+INFO 2025-08-21 07:54:27,147 basehttp 86770 6167261184 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 07:54:45,973 views 86770 6167261184 [ProductCreate] Request data: {'name': 'Vivaldo Adão', 'description': 'frf', 'price': 4, 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 4, 'is_active': True, 'slug': 'vivaldo-adao-1755759285955-6hod', 'sku': 'PRD-1755759285955-YBH0', 'short_description': 'frf', 'track_inventory': True, 'requires_shipping': True, 'low_stock_threshold': 5}
+INFO 2025-08-21 07:54:45,980 basehttp 86770 6167261184 "POST /api/v1/products/create/ HTTP/1.1" 201 553
+INFO 2025-08-21 07:54:45,991 basehttp 86770 6167261184 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5146
+ERROR 2025-08-21 11:24:49,692 exceptions 86770 6167261184 API Error: Validation error - Status: 401 - Path: /api/v1/auth/profile/
+WARNING 2025-08-21 11:24:49,693 log 86770 6167261184 Unauthorized: /api/v1/auth/profile/
+WARNING 2025-08-21 11:24:49,693 basehttp 86770 6167261184 "GET /api/v1/auth/profile/ HTTP/1.1" 401 244
+INFO 2025-08-21 11:24:49,708 basehttp 86770 6167261184 "POST /api/v1/auth/refresh-token/ HTTP/1.1" 200 787
+INFO 2025-08-21 11:24:49,715 basehttp 86770 6167261184 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:29:49,686 basehttp 86770 6167261184 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:30:16,985 autoreload 86770 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/serializers.py changed, reloading.
+INFO 2025-08-21 11:30:18,654 autoreload 88869 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:32:07,424 basehttp 88869 6210809856 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:32:07,426 basehttp 88869 6160330752 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:32:07,441 basehttp 88869 6177157120 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5146
+INFO 2025-08-21 11:32:07,448 basehttp 88869 6210809856 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:32:07,457 basehttp 88869 6193983488 "GET /api/v1/admin/stats/ HTTP/1.1" 200 816
+INFO 2025-08-21 11:32:07,458 basehttp 88869 6160330752 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5146
+INFO 2025-08-21 11:32:12,572 basehttp 88869 6160330752 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:32:45,870 views 88869 6160330752 [ProductCreate] Request data: {'name': 'test', 'description': 'hgyygy', 'price': 560, 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 667, 'is_active': True, 'slug': 'test-1755772365858-6wu1', 'sku': 'PRD-1755772365858-8VYU', 'short_description': 'hgyygy', 'track_inventory': True, 'requires_shipping': True, 'low_stock_threshold': 5}
+INFO 2025-08-21 11:32:45,886 basehttp 88869 6160330752 "POST /api/v1/products/create/ HTTP/1.1" 201 590
+INFO 2025-08-21 11:32:45,890 basehttp 88869 6160330752 "OPTIONS /api/v1/upload/products/ HTTP/1.1" 200 0
+WARNING 2025-08-21 11:32:45,897 log 88869 6160330752 Forbidden: /api/v1/upload/products/
+WARNING 2025-08-21 11:32:45,897 basehttp 88869 6160330752 "POST /api/v1/upload/products/ HTTP/1.1" 403 71
+INFO 2025-08-21 11:32:45,912 basehttp 88869 6160330752 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5833
+INFO 2025-08-21 11:34:43,959 autoreload 88869 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_views.py changed, reloading.
+INFO 2025-08-21 11:34:45,413 autoreload 89187 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:35:08,622 basehttp 89187 6126170112 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:35:08,623 basehttp 89187 6176649216 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:35:08,639 basehttp 89187 6126170112 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:35:08,647 basehttp 89187 6142996480 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5833
+INFO 2025-08-21 11:35:08,668 basehttp 89187 6159822848 "GET /api/v1/admin/stats/ HTTP/1.1" 200 852
+INFO 2025-08-21 11:35:08,674 basehttp 89187 6126170112 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5833
+INFO 2025-08-21 11:35:17,652 basehttp 89187 6142996480 "OPTIONS /api/v1/admin/products/782ec58a-9339-4bab-873a-e1c7941786c2/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:35:17,652 basehttp 89187 6126170112 "OPTIONS /api/v1/admin/products/782ec58a-9339-4bab-873a-e1c7941786c2/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:35:17,659 basehttp 89187 6126170112 "GET /api/v1/admin/products/782ec58a-9339-4bab-873a-e1c7941786c2/ HTTP/1.1" 200 989
+INFO 2025-08-21 11:35:17,671 basehttp 89187 6126170112 "GET /api/v1/admin/products/782ec58a-9339-4bab-873a-e1c7941786c2/ HTTP/1.1" 200 989
+INFO 2025-08-21 11:35:23,610 basehttp 89187 6126170112 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:35:23,633 basehttp 89187 6126170112 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:35:23,640 basehttp 89187 6142996480 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5833
+INFO 2025-08-21 11:35:23,650 basehttp 89187 6159822848 "GET /api/v1/admin/stats/ HTTP/1.1" 200 852
+INFO 2025-08-21 11:35:23,667 basehttp 89187 6126170112 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:35:23,670 basehttp 89187 6176649216 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5833
+INFO 2025-08-21 11:35:23,682 basehttp 89187 6126170112 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:35:23,682 basehttp 89187 6142996480 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 5833
+INFO 2025-08-21 11:35:23,683 basehttp 89187 6159822848 "GET /api/v1/admin/stats/ HTTP/1.1" 200 852
+INFO 2025-08-21 11:35:23,713 basehttp 89187 6159822848 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5833
+INFO 2025-08-21 11:35:30,866 basehttp 89187 6126170112 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 11:35:30,974 basehttp 89187 6126170112 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5146
+INFO 2025-08-21 11:35:34,036 basehttp 89187 6126170112 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:36:08,443 views 89187 6126170112 [ProductCreate] Request data: {'name': 'test', 'description': 'gygyygyg', 'price': 450, 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 5670, 'is_active': True, 'slug': 'test-1755772568430-7lrm', 'sku': 'PRD-1755772568430-V9QR', 'short_description': 'gygyygyg', 'track_inventory': True, 'requires_shipping': True, 'low_stock_threshold': 5}
+INFO 2025-08-21 11:36:08,448 basehttp 89187 6126170112 "POST /api/v1/products/create/ HTTP/1.1" 201 595
+INFO 2025-08-21 11:36:08,465 upload_views 89187 6126170112 [ProductImageUpload] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 11:36:08,465 upload_views 89187 6126170112 [ProductImageUpload] User authenticated: True
+INFO 2025-08-21 11:36:08,466 upload_views 89187 6126170112 [ProductImageUpload] Files received: ['images']
+INFO 2025-08-21 11:36:08,466 upload_views 89187 6126170112 [ProductImageUpload] POST data: {'product_id': ['d8a256c2-0e78-4ff1-986e-79ac9e72a7f8'], 'set_primary': ['true']}
+WARNING 2025-08-21 11:36:08,467 log 89187 6126170112 Forbidden: /api/v1/upload/products/
+WARNING 2025-08-21 11:36:08,467 basehttp 89187 6126170112 "POST /api/v1/upload/products/ HTTP/1.1" 403 71
+INFO 2025-08-21 11:36:08,481 basehttp 89187 6126170112 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5836
+INFO 2025-08-21 11:38:45,524 autoreload 89497 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:39:10,143 autoreload 89187 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_views.py changed, reloading.
+INFO 2025-08-21 11:39:10,862 autoreload 89497 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_views.py changed, reloading.
+INFO 2025-08-21 11:39:11,874 autoreload 89569 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:39:12,128 autoreload 89572 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:39:24,452 autoreload 89572 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_views.py changed, reloading.
+INFO 2025-08-21 11:39:24,459 autoreload 89569 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_views.py changed, reloading.
+INFO 2025-08-21 11:39:26,017 autoreload 89616 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:39:26,017 autoreload 89615 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:40:09,686 basehttp 89616 6137999360 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:40:21,040 basehttp 89616 6137999360 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:40:32,745 basehttp 89616 6137999360 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 11:40:32,860 basehttp 89616 6137999360 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5146
+INFO 2025-08-21 11:40:34,657 basehttp 89616 6137999360 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:41:02,627 views 89616 6137999360 [ProductCreate] Request data: {'name': 'test', 'description': 'jjjhhjhjh', 'price': 550, 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 880, 'is_active': True, 'slug': 'test-1755772862606-776s', 'sku': 'PRD-1755772862606-KR9R', 'short_description': 'jjjhhjhjh', 'track_inventory': True, 'requires_shipping': True, 'low_stock_threshold': 5}
+INFO 2025-08-21 11:41:02,634 basehttp 89616 6137999360 "POST /api/v1/products/create/ HTTP/1.1" 201 596
+INFO 2025-08-21 11:41:02,641 upload_views 89616 6137999360 [ProductImageUpload] Request method: POST
+INFO 2025-08-21 11:41:02,641 upload_views 89616 6137999360 [ProductImageUpload] Request headers: {'Content-Length': '420902', 'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundarydelFZ8UXmBejYAyO', 'Host': 'localhost:8000', 'Connection': 'keep-alive', 'Sec-Ch-Ua-Platform': '"macOS"', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1Nzc1NDg5LCJpYXQiOjE3NTU3NzE4ODksImp0aSI6IjY5ZGMwZWJlNmNkOTQ1ZWU5MmVhOWJlMzY0MDg1Y2VlIiwidXNlcl9pZCI6IjZjMmZmZjk1LWNiZDEtNDhhNy05YmY3LWEzZDdlMTBkNjU1ZCIsImVtYWlsIjoiYWRhb192aXZhbGRvQGhvdG1haWwuY29tIiwicm9sZSI6ImFkbWluIiwibmFtZSI6IlZpdmFsZG8gQWRcdTAwZTNvIn0.S8UajowwyHpqt5OWw5MP9r4KHGAZuYTnxBBM38aYL2k', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'Sec-Ch-Ua': '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"', 'Sec-Ch-Ua-Mobile': '?0', 'Accept': '*/*', 'Origin': 'http://localhost:3000', 'Sec-Fetch-Site': 'same-site', 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Dest': 'empty', 'Referer': 'http://localhost:3000/', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7'}
+INFO 2025-08-21 11:41:02,642 upload_views 89616 6137999360 [ProductImageUpload] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 11:41:02,642 upload_views 89616 6137999360 [ProductImageUpload] User authenticated: True
+INFO 2025-08-21 11:41:02,642 upload_views 89616 6137999360 [ProductImageUpload] User is_staff: False
+INFO 2025-08-21 11:41:02,643 upload_views 89616 6137999360 [ProductImageUpload] Files received: ['images']
+INFO 2025-08-21 11:41:02,643 upload_views 89616 6137999360 [ProductImageUpload] POST data: {'product_id': ['389ca071-4689-44a2-8bb4-3b0b24319e4e'], 'set_primary': ['true']}
+INFO 2025-08-21 11:41:02,643 upload_views 89616 6137999360 [ProductImageUpload] Request auth: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1Nzc1NDg5LCJpYXQiOjE3NTU3NzE4ODksImp0aSI6IjY5ZGMwZWJlNmNkOTQ1ZWU5MmVhOWJlMzY0MDg1Y2VlIiwidXNlcl9pZCI6IjZjMmZmZjk1LWNiZDEtNDhhNy05YmY3LWEzZDdlMTBkNjU1ZCIsImVtYWlsIjoiYWRhb192aXZhbGRvQGhvdG1haWwuY29tIiwicm9sZSI6ImFkbWluIiwibmFtZSI6IlZpdmFsZG8gQWRcdTAwZTNvIn0.S8UajowwyHpqt5OWw5MP9r4KHGAZuYTnxBBM38aYL2k
+INFO 2025-08-21 11:41:02,643 upload_views 89616 6137999360 [ProductImageUpload] Permission classes: [<class 'rest_framework.permissions.IsAuthenticated'>]
+INFO 2025-08-21 11:41:02,643 upload_views 89616 6137999360 [ProductImageUpload] Permission IsAuthenticated: True
+WARNING 2025-08-21 11:41:02,645 log 89616 6137999360 Forbidden: /api/v1/upload/products/
+WARNING 2025-08-21 11:41:02,645 basehttp 89616 6137999360 "POST /api/v1/upload/products/ HTTP/1.1" 403 71
+INFO 2025-08-21 11:41:02,658 basehttp 89616 6137999360 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5836
+INFO 2025-08-21 11:42:29,556 autoreload 89615 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_views.py changed, reloading.
+INFO 2025-08-21 11:42:29,802 autoreload 89616 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/core/upload_views.py changed, reloading.
+INFO 2025-08-21 11:42:31,393 autoreload 89832 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:42:31,393 autoreload 89829 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:43:10,229 basehttp 89832 6197669888 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 11:43:10,324 basehttp 89832 6197669888 "OPTIONS /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 0
+INFO 2025-08-21 11:43:10,338 basehttp 89832 6197669888 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5146
+INFO 2025-08-21 11:43:16,318 basehttp 89832 6197669888 "OPTIONS /api/v1/admin/categories/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:43:16,328 basehttp 89832 6197669888 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:43:48,571 views 89832 6197669888 [ProductCreate] Request data: {'name': 'test', 'description': 'huhhuhuhyybhjnkm', 'price': 560, 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 980, 'is_active': True, 'slug': 'test-1755773028548-duzm', 'sku': 'PRD-1755773028548-TUSN', 'short_description': 'huhhuhuhyybhjnkm', 'track_inventory': True, 'requires_shipping': True, 'low_stock_threshold': 5}
+INFO 2025-08-21 11:43:48,591 basehttp 89832 6197669888 "POST /api/v1/products/create/ HTTP/1.1" 201 610
+INFO 2025-08-21 11:43:48,597 upload_views 89832 6197669888 [ProductImageUpload] Request method: POST
+INFO 2025-08-21 11:43:48,597 upload_views 89832 6197669888 [ProductImageUpload] Request headers: {'Content-Length': '534943', 'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundaryIKHtALqtHmeA8uSv', 'Host': 'localhost:8000', 'Connection': 'keep-alive', 'Sec-Ch-Ua-Platform': '"macOS"', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1Nzc1NDg5LCJpYXQiOjE3NTU3NzE4ODksImp0aSI6IjY5ZGMwZWJlNmNkOTQ1ZWU5MmVhOWJlMzY0MDg1Y2VlIiwidXNlcl9pZCI6IjZjMmZmZjk1LWNiZDEtNDhhNy05YmY3LWEzZDdlMTBkNjU1ZCIsImVtYWlsIjoiYWRhb192aXZhbGRvQGhvdG1haWwuY29tIiwicm9sZSI6ImFkbWluIiwibmFtZSI6IlZpdmFsZG8gQWRcdTAwZTNvIn0.S8UajowwyHpqt5OWw5MP9r4KHGAZuYTnxBBM38aYL2k', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'Sec-Ch-Ua': '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"', 'Sec-Ch-Ua-Mobile': '?0', 'Accept': '*/*', 'Origin': 'http://localhost:3000', 'Sec-Fetch-Site': 'same-site', 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Dest': 'empty', 'Referer': 'http://localhost:3000/', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7'}
+INFO 2025-08-21 11:43:48,597 upload_views 89832 6197669888 [ProductImageUpload] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 11:43:48,597 upload_views 89832 6197669888 [ProductImageUpload] User authenticated: True
+INFO 2025-08-21 11:43:48,597 upload_views 89832 6197669888 [ProductImageUpload] User is_staff: False
+INFO 2025-08-21 11:43:48,598 upload_views 89832 6197669888 [ProductImageUpload] Files received: ['images']
+INFO 2025-08-21 11:43:48,598 upload_views 89832 6197669888 [ProductImageUpload] POST data: {'product_id': ['30f911ec-9655-4508-806e-4556456cfc41'], 'set_primary': ['true']}
+INFO 2025-08-21 11:43:48,599 upload_views 89832 6197669888 [ProductImageUpload] Request auth: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1Nzc1NDg5LCJpYXQiOjE3NTU3NzE4ODksImp0aSI6IjY5ZGMwZWJlNmNkOTQ1ZWU5MmVhOWJlMzY0MDg1Y2VlIiwidXNlcl9pZCI6IjZjMmZmZjk1LWNiZDEtNDhhNy05YmY3LWEzZDdlMTBkNjU1ZCIsImVtYWlsIjoiYWRhb192aXZhbGRvQGhvdG1haWwuY29tIiwicm9sZSI6ImFkbWluIiwibmFtZSI6IlZpdmFsZG8gQWRcdTAwZTNvIn0.S8UajowwyHpqt5OWw5MP9r4KHGAZuYTnxBBM38aYL2k
+INFO 2025-08-21 11:43:48,599 upload_views 89832 6197669888 [ProductImageUpload] Permission classes: [<class 'rest_framework.permissions.IsAuthenticated'>]
+INFO 2025-08-21 11:43:48,599 upload_views 89832 6197669888 [ProductImageUpload] Permission IsAuthenticated: True
+INFO 2025-08-21 11:43:48,918 upload 89832 6197669888 File uploaded successfully: uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/pexels-photo-14653174_78cf85bf-23d6-4db7-813f-43b81e56906c.jpg
+INFO 2025-08-21 11:43:50,054 upload 89832 6197669888 File uploaded successfully: uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/leao-de-perfil-detalhado-simbolo-retrato-rosto-det_0422f578-cc0a-4377-9371-28c852859995.webp
+INFO 2025-08-21 11:43:50,054 upload 89832 6197669888 Multiple file upload completed: 2/2 successful
+INFO 2025-08-21 11:43:50,057 basehttp 89832 6197669888 "POST /api/v1/upload/products/ HTTP/1.1" 201 2259
+INFO 2025-08-21 11:43:50,074 basehttp 89832 6197669888 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6323
+INFO 2025-08-21 11:43:50,235 basehttp 89832 6214496256 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/pexels-photo-14653174_78cf85bf-23d6-4db7-813f-43b81e56906c.jpg HTTP/1.1" 200 215918
+INFO 2025-08-21 11:44:55,740 basehttp 89832 6197669888 "OPTIONS /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:44:55,741 basehttp 89832 6214496256 "OPTIONS /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:44:55,757 basehttp 89832 6197669888 "GET /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/ HTTP/1.1" 200 1715
+INFO 2025-08-21 11:44:55,766 basehttp 89832 6197669888 "GET /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/ HTTP/1.1" 200 1715
+INFO 2025-08-21 11:44:55,780 basehttp 89832 6231322624 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/leao-de-perfil-detalhado-simbolo-retrato-rosto-det_0422f578-cc0a-4377-9371-28c852859995.webp HTTP/1.1" 200 15506
+INFO 2025-08-21 11:45:06,403 basehttp 89832 6197669888 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:45:08,697 basehttp 89832 6197669888 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:45:15,010 basehttp 89832 6197669888 "OPTIONS /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 200 0
+ERROR 2025-08-21 11:45:15,017 exceptions 89832 6197669888 API Error: Validation error - Status: 400 - Path: /api/v1/products/test-1755773028548-duzm/update/
+WARNING 2025-08-21 11:45:15,018 log 89832 6197669888 Bad Request: /api/v1/products/test-1755773028548-duzm/update/
+WARNING 2025-08-21 11:45:15,019 basehttp 89832 6197669888 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 400 134
+INFO 2025-08-21 11:45:27,628 basehttp 89832 6197669888 "OPTIONS /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/toggle-status/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:45:27,646 basehttp 89832 6197669888 "PATCH /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/toggle-status/ HTTP/1.1" 200 79
+INFO 2025-08-21 11:45:29,380 basehttp 89832 6197669888 "PATCH /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/toggle-status/ HTTP/1.1" 200 76
+INFO 2025-08-21 11:45:35,603 basehttp 89832 6214496256 "OPTIONS /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 0
+INFO 2025-08-21 11:45:35,604 basehttp 89832 6231322624 "OPTIONS /api/v1/admin/stats/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:45:35,604 basehttp 89832 6248148992 "OPTIONS /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 0
+INFO 2025-08-21 11:45:35,605 basehttp 89832 6264975360 "OPTIONS /api/v1/admin/stats/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:45:35,608 basehttp 89832 6197669888 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:45:35,625 basehttp 89832 6197669888 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:45:35,650 basehttp 89832 6214496256 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6323
+INFO 2025-08-21 11:45:35,660 basehttp 89832 6264975360 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6323
+INFO 2025-08-21 11:45:35,674 basehttp 89832 6197669888 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:45:35,681 basehttp 89832 6231322624 "GET /api/v1/admin/stats/ HTTP/1.1" 200 852
+INFO 2025-08-21 11:45:35,684 basehttp 89832 6248148992 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6323
+INFO 2025-08-21 11:45:35,686 basehttp 89832 6197669888 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:45:35,692 basehttp 89832 6264975360 "GET /api/v1/admin/stats/ HTTP/1.1" 200 852
+INFO 2025-08-21 11:45:35,703 basehttp 89832 6264975360 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6323
+INFO 2025-08-21 11:45:35,772 basehttp 89832 6281801728 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/pexels-photo-14653174_78cf85bf-23d6-4db7-813f-43b81e56906c.jpg HTTP/1.1" 304 0
+INFO 2025-08-21 11:45:41,515 basehttp 89832 6197669888 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+ERROR 2025-08-21 11:45:51,313 exceptions 89832 6197669888 API Error: Validation error - Status: 400 - Path: /api/v1/products/test-1755773028548-duzm/update/
+WARNING 2025-08-21 11:45:51,313 log 89832 6197669888 Bad Request: /api/v1/products/test-1755773028548-duzm/update/
+WARNING 2025-08-21 11:45:51,313 basehttp 89832 6197669888 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 400 134
+INFO 2025-08-21 11:48:20,167 autoreload 89829 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:48:20,564 autoreload 89832 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:48:21,952 autoreload 90368 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:48:21,952 autoreload 90367 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:49:07,642 basehttp 90368 6131412992 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:49:13,925 views 90368 6131412992 [ProductUpdate] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 11:49:13,925 views 90368 6131412992 [ProductUpdate] User authenticated: True
+INFO 2025-08-21 11:49:13,926 views 90368 6131412992 [ProductUpdate] User role: admin
+INFO 2025-08-21 11:49:13,926 views 90368 6131412992 [ProductUpdate] Request data: {'name': 'testrr', 'short_description': 'huhhuhuhyybhjnkm', 'price': '560', 'category': 'Produtos de Cabelo', 'stock_quantity': 980}
+ERROR 2025-08-21 11:49:13,927 views 90368 6131412992 [ProductUpdate] Error: {'category': [ErrorDetail(string='“Produtos de Cabelo” is not a valid UUID.', code='invalid')]}
+ERROR 2025-08-21 11:49:13,927 views 90368 6131412992 [ProductUpdate] Error type: <class 'rest_framework.exceptions.ValidationError'>
+ERROR 2025-08-21 11:49:13,928 exceptions 90368 6131412992 API Error: Validation error - Status: 400 - Path: /api/v1/products/test-1755773028548-duzm/update/
+WARNING 2025-08-21 11:49:13,928 log 90368 6131412992 Bad Request: /api/v1/products/test-1755773028548-duzm/update/
+WARNING 2025-08-21 11:49:13,928 basehttp 90368 6131412992 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 400 134
+INFO 2025-08-21 11:50:09,645 basehttp 90368 6131412992 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:51:19,018 views 90368 6131412992 [ProductUpdate] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 11:51:19,019 views 90368 6131412992 [ProductUpdate] User authenticated: True
+INFO 2025-08-21 11:51:19,019 views 90368 6131412992 [ProductUpdate] User role: admin
+INFO 2025-08-21 11:51:19,019 views 90368 6131412992 [ProductUpdate] Request data: {'name': 'testrr', 'short_description': 'huhhuhuhyybhjnkm', 'price': '560', 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 980}
+INFO 2025-08-21 11:51:19,038 basehttp 90368 6131412992 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 200 612
+INFO 2025-08-21 11:51:19,052 basehttp 90368 6131412992 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6325
+INFO 2025-08-21 11:51:30,454 basehttp 90368 6131412992 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:51:36,823 views 90368 6131412992 [ProductUpdate] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 11:51:36,823 views 90368 6131412992 [ProductUpdate] User authenticated: True
+INFO 2025-08-21 11:51:36,823 views 90368 6131412992 [ProductUpdate] User role: admin
+INFO 2025-08-21 11:51:36,823 views 90368 6131412992 [ProductUpdate] Request data: {'name': 'testrr666', 'short_description': 'huhhuhuhyybhjnkm', 'price': '560', 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 980}
+INFO 2025-08-21 11:51:36,828 basehttp 90368 6131412992 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 200 615
+INFO 2025-08-21 11:51:36,845 basehttp 90368 6131412992 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:54:04,242 autoreload 90367 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:54:04,530 autoreload 90368 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:54:06,161 autoreload 90936 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:06,161 autoreload 90933 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:20,955 autoreload 90933 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:54:20,970 autoreload 90936 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:54:22,207 autoreload 91001 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:22,207 autoreload 91000 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:27,712 autoreload 91001 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:54:27,736 autoreload 91000 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:54:29,023 autoreload 91034 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:29,023 autoreload 91035 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:34,912 autoreload 91034 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:54:34,920 autoreload 91035 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/views.py changed, reloading.
+INFO 2025-08-21 11:54:36,243 autoreload 91073 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:36,244 autoreload 91074 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:44,310 autoreload 91074 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/urls.py changed, reloading.
+INFO 2025-08-21 11:54:44,314 autoreload 91073 8544362688 /Users/vadao/Documents/Projectos_Next/Projecto-Tuwi/backend/apps/ecommerce/urls.py changed, reloading.
+INFO 2025-08-21 11:54:45,770 autoreload 91124 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:54:45,771 autoreload 91123 8544362688 Watching for file changes with StatReloader
+INFO 2025-08-21 11:55:09,653 basehttp 91124 6127136768 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:55:30,377 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:55:30,414 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:55:47,391 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:55:47,504 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:56:44,691 basehttp 91124 6177615872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 11:56:44,695 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:56:44,772 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:56:44,797 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:56:44,805 basehttp 91124 6177615872 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:56:44,807 basehttp 91124 6160789504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 857
+INFO 2025-08-21 11:56:44,859 basehttp 91124 6194442240 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/pexels-photo-14653174_78cf85bf-23d6-4db7-813f-43b81e56906c.jpg HTTP/1.1" 304 0
+INFO 2025-08-21 11:57:42,257 basehttp 91124 6127136768 "GET /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/ HTTP/1.1" 200 1720
+INFO 2025-08-21 11:57:42,265 basehttp 91124 6127136768 "GET /api/v1/admin/products/30f911ec-9655-4508-806e-4556456cfc41/ HTTP/1.1" 200 1720
+INFO 2025-08-21 11:57:42,278 basehttp 91124 6143963136 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/leao-de-perfil-detalhado-simbolo-retrato-rosto-det_0422f578-cc0a-4377-9371-28c852859995.webp HTTP/1.1" 304 0
+INFO 2025-08-21 11:57:47,487 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:57:47,496 basehttp 91124 6127136768 "OPTIONS /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:57:47,497 basehttp 91124 6127136768 "OPTIONS /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 0
+INFO 2025-08-21 11:57:47,501 basehttp 91124 6143963136 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 11:57:47,507 basehttp 91124 6143963136 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 11:57:59,172 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:57:59,187 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:57:59,207 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:57:59,229 basehttp 91124 6177615872 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:57:59,230 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:57:59,231 basehttp 91124 6160789504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 857
+INFO 2025-08-21 11:57:59,256 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:57:59,264 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:57:59,272 basehttp 91124 6177615872 "GET /api/v1/admin/stats/ HTTP/1.1" 200 857
+INFO 2025-08-21 11:57:59,284 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 11:58:01,901 basehttp 91124 6143963136 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:58:15,452 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 11:58:15,461 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 11:58:15,467 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 12:01:45,654 basehttp 91124 6127136768 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 12:04:27,008 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:04:27,015 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 12:04:27,021 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 12:05:44,010 basehttp 91124 6177615872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 12:05:44,016 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:05:44,053 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:05:44,080 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6328
+INFO 2025-08-21 12:05:44,111 basehttp 91124 6160789504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 857
+INFO 2025-08-21 12:05:44,160 basehttp 91124 6177615872 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 12:05:44,272 basehttp 91124 6194442240 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/pexels-photo-14653174_78cf85bf-23d6-4db7-813f-43b81e56906c.jpg HTTP/1.1" 304 0
+INFO 2025-08-21 12:05:49,610 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:05:49,645 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 12:05:49,654 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 12:06:01,463 views 91124 6127136768 [ProductUpdate] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 12:06:01,463 views 91124 6127136768 [ProductUpdate] User authenticated: True
+INFO 2025-08-21 12:06:01,463 views 91124 6127136768 [ProductUpdate] User role: admin
+INFO 2025-08-21 12:06:01,464 views 91124 6127136768 [ProductUpdate] Request data: {'name': 'testrr666', 'short_description': 'huhhuhuhyybhjnkm', 'price': '560', 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 980}
+INFO 2025-08-21 12:06:01,483 basehttp 91124 6127136768 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 200 615
+INFO 2025-08-21 12:06:01,501 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 12:07:18,153 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:07:18,179 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 12:07:37,483 basehttp 91124 6177615872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 12:07:37,485 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:07:37,493 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6328
+INFO 2025-08-21 12:07:37,499 basehttp 91124 6160789504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 857
+INFO 2025-08-21 12:07:37,500 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:07:37,528 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6328
+INFO 2025-08-21 12:08:46,621 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:08:46,621 basehttp 91124 6143963136 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 12:08:46,631 basehttp 91124 6143963136 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 806
+INFO 2025-08-21 12:08:46,673 basehttp 91124 6177615872 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/leao-de-perfil-detalhado-simbolo-retrato-rosto-det_0422f578-cc0a-4377-9371-28c852859995.webp HTTP/1.1" 200 15506
+INFO 2025-08-21 12:08:46,674 basehttp 91124 6160789504 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/pexels-photo-14653174_78cf85bf-23d6-4db7-813f-43b81e56906c.jpg HTTP/1.1" 200 215918
+INFO 2025-08-21 12:08:53,348 basehttp 91124 6127136768 "OPTIONS /api/v1/products/images/0e399960-aec9-46e8-a17d-24ce500d0a0c/ HTTP/1.1" 200 0
+INFO 2025-08-21 12:08:53,356 views 91124 6127136768 [ProductUpdate] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 12:08:53,356 views 91124 6127136768 [ProductUpdate] User authenticated: True
+INFO 2025-08-21 12:08:53,357 views 91124 6127136768 [ProductUpdate] User role: admin
+INFO 2025-08-21 12:08:53,357 views 91124 6127136768 [ProductUpdate] Request data: {'name': 'testrr666', 'short_description': 'huhhuhuhyybhjnkm', 'price': '560', 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 980}
+INFO 2025-08-21 12:08:53,370 basehttp 91124 6143963136 "DELETE /api/v1/products/images/0e399960-aec9-46e8-a17d-24ce500d0a0c/ HTTP/1.1" 200 108
+INFO 2025-08-21 12:08:53,384 basehttp 91124 6127136768 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 200 615
+INFO 2025-08-21 12:08:53,395 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:08:58,852 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:08:58,860 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 437
+INFO 2025-08-21 12:08:58,867 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 437
+INFO 2025-08-21 12:09:14,160 upload_views 91124 6127136768 [ProductImageUpload] Request method: POST
+INFO 2025-08-21 12:09:14,160 upload_views 91124 6127136768 [ProductImageUpload] Request headers: {'Content-Length': '114320', 'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundaryfYrGYb3Mj5fuQfNv', 'Host': 'localhost:8000', 'Connection': 'keep-alive', 'Sec-Ch-Ua-Platform': '"macOS"', 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1Nzc1NDg5LCJpYXQiOjE3NTU3NzE4ODksImp0aSI6IjY5ZGMwZWJlNmNkOTQ1ZWU5MmVhOWJlMzY0MDg1Y2VlIiwidXNlcl9pZCI6IjZjMmZmZjk1LWNiZDEtNDhhNy05YmY3LWEzZDdlMTBkNjU1ZCIsImVtYWlsIjoiYWRhb192aXZhbGRvQGhvdG1haWwuY29tIiwicm9sZSI6ImFkbWluIiwibmFtZSI6IlZpdmFsZG8gQWRcdTAwZTNvIn0.S8UajowwyHpqt5OWw5MP9r4KHGAZuYTnxBBM38aYL2k', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', 'Sec-Ch-Ua': '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"', 'Sec-Ch-Ua-Mobile': '?0', 'Accept': '*/*', 'Origin': 'http://localhost:3000', 'Sec-Fetch-Site': 'same-site', 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Dest': 'empty', 'Referer': 'http://localhost:3000/', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept-Language': 'pt-PT,pt;q=0.9,en-US;q=0.8,en;q=0.7'}
+INFO 2025-08-21 12:09:14,160 upload_views 91124 6127136768 [ProductImageUpload] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 12:09:14,160 upload_views 91124 6127136768 [ProductImageUpload] User authenticated: True
+INFO 2025-08-21 12:09:14,160 upload_views 91124 6127136768 [ProductImageUpload] User is_staff: False
+INFO 2025-08-21 12:09:14,161 upload_views 91124 6127136768 [ProductImageUpload] Files received: ['images']
+INFO 2025-08-21 12:09:14,161 upload_views 91124 6127136768 [ProductImageUpload] POST data: {'product_id': ['30f911ec-9655-4508-806e-4556456cfc41'], 'set_primary': ['true']}
+INFO 2025-08-21 12:09:14,161 upload_views 91124 6127136768 [ProductImageUpload] Request auth: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU1Nzc1NDg5LCJpYXQiOjE3NTU3NzE4ODksImp0aSI6IjY5ZGMwZWJlNmNkOTQ1ZWU5MmVhOWJlMzY0MDg1Y2VlIiwidXNlcl9pZCI6IjZjMmZmZjk1LWNiZDEtNDhhNy05YmY3LWEzZDdlMTBkNjU1ZCIsImVtYWlsIjoiYWRhb192aXZhbGRvQGhvdG1haWwuY29tIiwicm9sZSI6ImFkbWluIiwibmFtZSI6IlZpdmFsZG8gQWRcdTAwZTNvIn0.S8UajowwyHpqt5OWw5MP9r4KHGAZuYTnxBBM38aYL2k
+INFO 2025-08-21 12:09:14,161 upload_views 91124 6127136768 [ProductImageUpload] Permission classes: [<class 'rest_framework.permissions.IsAuthenticated'>]
+INFO 2025-08-21 12:09:14,161 upload_views 91124 6127136768 [ProductImageUpload] Permission IsAuthenticated: True
+INFO 2025-08-21 12:09:14,233 upload 91124 6127136768 File uploaded successfully: uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/leao-de-perfil-detalhado-simbolo-retrato-rosto-det_00c936e0-ef90-4b70-a387-a40228235b95.webp
+INFO 2025-08-21 12:09:14,233 upload 91124 6127136768 Multiple file upload completed: 1/1 successful
+INFO 2025-08-21 12:09:14,236 basehttp 91124 6127136768 "POST /api/v1/upload/products/ HTTP/1.1" 201 1316
+INFO 2025-08-21 12:09:14,241 views 91124 6127136768 [ProductUpdate] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 12:09:14,241 views 91124 6127136768 [ProductUpdate] User authenticated: True
+INFO 2025-08-21 12:09:14,241 views 91124 6127136768 [ProductUpdate] User role: admin
+INFO 2025-08-21 12:09:14,241 views 91124 6127136768 [ProductUpdate] Request data: {'name': 'testrr666', 'short_description': 'huhhuhuhyybhjnkm', 'price': '560', 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 980}
+INFO 2025-08-21 12:09:14,244 basehttp 91124 6127136768 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 200 615
+INFO 2025-08-21 12:09:14,256 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6358
+INFO 2025-08-21 12:09:14,310 basehttp 91124 6143963136 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/leao-de-perfil-detalhado-simbolo-retrato-rosto-det_00c936e0-ef90-4b70-a387-a40228235b95.webp HTTP/1.1" 200 15506
+INFO 2025-08-21 12:09:20,670 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:09:20,680 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 811
+INFO 2025-08-21 12:09:20,688 basehttp 91124 6127136768 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 811
+INFO 2025-08-21 12:09:20,707 basehttp 91124 6143963136 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/leao-de-perfil-detalhado-simbolo-retrato-rosto-det_00c936e0-ef90-4b70-a387-a40228235b95.webp HTTP/1.1" 200 15506
+INFO 2025-08-21 12:09:28,315 basehttp 91124 6127136768 "OPTIONS /api/v1/products/images/640e711b-243e-4bbe-806c-1710b974aaff/ HTTP/1.1" 200 0
+INFO 2025-08-21 12:09:28,321 views 91124 6143963136 [ProductUpdate] User: Vivaldo Adão (adao_vivaldo@hotmail.com)
+INFO 2025-08-21 12:09:28,321 views 91124 6143963136 [ProductUpdate] User authenticated: True
+INFO 2025-08-21 12:09:28,321 views 91124 6143963136 [ProductUpdate] User role: admin
+INFO 2025-08-21 12:09:28,321 views 91124 6143963136 [ProductUpdate] Request data: {'name': 'testrr666', 'short_description': 'huhhuhuhyybhjnkm', 'price': '560', 'category': '9557818c-1a1d-4335-a721-0e85335a4896', 'stock_quantity': 980}
+INFO 2025-08-21 12:09:28,325 basehttp 91124 6127136768 "DELETE /api/v1/products/images/640e711b-243e-4bbe-806c-1710b974aaff/ HTTP/1.1" 200 108
+INFO 2025-08-21 12:09:28,326 basehttp 91124 6143963136 "PATCH /api/v1/products/test-1755773028548-duzm/update/ HTTP/1.1" 200 615
+INFO 2025-08-21 12:09:28,341 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:09:28,391 basehttp 91124 6160789504 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/pexels-photo-14653174_78cf85bf-23d6-4db7-813f-43b81e56906c.jpg HTTP/1.1" 304 0
+INFO 2025-08-21 12:09:34,442 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:09:34,447 basehttp 91124 6143963136 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 438
+INFO 2025-08-21 12:09:34,453 basehttp 91124 6143963136 "GET /api/v1/products/30f911ec-9655-4508-806e-4556456cfc41/images/ HTTP/1.1" 200 438
+INFO 2025-08-21 12:11:21,798 basehttp 91124 6177615872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 12:11:21,800 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:11:21,817 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:11:21,820 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:11:21,821 basehttp 91124 6160789504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 857
+INFO 2025-08-21 12:11:21,831 basehttp 91124 6177615872 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:11:31,602 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:11:31,664 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:11:46,700 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:11:47,152 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:11:59,221 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:11:59,313 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:12:08,231 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:12:08,251 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:12:19,003 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:12:19,038 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:12:53,234 basehttp 91124 6177615872 "GET /api/v1/auth/profile/ HTTP/1.1" 200 248
+INFO 2025-08-21 12:12:53,239 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:12:53,263 basehttp 91124 6143963136 "GET /api/v1/admin/products/?page=1&page_size=1000 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:12:53,267 basehttp 91124 6127136768 "GET /api/v1/admin/categories/ HTTP/1.1" 200 311
+INFO 2025-08-21 12:12:53,271 basehttp 91124 6160789504 "GET /api/v1/admin/stats/ HTTP/1.1" 200 857
+INFO 2025-08-21 12:12:53,281 basehttp 91124 6177615872 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 6146
+INFO 2025-08-21 12:12:53,331 basehttp 91124 6194442240 "GET /media/uploads/products/user_6c2fff95-cbd1-48a7-9bf7-a3d7e10d655d/pexels-photo-14653174_78cf85bf-23d6-4db7-813f-43b81e56906c.jpg HTTP/1.1" 304 0
+INFO 2025-08-21 12:13:10,928 basehttp 91124 6127136768 "POST /api/v1/admin/products/bulk-operations/ HTTP/1.1" 200 60
+INFO 2025-08-21 12:13:10,949 basehttp 91124 6127136768 "GET /api/v1/admin/products/?page=1&page_size=10 HTTP/1.1" 200 5452

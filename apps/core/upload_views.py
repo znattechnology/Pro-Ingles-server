@@ -361,3 +361,143 @@ class BatchUploadView(APIView):
             return Response(results, status=status.HTTP_201_CREATED)
         else:
             return Response(results, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductImageUploadView(APIView):
+    """
+    Product image upload endpoint for e-commerce products.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+    authentication_classes = []  # Add all auth classes explicitly
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Import here to avoid circular imports
+        from rest_framework_simplejwt.authentication import JWTAuthentication
+        self.authentication_classes = [JWTAuthentication]
+    
+    def post(self, request):
+        """
+        Upload product images.
+        
+        Expected form data:
+        - images: Multiple image files
+        - product_id: UUID of the product (optional, for existing product)
+        - set_primary: Boolean to set first image as primary (optional)
+        """
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"[ProductImageUpload] Request method: {request.method}")
+        logger.info(f"[ProductImageUpload] Request headers: {dict(request.headers)}")
+        logger.info(f"[ProductImageUpload] User: {request.user}")
+        logger.info(f"[ProductImageUpload] User authenticated: {request.user.is_authenticated}")
+        logger.info(f"[ProductImageUpload] User is_staff: {getattr(request.user, 'is_staff', False)}")
+        logger.info(f"[ProductImageUpload] Files received: {list(request.FILES.keys())}")
+        logger.info(f"[ProductImageUpload] POST data: {dict(request.POST)}")
+        logger.info(f"[ProductImageUpload] Request auth: {getattr(request, 'auth', None)}")
+        logger.info(f"[ProductImageUpload] Permission classes: {self.permission_classes}")
+        
+        # Check permissions manually for debugging
+        for perm_class in self.permission_classes:
+            perm_instance = perm_class()
+            has_perm = perm_instance.has_permission(request, self)
+            logger.info(f"[ProductImageUpload] Permission {perm_class.__name__}: {has_perm}")
+            if not has_perm:
+                logger.warning(f"[ProductImageUpload] Permission denied by {perm_class.__name__}")
+                return Response({
+                    'success': False,
+                    'errors': [f'Permission denied by {perm_class.__name__}']
+                }, status=status.HTTP_403_FORBIDDEN)
+        
+        from apps.ecommerce.models import Product, ProductImage
+        
+        images = request.FILES.getlist('images')
+        if not images:
+            return Response({
+                'success': False,
+                'errors': ['No images provided']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate image count
+        if len(images) > 5:
+            return Response({
+                'success': False,
+                'errors': ['Maximum 5 images allowed per product']
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validate image types and sizes
+        valid_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+        max_size = 5 * 1024 * 1024  # 5MB
+        
+        for image in images:
+            if image.content_type not in valid_types:
+                return Response({
+                    'success': False,
+                    'errors': [f'Invalid image type: {image.content_type}. Allowed: JPG, PNG, WebP, GIF']
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            if image.size > max_size:
+                return Response({
+                    'success': False,
+                    'errors': [f'Image {image.name} is too large. Maximum size: 5MB']
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Check if uploading to existing product
+        product_id = request.data.get('product_id')
+        product = None
+        if product_id:
+            try:
+                product = get_object_or_404(Product, id=product_id)
+                # Check if user has permission to edit this product
+                # Allow authenticated users (staff or admin role from JWT)
+                if not (request.user.is_staff or getattr(request.user, 'role', None) == 'admin'):
+                    logger.warning(f"[ProductImageUpload] Permission denied - User is_staff: {request.user.is_staff}, role: {getattr(request.user, 'role', None)}")
+                    return Response({
+                        'success': False,
+                        'errors': ['Access denied: Admin privileges required']
+                    }, status=status.HTTP_403_FORBIDDEN)
+            except Product.DoesNotExist:
+                return Response({
+                    'success': False,
+                    'errors': ['Product not found']
+                }, status=status.HTTP_404_NOT_FOUND)
+        
+        set_primary = request.data.get('set_primary', '').lower() in ['true', '1', 'yes']
+        
+        # Use general file upload handler
+        handler = FileUploadHandler(upload_type='products', user=request.user)
+        result = handler.upload_multiple_files(images)
+        
+        if result['success']:
+            # If product exists, create ProductImage entries
+            if product:
+                image_objects = []
+                for i, uploaded_file in enumerate(result['uploaded_files']):
+                    is_primary = (i == 0 and set_primary) or (i == 0 and not product.images.filter(is_primary=True).exists())
+                    
+                    # If setting as primary, unset other primary images
+                    if is_primary:
+                        ProductImage.objects.filter(product=product, is_primary=True).update(is_primary=False)
+                    
+                    product_image = ProductImage.objects.create(
+                        product=product,
+                        image=uploaded_file['file_path'],
+                        alt_text=f"{product.name} - Image {i + 1}",
+                        is_primary=is_primary,
+                        sort_order=i
+                    )
+                    image_objects.append({
+                        'id': str(product_image.id),
+                        'url': uploaded_file['file_url'],
+                        'is_primary': is_primary,
+                        'sort_order': i
+                    })
+                
+                result['product_images'] = image_objects
+                result['product_id'] = str(product.id)
+            
+            return Response(result, status=status.HTTP_201_CREATED)
+        else:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)

@@ -38,4 +38,12 @@ urlpatterns = [
     # Google OAuth
     path('oauth/google/url/', views.GoogleOAuthURLView.as_view(), name='google_oauth_url'),
     path('oauth/google/login/', views.GoogleOAuthLoginView.as_view(), name='google_oauth_login'),
+    
+    # Admin endpoints
+    path('admin/users/', views.AdminUsersListView.as_view(), name='admin_users_list'),
+    path('admin/users/<uuid:id>/', views.AdminUserDetailView.as_view(), name='admin_user_detail'),
+    path('admin/users/<uuid:id>/update/', views.AdminUserUpdateView.as_view(), name='admin_user_update'),
+    path('admin/users/<uuid:id>/role/', views.AdminUserRoleUpdateView.as_view(), name='admin_user_role_update'),
+    path('admin/users/<uuid:id>/status/', views.AdminUserToggleStatusView.as_view(), name='admin_user_toggle_status'),
+    path('admin/users/<uuid:id>/delete/', views.AdminUserDeleteView.as_view(), name='admin_user_delete'),
 ]

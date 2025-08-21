@@ -2,6 +2,7 @@
 Views for e-commerce functionality.
 """
 
+import logging
 from decimal import Decimal
 from django.db.models import Q, Count, Avg, Min, Max, F
 from django.contrib.auth import get_user_model
@@ -19,13 +20,15 @@ from .models import (
 )
 from .serializers import (
     ProductCategorySerializer, BrandSerializer, ProductListSerializer,
-    ProductDetailSerializer, ProductCreateUpdateSerializer, CartSerializer,
-    CartItemSerializer, CouponSerializer, CouponValidateSerializer,
+    ProductDetailSerializer, ProductCreateUpdateSerializer, ProductAdminListSerializer,
+    ProductImageSerializer, CartSerializer, CartItemSerializer, CouponSerializer, CouponValidateSerializer,
     OrderListSerializer, OrderDetailSerializer, OrderCreateSerializer,
     OrderStatusUpdateSerializer
 )
 from apps.core.permissions import IsAdminUser
 from apps.core.pagination import CustomPagination
+
+logger = logging.getLogger(__name__)
 
 
 class ProductFilter(django_filters.FilterSet):
@@ -122,6 +125,33 @@ class ProductCreateView(generics.CreateAPIView):
     
     serializer_class = ProductCreateUpdateSerializer
     permission_classes = [IsAdminUser]
+    
+    def create(self, request, *args, **kwargs):
+        """Create a new product with detailed error logging."""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"[ProductCreate] Request data: {request.data}")
+        
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            logger.error(f"[ProductCreate] Validation errors: {serializer.errors}")
+            return Response({
+                'success': False,
+                'errors': serializer.errors,
+                'message': 'Validation error'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            self.perform_create(serializer)
+            headers = self.get_success_headers(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        except Exception as e:
+            logger.error(f"[ProductCreate] Creation error: {str(e)}")
+            return Response({
+                'success': False,
+                'message': f'Error creating product: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class ProductUpdateView(generics.UpdateAPIView):
@@ -133,6 +163,22 @@ class ProductUpdateView(generics.UpdateAPIView):
     
     def get_queryset(self):
         return Product.objects.all()
+    
+    def update(self, request, *args, **kwargs):
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        logger.info(f"[ProductUpdate] User: {request.user}")
+        logger.info(f"[ProductUpdate] User authenticated: {request.user.is_authenticated}")
+        logger.info(f"[ProductUpdate] User role: {getattr(request.user, 'role', None)}")
+        logger.info(f"[ProductUpdate] Request data: {request.data}")
+        
+        try:
+            return super().update(request, *args, **kwargs)
+        except Exception as e:
+            logger.error(f"[ProductUpdate] Error: {str(e)}")
+            logger.error(f"[ProductUpdate] Error type: {type(e)}")
+            raise
 
 
 class FeaturedProductsView(generics.ListAPIView):
@@ -459,19 +505,29 @@ def ecommerce_stats(request):
     
     stats = {
         # Products
-        'total_products': Product.objects.filter(is_active=True).count(),
+        'total_products': Product.objects.count(),
+        'active_products': Product.objects.filter(is_active=True).count(),
+        'inactive_products': Product.objects.filter(is_active=False).count(),
         'featured_products': Product.objects.filter(is_active=True, is_featured=True).count(),
         'low_stock_products': Product.objects.filter(
-            is_active=True,
             track_inventory=True,
-            stock_quantity__lte=F('low_stock_threshold')
+            stock_quantity__lte=F('low_stock_threshold'),
+            stock_quantity__gt=0
         ).count(),
         'out_of_stock_products': Product.objects.filter(
-            is_active=True,
             track_inventory=True,
-            stock_quantity=0,
-            allow_backorder=False
+            stock_quantity=0
         ).count(),
+        
+        # Product values
+        'total_product_value': Product.objects.filter(
+            is_active=True
+        ).aggregate(
+            total=Sum(F('price') * F('stock_quantity'))
+        )['total'] or 0,
+        'average_product_price': Product.objects.filter(
+            is_active=True
+        ).aggregate(avg=Avg('price'))['avg'] or 0,
         
         # Orders
         'total_orders': Order.objects.count(),
@@ -517,6 +573,176 @@ def ecommerce_stats(request):
     return Response(stats)
 
 
+# ============================================================================
+# ADMIN VIEWS FOR DASHBOARD
+# ============================================================================
+
+class ProductAdminListView(generics.ListAPIView):
+    """Admin-specific product listing for dashboard."""
+    
+    serializer_class = ProductAdminListSerializer
+    permission_classes = [IsAdminUser]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = ProductFilter
+    search_fields = ['name', 'description', 'short_description', 'sku', 'brand__name']
+    ordering_fields = ['name', 'price', 'stock_quantity', 'created_at', 'average_rating']
+    ordering = ['-created_at']
+    pagination_class = CustomPagination
+    
+    def get_queryset(self):
+        """Return all products (active and inactive) for admin."""
+        return Product.objects.select_related('category', 'brand').prefetch_related('images')
+
+
+class ProductAdminDetailView(generics.RetrieveAPIView):
+    """Admin-specific product detail view."""
+    
+    serializer_class = ProductDetailSerializer
+    permission_classes = [IsAdminUser]
+    lookup_field = 'id'
+    
+    def get_queryset(self):
+        return Product.objects.select_related('category', 'brand').prefetch_related(
+            'images', 'variations__attributes'
+        )
+
+
+class ProductToggleStatusView(generics.UpdateAPIView):
+    """Toggle product active status."""
+    
+    permission_classes = [IsAdminUser]
+    lookup_field = 'id'
+    
+    def patch(self, request, id):
+        try:
+            product = Product.objects.get(id=id)
+            product.is_active = not product.is_active
+            product.save(update_fields=['is_active'])
+            
+            return Response({
+                'success': True, 
+                'is_active': product.is_active,
+                'message': f'Product {"activated" if product.is_active else "deactivated"} successfully'
+            })
+        except Product.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'Product not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
+class ProductBulkOperationsView(generics.GenericAPIView):
+    """Bulk operations for products."""
+    
+    permission_classes = [IsAdminUser]
+    
+    def post(self, request):
+        action = request.data.get('action')
+        product_ids = request.data.get('product_ids', [])
+        
+        if not action or not product_ids:
+            return Response({
+                'success': False,
+                'error': 'Action and product_ids are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            if action == 'bulk_activate':
+                updated = Product.objects.filter(id__in=product_ids).update(is_active=True)
+                message = f'{updated} products activated successfully'
+                
+            elif action == 'bulk_deactivate':
+                updated = Product.objects.filter(id__in=product_ids).update(is_active=False)
+                message = f'{updated} products deactivated successfully'
+                
+            elif action == 'bulk_delete':
+                deleted = Product.objects.filter(id__in=product_ids).delete()
+                message = f'{deleted[0]} products deleted successfully'
+                
+            else:
+                return Response({
+                    'success': False,
+                    'error': 'Invalid action. Use: bulk_activate, bulk_deactivate, or bulk_delete'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            return Response({
+                'success': True,
+                'message': message
+            })
+            
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ProductCategoriesAdminView(generics.ListCreateAPIView):
+    """Admin endpoint for product categories - list and create."""
+    
+    serializer_class = ProductCategorySerializer
+    permission_classes = [IsAdminUser]
+    pagination_class = None  # No pagination for dropdown
+    
+    def get_queryset(self):
+        return ProductCategory.objects.filter(is_active=True).order_by('sort_order', 'name')
+
+
+class ProductCategoryAdminDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Admin endpoint for individual category operations."""
+    
+    serializer_class = ProductCategorySerializer
+    permission_classes = [IsAdminUser]
+    lookup_field = 'id'
+    
+    def get_queryset(self):
+        return ProductCategory.objects.all()
+    
+    def destroy(self, request, *args, **kwargs):
+        """Soft delete category by marking as inactive."""
+        category = self.get_object()
+        
+        # Check if category has products
+        if category.products.filter(is_active=True).exists():
+            return Response({
+                'success': False,
+                'error': 'Cannot delete category with active products. Move products to another category first.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Soft delete
+        category.is_active = False
+        category.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Category deleted successfully'
+        })
+
+
+class ProductCategoryToggleStatusView(generics.UpdateAPIView):
+    """Toggle category active status."""
+    
+    permission_classes = [IsAdminUser]
+    lookup_field = 'id'
+    
+    def patch(self, request, id):
+        try:
+            category = ProductCategory.objects.get(id=id)
+            category.is_active = not category.is_active
+            category.save(update_fields=['is_active'])
+            
+            return Response({
+                'success': True, 
+                'is_active': category.is_active,
+                'message': f'Category {"activated" if category.is_active else "deactivated"} successfully'
+            })
+        except ProductCategory.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'Category not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+
 @api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def product_recommendations(request, product_id):
@@ -546,3 +772,68 @@ def product_recommendations(request, product_id):
     return Response({
         'recommendations': serializer.data
     })
+
+
+# ============================================================================
+# PRODUCT IMAGE MANAGEMENT VIEWS
+# ============================================================================
+
+class ProductImageListView(generics.ListAPIView):
+    """List all images for a specific product."""
+    
+    serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminUser]
+    
+    def get_queryset(self):
+        product_id = self.kwargs['product_id']
+        return ProductImage.objects.filter(product_id=product_id).order_by('sort_order', 'created_at')
+
+
+class ProductImageDeleteView(generics.DestroyAPIView):
+    """Delete a specific product image."""
+    
+    permission_classes = [IsAdminUser]
+    
+    def get_queryset(self):
+        return ProductImage.objects.all()
+    
+    def destroy(self, request, *args, **kwargs):
+        image = self.get_object()
+        product_id = image.product_id
+        
+        # Delete the physical file
+        if image.image:
+            try:
+                image.image.delete(save=False)
+            except Exception as e:
+                logger.warning(f"Could not delete image file: {str(e)}")
+        
+        # Delete the database record
+        image.delete()
+        
+        return Response({
+            'success': True,
+            'message': 'Imagem deletada com sucesso',
+            'product_id': str(product_id)
+        }, status=status.HTTP_200_OK)
+
+
+class ProductImageUpdateView(generics.UpdateAPIView):
+    """Update product image metadata (alt_text, is_primary, sort_order)."""
+    
+    serializer_class = ProductImageSerializer
+    permission_classes = [IsAdminUser]
+    
+    def get_queryset(self):
+        return ProductImage.objects.all()
+    
+    def update(self, request, *args, **kwargs):
+        # If setting as primary, unset other primary images for this product
+        if request.data.get('is_primary') is True:
+            image = self.get_object()
+            ProductImage.objects.filter(
+                product=image.product, 
+                is_primary=True
+            ).exclude(id=image.id).update(is_primary=False)
+        
+        return super().update(request, *args, **kwargs)

@@ -46,4 +46,18 @@ urlpatterns = [
     
     # Admin endpoints
     path('admin/stats/', views.ecommerce_stats, name='ecommerce-stats'),
+    path('admin/products/', views.ProductAdminListView.as_view(), name='admin-products-list'),
+    path('admin/products/<uuid:id>/', views.ProductAdminDetailView.as_view(), name='admin-product-detail'),
+    path('admin/products/<uuid:id>/toggle-status/', views.ProductToggleStatusView.as_view(), name='admin-product-toggle'),
+    path('admin/products/bulk-operations/', views.ProductBulkOperationsView.as_view(), name='admin-products-bulk'),
+    
+    # Category admin endpoints
+    path('admin/categories/', views.ProductCategoriesAdminView.as_view(), name='admin-categories-list'),
+    path('admin/categories/<uuid:id>/', views.ProductCategoryAdminDetailView.as_view(), name='admin-category-detail'),
+    path('admin/categories/<uuid:id>/toggle-status/', views.ProductCategoryToggleStatusView.as_view(), name='admin-category-toggle'),
+    
+    # Product image management
+    path('products/<uuid:product_id>/images/', views.ProductImageListView.as_view(), name='product-images-list'),
+    path('products/images/<uuid:pk>/', views.ProductImageDeleteView.as_view(), name='product-image-delete'),
+    path('products/images/<uuid:pk>/update/', views.ProductImageUpdateView.as_view(), name='product-image-update'),
 ]

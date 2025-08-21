@@ -156,7 +156,7 @@ class ProductCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'name', 'slug', 'description', 'short_description', 'category',
+            'id', 'name', 'slug', 'description', 'short_description', 'category',
             'brand', 'price', 'sale_price', 'cost_price', 'sku',
             'stock_quantity', 'low_stock_threshold', 'track_inventory',
             'allow_backorder', 'weight', 'dimensions_length', 'dimensions_width',
@@ -183,6 +183,60 @@ class ProductCreateUpdateSerializer(serializers.ModelSerializer):
             ProductImage.objects.create(product=product, **image_data)
         
         return product
+
+
+class ProductAdminListSerializer(serializers.ModelSerializer):
+    """Admin-specific serializer for product dashboard listing."""
+    
+    category_name = serializers.CharField(source='category.name', read_only=True)
+    brand_name = serializers.CharField(source='brand.name', read_only=True)
+    primary_image = serializers.SerializerMethodField()
+    current_price = serializers.ReadOnlyField()
+    discount_percentage = serializers.ReadOnlyField()
+    is_on_sale = serializers.ReadOnlyField()
+    is_in_stock = serializers.ReadOnlyField()
+    is_low_stock = serializers.ReadOnlyField()
+    images_urls = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Product
+        fields = [
+            'id', 'name', 'slug', 'short_description', 'category', 'category_name',
+            'brand', 'brand_name', 'price', 'sale_price', 'cost_price', 'current_price',
+            'discount_percentage', 'is_on_sale', 'sku', 'stock_quantity',
+            'low_stock_threshold', 'is_active', 'is_featured', 'is_digital',
+            'average_rating', 'total_reviews', 'primary_image', 'images_urls',
+            'is_in_stock', 'is_low_stock', 'created_at', 'updated_at'
+        ]
+    
+    def get_primary_image(self, obj):
+        """Get primary product image URL."""
+        primary_image = obj.images.filter(is_primary=True).first()
+        if primary_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(primary_image.image.url)
+            return primary_image.image.url
+        
+        first_image = obj.images.first()
+        if first_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(first_image.image.url)
+            return first_image.image.url
+        
+        return None
+    
+    def get_images_urls(self, obj):
+        """Get all product image URLs."""
+        request = self.context.get('request')
+        images = []
+        for image in obj.images.all()[:5]:  # Limit to 5 images for performance
+            if request:
+                images.append(request.build_absolute_uri(image.image.url))
+            else:
+                images.append(image.image.url)
+        return images
 
 
 class CartItemSerializer(serializers.ModelSerializer):
