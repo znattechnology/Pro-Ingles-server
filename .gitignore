@@ -8,6 +8,11 @@ venv/
 .env/
 .venv/
 
+# arquivos de configuração sensíveis
+.env
+.env.local
+.env.production
+
 # IDEs e configs
 .vscode/
 .idea/

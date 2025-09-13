@@ -1,7 +1,7 @@
 """
-Django settings for Tuwi Beauty Platform.
+Django settings for ProEnglish Platform.
 
-Following Django best practices and security guidelines.
+Clean backend focused on authentication system for English learning platform.
 """
 
 import os
@@ -37,31 +37,16 @@ THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
-    'django_filters',
     'drf_spectacular',
-    'admin_interface',
-    'colorfield',
-    'channels',
-    'django_redis',
-    'django_celery_beat',
-    'django_celery_results',
-    'django_structlog',
 ]
 
 LOCAL_APPS = [
     'apps.core',
     'apps.users',
-    'apps.braiders',
-    'apps.bookings',
-    'apps.ecommerce',
-    'apps.ratings',
-    'apps.chat',
-    'apps.notifications',
-    'apps.payments',
-    'apps.analytics',
-    'apps.ml',
-    'apps.promotions',
-    # 'apps.integrations.apps.IntegrationsConfig',
+    'apps.courses',
+    'apps.practice',
+    'apps.subscriptions',
+    'apps.cms',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -75,7 +60,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_structlog.middlewares.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -97,20 +81,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-ASGI_APPLICATION = 'core.asgi.application'
-
-# =============================================================================
-# CHANNELS (WebSockets)
-# =============================================================================
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [config('REDIS_URL', default='redis://localhost:6379/1')],
-        },
-    },
-}
 
 # =============================================================================
 # DATABASE
@@ -123,7 +93,7 @@ if USE_POSTGRESQL:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('DB_NAME', default='tuwi_dev'),
+            'NAME': config('DB_NAME', default='proenglish_dev'),
             'USER': config('DB_USER', default='postgres'),
             'PASSWORD': config('DB_PASSWORD', default='postgres'),
             'HOST': config('DB_HOST', default='localhost'),
@@ -132,7 +102,7 @@ if USE_POSTGRESQL:
                 'charset': 'utf8',
             },
             'TEST': {
-                'NAME': 'test_tuwi_dev',
+                'NAME': 'test_proenglish_dev',
             },
         }
     }
@@ -194,14 +164,11 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FileUploadParser',
     ],
     'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
-    'DEFAULT_PAGINATION_CLASS': 'apps.core.pagination.CustomPagination',
     'PAGE_SIZE': 20,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'EXCEPTION_HANDLER': 'apps.core.exceptions.custom_exception_handler',
 }
 
 # =============================================================================
@@ -220,8 +187,6 @@ SIMPLE_JWT = {
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
-    'JWK_URL': None,
-    'LEEWAY': 0,
 
     'AUTH_HEADER_TYPES': ('Bearer',),
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
@@ -231,13 +196,8 @@ SIMPLE_JWT = {
 
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
-    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
 
     'JTI_CLAIM': 'jti',
-
-    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
 # =============================================================================
@@ -256,8 +216,8 @@ CORS_ALLOW_CREDENTIALS = True
 # INTERNATIONALIZATION
 # =============================================================================
 
-LANGUAGE_CODE = 'pt-pt'
-TIME_ZONE = 'Europe/Lisbon'
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
@@ -272,22 +232,38 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# AWS S3 Settings (for production)
+# =============================================================================
+# AWS S3 CONFIGURATION
+# =============================================================================
+
+# AWS Settings
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='')
+AWS_STORAGE_BUCKET_NAME = config('AWS_S3_BUCKET_NAME', default='')
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='us-east-1')
+
+# CloudFront Distribution (for CDN)
+AWS_CLOUDFRONT_DOMAIN = config('AWS_CLOUDFRONT_DOMAIN', default='')
+
+# S3 Settings
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+AWS_DEFAULT_ACL = 'public-read'
+AWS_QUERYSTRING_AUTH = False
+
+# Static and Media files configuration
 USE_S3 = config('USE_S3', default=False, cast=bool)
 
-# AWS S3 configuration will be added later
-# if USE_S3:
-#     AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
-#     AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
-#     AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
-#     AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='eu-west-1')
-#     AWS_DEFAULT_ACL = None
-#     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-#     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
-#     
-#     # Static files settings
-#     STATICFILES_STORAGE = 'storages.backends.s3boto3.StaticS3Boto3Storage'
-#     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.MediaS3Boto3Storage'
+if USE_S3:
+    # Static files
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/static/'
+    
+    # Media files  
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
 
 # =============================================================================
 # EMAIL SETTINGS
@@ -306,14 +282,8 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', default=False, cast=bool)
 
-if EMAIL_BACKEND == 'anymail.backends.mailgun.EmailBackend':
-    ANYMAIL = {
-        'MAILGUN_API_KEY': config('MAILGUN_API_KEY'),
-        'MAILGUN_SENDER_DOMAIN': config('MAILGUN_SENDER_DOMAIN'),
-    }
-
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@tuwi.pt')
-CONTACT_EMAIL = config('CONTACT_EMAIL', default='contact@tuwi.pt')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@proenglish.com')
+CONTACT_EMAIL = config('CONTACT_EMAIL', default='contact@proenglish.com')
 
 # Frontend URL for email links
 FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
@@ -345,45 +315,9 @@ OAUTH2_SETTINGS = {
 }
 
 # =============================================================================
-# LOGGING & STRUCTURED LOGGING
+# LOGGING
 # =============================================================================
 
-import structlog
-
-# Structlog configuration
-structlog.configure(
-    processors=[
-        structlog.contextvars.merge_contextvars,
-        structlog.processors.add_log_level,
-        structlog.processors.StackInfoRenderer(),
-        structlog.dev.set_exc_info,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.dev.ConsoleRenderer() if DEBUG else structlog.processors.JSONRenderer(),
-    ],
-    context_class=dict,
-    logger_factory=structlog.WriteLoggerFactory(),
-    wrapper_class=structlog.make_filtering_bound_logger(20),  # INFO level
-    cache_logger_on_first_use=True,
-)
-
-# Django structlog configuration
-STRUCTLOG_SETTINGS = {
-    "CONTEXT_CLASS": dict,
-    "LOGGER_FACTORY": structlog.WriteLoggerFactory(),
-    "WRAPPER_CLASS": structlog.make_filtering_bound_logger(20),
-    "CACHE_LOGGER_ON_FIRST_USE": True,
-    "LOG_LEVEL": "INFO",
-    "PROCESSORS": [
-        structlog.contextvars.merge_contextvars,
-        structlog.processors.add_log_level,
-        structlog.processors.StackInfoRenderer(),
-        structlog.dev.set_exc_info,
-        structlog.processors.TimeStamper(fmt="iso"),
-        structlog.dev.ConsoleRenderer() if DEBUG else structlog.processors.JSONRenderer(),
-    ],
-}
-
-# Standard Django logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -396,40 +330,18 @@ LOGGING = {
             'format': '{levelname} {message}',
             'style': '{',
         },
-        'json': {
-            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-            'format': '%(asctime)s %(name)s %(levelname)s %(message)s'
-        },
     },
     'handlers': {
         'file': {
             'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs' / 'django.log',
-            'formatter': 'json' if not DEBUG else 'verbose',
-            'maxBytes': 10485760,  # 10MB
-            'backupCount': 5,
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'error.log',
-            'formatter': 'json' if not DEBUG else 'verbose',
-            'maxBytes': 10485760,  # 10MB
-            'backupCount': 5,
+            'formatter': 'verbose',
         },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
-        },
-        'performance': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': BASE_DIR / 'logs' / 'performance.log',
-            'formatter': 'json' if not DEBUG else 'verbose',
-            'maxBytes': 10485760,  # 10MB
-            'backupCount': 3,
         },
     },
     'root': {
@@ -438,33 +350,13 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console', 'file'] if not DEBUG else ['console'],
             'level': 'INFO',
-            'propagate': False,
-        },
-        'django.db.backends': {
-            'handlers': ['file'],
-            'level': 'WARNING',
             'propagate': False,
         },
         'apps': {
-            'handlers': ['file', 'console'],
+            'handlers': ['console', 'file'] if not DEBUG else ['console'],
             'level': 'DEBUG',
-            'propagate': False,
-        },
-        'apps.core.monitoring': {
-            'handlers': ['performance'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'celery': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'structlog': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
             'propagate': False,
         },
     },
@@ -475,116 +367,41 @@ LOGGING = {
 # =============================================================================
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Tuwi Beauty Platform API',
+    'TITLE': 'ProEnglish Platform API',
     'DESCRIPTION': '''
-    Comprehensive API for the Tuwi Beauty Platform - a modern marketplace connecting clients with professional braiders.
+    API for the ProEnglish Platform - English Learning Management System.
     
     ## Features
     - 🔐 User Authentication & Authorization (JWT)
-    - 👥 User & Braider Management
-    - 📅 Booking & Appointment System
-    - 🛒 E-commerce & Product Management
-    - ⭐ Reviews & Ratings
-    - 💬 Real-time Chat System
-    - 🔔 Push Notifications
-    - 💳 Payment Processing (Stripe)
-    - 📊 Analytics & Reporting
-    - 🤖 Machine Learning & AI Features
-    - 🔗 External Integrations
+    - 👥 User Management with Student/Teacher roles
+    - 📚 Course Management System
+    - 📊 Progress Tracking
+    - 💳 Payment Processing
+    - 🔗 Google OAuth Integration
     
-    ## Rate Limiting
-    API endpoints are rate-limited to ensure fair usage:
-    - Authentication endpoints: 20 requests per 15 minutes
-    - ML endpoints: 50 requests per hour
-    - General API: 1000 requests per hour
-    
-    ## Response Format
-    All API responses follow a consistent format with appropriate HTTP status codes.
-    Error responses include detailed error messages and validation errors where applicable.
+    ## Authentication
+    This API uses JWT (JSON Web Tokens) for authentication.
+    Include the token in the Authorization header: `Authorization: Bearer <your-token>`
     ''',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,
     'CONTACT': {
-        'name': 'Tuwi Development Team',
-        'email': 'dev@tuwi.pt',
+        'name': 'ProEnglish Development Team',
+        'email': 'dev@proenglish.com',
     },
     'LICENSE': {
         'name': 'Proprietary',
     },
-    'TAGS': [
-        {
-            'name': 'Authentication',
-            'description': 'User authentication and authorization endpoints'
-        },
-        {
-            'name': 'Users',
-            'description': 'User profile and account management'
-        },
-        {
-            'name': 'Braiders',
-            'description': 'Braider profiles, services, and availability'
-        },
-        {
-            'name': 'Bookings',
-            'description': 'Appointment booking and management'
-        },
-        {
-            'name': 'E-commerce',
-            'description': 'Products, categories, and cart management'
-        },
-        {
-            'name': 'Reviews',
-            'description': 'Rating and review system'
-        },
-        {
-            'name': 'Chat',
-            'description': 'Real-time messaging between users and braiders'
-        },
-        {
-            'name': 'Notifications',
-            'description': 'Push notifications and alerts'
-        },
-        {
-            'name': 'Payments',
-            'description': 'Payment processing and transaction management'
-        },
-        {
-            'name': 'Analytics',
-            'description': 'Business intelligence and reporting'
-        },
-        {
-            'name': 'Machine Learning',
-            'description': 'AI-powered recommendations and predictions'
-        },
-        {
-            'name': 'Integrations',
-            'description': 'External service integrations'
-        },
-    ],
     'SERVERS': [
         {
             'url': 'http://localhost:8000',
             'description': 'Development server'
         },
-        {
-            'url': 'https://api.tuwi.pt',
-            'description': 'Production server'
-        },
     ],
-    'EXTERNAL_DOCS': {
-        'description': 'Full Documentation',
-        'url': 'https://docs.tuwi.pt'
-    },
     'SCHEMA_PATH_PREFIX': '/api/v1/',
     'SCHEMA_PATH_PREFIX_TRIM': True,
     'SORT_OPERATIONS': True,
-    'ENUM_NAME_OVERRIDES': {
-        'ValidationErrorEnum': 'django.core.exceptions.ValidationError',
-    },
-    'POSTPROCESSING_HOOKS': [
-        'drf_spectacular.hooks.postprocess_schema_enums'
-    ],
     'SECURITY': [
         {
             'type': 'http',
@@ -595,116 +412,58 @@ SPECTACULAR_SETTINGS = {
 }
 
 # =============================================================================
-# ADMIN INTERFACE
+# OPENAI API SETTINGS
 # =============================================================================
 
-X_FRAME_OPTIONS = 'SAMEORIGIN'
-SILENCED_SYSTEM_CHECKS = ['security.W019']
+# OpenAI API configuration for AI Speaking Practice
+OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
+OPENAI_ORGANIZATION_ID = config('OPENAI_ORGANIZATION_ID', default='')
+
+# AI Speaking Practice Settings
+AI_SPEAKING_SETTINGS = {
+    # Models configuration
+    'MODELS': {
+        'CHAT': 'gpt-4-turbo-preview',
+        'WHISPER': 'whisper-1',
+        'TTS': 'tts-1',
+    },
+    
+    # Speech analysis weights
+    'SCORING_WEIGHTS': {
+        'PRONUNCIATION': 0.35,
+        'FLUENCY': 0.25,
+        'ACCURACY': 0.25,
+        'CONFIDENCE': 0.15,
+    },
+    
+    # Conversation settings
+    'CONVERSATION': {
+        'MAX_TOKENS': 200,
+        'TEMPERATURE': 0.7,
+        'MAX_CONTEXT_MESSAGES': 5,
+    },
+    
+    # TTS settings
+    'TTS': {
+        'VOICE': 'nova',
+        'MODEL': 'tts-1',
+        'RESPONSE_FORMAT': 'mp3',
+    },
+    
+    # Minimum scores for passing
+    'MINIMUM_SCORES': {
+        'OVERALL': 70.0,
+        'PRONUNCIATION': 60.0,
+        'FLUENCY': 65.0,
+        'ACCURACY': 70.0,
+    },
+}
 
 # =============================================================================
 # DEFAULT FIELD SETTINGS
 # =============================================================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# =============================================================================
-# CACHE SETTINGS
-# =============================================================================
-
-# Redis Cache Configuration
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config('REDIS_CACHE_URL', default='redis://localhost:6379/0'),
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'SERIALIZER': 'django_redis.serializers.json.JSONSerializer',
-            'COMPRESSOR': 'django_redis.compressors.zlib.ZlibCompressor',
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 50,
-                'retry_on_timeout': True,
-            },
-        },
-        'KEY_PREFIX': 'tuwi',
-        'TIMEOUT': 1800,  # 30 minutes default
-    }
-}
-
-# Cache configuration
-CACHE_TTL = config('CACHE_TTL', default=1800, cast=int)  # 30 minutes
-
-# Session cache (use Redis)
-# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'  # Redis não disponível
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usar database temporariamente
-SESSION_CACHE_ALIAS = 'default'
-SESSION_COOKIE_AGE = 86400  # 24 hours
-
-# =============================================================================
-# CELERY SETTINGS
-# =============================================================================
-
-# Celery Configuration
-CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/1')
-CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379/1')
-
-# Celery Task Configuration
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
-CELERY_ENABLE_UTC = True
-
-# Celery Worker Configuration
-CELERY_WORKER_PREFETCH_MULTIPLIER = 1
-CELERY_TASK_ACKS_LATE = True
-CELERY_WORKER_MAX_TASKS_PER_CHILD = 1000
-CELERY_TASK_REJECT_ON_WORKER_LOST = True
-
-# Task routing
-CELERY_TASK_ROUTES = {
-    'apps.notifications.tasks.*': {'queue': 'notifications'},
-    'apps.chat.tasks.*': {'queue': 'chat'},
-    'apps.payments.tasks.*': {'queue': 'payments'},
-    'apps.ml.tasks.*': {'queue': 'ml'},
-    'apps.analytics.tasks.*': {'queue': 'analytics'},
-    'apps.core.tasks.*': {'queue': 'core'},
-}
-
-# Celery Beat (Scheduler)
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
-# Task time limits
-CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
-CELERY_TASK_SOFT_TIME_LIMIT = 25 * 60  # 25 minutes
-
-# Result backend settings
-CELERY_RESULT_EXPIRES = 3600  # 1 hour
-CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = {
-    'master_name': 'mymaster',
-    'retry_on_timeout': True,
-}
-
-# Task annotations for specific rate limits
-CELERY_TASK_ANNOTATIONS = {
-    '*': {
-        'rate_limit': '100/m',
-    },
-    'apps.ml.tasks.train_model': {
-        'rate_limit': '10/m',
-        'time_limit': 2 * 60 * 60,  # 2 hours
-    },
-    'apps.core.tasks.backup_database': {
-        'rate_limit': '1/h',
-    },
-}
-
-# =============================================================================
-# STRIPE SETTINGS
-# =============================================================================
-
-STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='')
-STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
-STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='')
 
 # =============================================================================
 # DEVELOPMENT SETTINGS

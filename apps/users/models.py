@@ -1,5 +1,5 @@
 """
-User models for the Tuwi platform.
+User models for the ProEnglish platform.
 
 Following Django best practices with AbstractUser and proper role management.
 """
@@ -24,8 +24,8 @@ class User(AbstractUser):
     """
     
     ROLE_CHOICES = [
-        ('customer', 'Customer'),
-        ('braider', 'Braider'),
+        ('student', 'Student'),
+        ('teacher', 'Teacher'),
         ('admin', 'Administrator'),
     ]
     
@@ -69,7 +69,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=20,
         choices=ROLE_CHOICES,
-        default='customer',
+        default='student',
         help_text="User's role in the system"
     )
     is_active = models.BooleanField(
@@ -168,14 +168,14 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
     
     @property
-    def is_braider(self):
-        """Check if user is a braider."""
-        return self.role == 'braider'
+    def is_teacher(self):
+        """Check if user is a teacher."""
+        return self.role == 'teacher'
     
     @property
-    def is_customer(self):
-        """Check if user is a customer."""
-        return self.role == 'customer'
+    def is_student(self):
+        """Check if user is a student."""
+        return self.role == 'student'
     
     @property
     def is_platform_admin(self):

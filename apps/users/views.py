@@ -26,7 +26,7 @@ from .serializers import (
     EmailVerificationSerializer, GoogleOAuthSerializer,
     GoogleOAuthURLSerializer
 )
-from .services import GoogleOAuthService
+# from .services import GoogleOAuthService  # Temporarily disabled
 from .email_service import EmailVerificationService
 
 
@@ -345,75 +345,16 @@ def resend_verification_email(request):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+# Temporarily disabled - Google OAuth views
+"""
 class GoogleOAuthURLView(generics.GenericAPIView):
-    """
-    Generate Google OAuth authorization URL.
-    """
-    serializer_class = GoogleOAuthURLSerializer
-    permission_classes = [permissions.AllowAny]
-    
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        oauth_service = GoogleOAuthService()
-        
-        try:
-            auth_url = oauth_service.generate_auth_url(
-                state=serializer.validated_data.get('state'),
-                redirect_uri=serializer.validated_data.get('redirect_uri')
-            )
-            
-            return Response({
-                'auth_url': auth_url
-            })
-            
-        except Exception as e:
-            return Response({
-                'error': f'Failed to generate OAuth URL: {str(e)}'
-            }, status=status.HTTP_400_BAD_REQUEST)
-
+    # Generate Google OAuth authorization URL.
+    pass
 
 class GoogleOAuthLoginView(generics.GenericAPIView):
-    """
-    Authenticate user with Google OAuth.
-    """
-    serializer_class = GoogleOAuthSerializer
-    permission_classes = [permissions.AllowAny]
-    
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        oauth_service = GoogleOAuthService()
-        
-        try:
-            # Authenticate user using OAuth service
-            user, tokens = oauth_service.authenticate_user(**serializer.validated_data)
-            
-            # Update last login
-            user.last_login_at = timezone.now()
-            user.save(update_fields=['last_login_at'])
-            
-            # Return user data and tokens
-            return Response({
-                'message': 'Login successful',
-                'user': {
-                    'id': str(user.id),
-                    'email': user.email,
-                    'name': user.name,
-                    'role': user.role,
-                    'avatar': user.avatar.url if user.avatar else None,
-                    'email_verified': user.email_verified,
-                    'google_id': user.google_id,
-                },
-                'tokens': tokens
-            })
-            
-        except Exception as e:
-            return Response({
-                'error': f'Authentication failed: {str(e)}'
-            }, status=status.HTTP_400_BAD_REQUEST)
+    # Authenticate user with Google OAuth.
+    pass
+"""
 
 
 class LogoutView(generics.GenericAPIView):
@@ -505,8 +446,8 @@ class AdminUsersListView(generics.ListAPIView):
         stats = {
             'total_users': total,
             'active_users': queryset.filter(is_active=True).count(),
-            'customer_users': queryset.filter(role='customer').count(),
-            'braider_users': queryset.filter(role='braider').count(),
+            'student_users': queryset.filter(role='student').count(),
+            'teacher_users': queryset.filter(role='teacher').count(),
             'admin_users': queryset.filter(role='admin').count(),
             'verified_users': queryset.filter(email_verified=True).count(),
         }
@@ -659,7 +600,7 @@ class AdminUserRoleUpdateView(generics.UpdateAPIView):
             new_role = request.data.get('role')
             
             # Validate role
-            valid_roles = ['customer', 'braider', 'admin']
+            valid_roles = ['student', 'teacher', 'admin']
             if not new_role or new_role not in valid_roles:
                 return Response({
                     'error': f'Invalid role. Must be one of: {", ".join(valid_roles)}'
@@ -773,36 +714,12 @@ class AdminUserDeleteView(generics.DestroyAPIView):
                 'role': user.role,
             }
             
-            # Check for related braider profile
-            braider_info = None
-            try:
-                from apps.braiders.models import Braider
-                braider = Braider.objects.get(user_id=user.id)
-                braider_info = {
-                    'id': str(braider.id),
-                    'name': braider.name,
-                    'status': braider.status,
-                }
-            except Braider.DoesNotExist:
-                braider_info = None
-            except ImportError:
-                # Braiders app not available
-                braider_info = None
-            
-            # Delete user (should cascade to related objects)
+            # Delete user (will cascade to related objects)
             user.delete()
-            
-            # Prepare cascade test result
-            cascade_result = {
-                'user_deleted': True,
-                'user_info': user_info,
-                'had_braider_profile': braider_info is not None,
-                'braider_info': braider_info,
-            }
             
             return Response({
                 'message': f'User {user_info["name"]} deleted successfully.',
-                'cascade_test': cascade_result
+                'user_info': user_info
             })
             
         except User.DoesNotExist:

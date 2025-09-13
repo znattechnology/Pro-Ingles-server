@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo(a) ao Tuwi!</title>
+    <title>Bem-vindo(a) ao ProEnglish!</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
-            color: #2f3e46;
-            background-color: #f8faf9;
+            color: #1f2937;
+            background-color: #f8fafc;
         }
         
         .email-container {
@@ -20,11 +20,11 @@
             background-color: #ffffff;
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(52, 79, 111, 0.1);
+            box-shadow: 0 10px 40px rgba(59, 130, 246, 0.1);
         }
         
         .header {
-            background: linear-gradient(135deg, #52796f 0%, #84a98c 50%, #0ea5e9 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #10b981 100%);
             padding: 50px 30px;
             text-align: center;
             color: white;
@@ -39,7 +39,7 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
             background-size: 30px 30px;
             animation: sparkle 8s linear infinite;
         }
@@ -57,14 +57,22 @@
         }
         
         .brand-name {
-            font-size: 32px;
-            font-weight: 700;
+            font-size: 36px;
+            font-weight: 800;
             margin: 10px 0;
             letter-spacing: 1.5px;
-            color: #7dd3fc;
+            color: #ffffff;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
             position: relative;
             z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 40px;
         }
         
         .header-title {
@@ -90,21 +98,21 @@
         .greeting {
             font-size: 24px;
             font-weight: 700;
-            color: #2f3e46;
+            color: #1f2937;
             margin-bottom: 20px;
             text-align: center;
         }
         
         .welcome-message {
             font-size: 16px;
-            color: #52796f;
+            color: #4b5563;
             margin-bottom: 30px;
             line-height: 1.8;
             text-align: center;
         }
         
         .features-section {
-            background: linear-gradient(135deg, #f0f4f1 0%, #f0f9ff 100%);
+            background: linear-gradient(135deg, #f1f5f9 0%, #eff6ff 100%);
             border-radius: 16px;
             padding: 35px 25px;
             margin: 30px 0;
@@ -113,7 +121,7 @@
         .features-title {
             font-size: 20px;
             font-weight: 700;
-            color: #2f3e46;
+            color: #1f2937;
             text-align: center;
             margin-bottom: 25px;
         }
@@ -127,8 +135,8 @@
             background: white;
             padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(52, 79, 111, 0.08);
-            border-left: 4px solid #84a98c;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.08);
+            border-left: 4px solid #3b82f6;
         }
         
         .feature-icon {
@@ -140,13 +148,13 @@
         .feature-title {
             font-size: 16px;
             font-weight: 600;
-            color: #2f3e46;
+            color: #1f2937;
             margin-bottom: 8px;
         }
         
         .feature-description {
             font-size: 14px;
-            color: #52796f;
+            color: #4b5563;
             line-height: 1.5;
         }
         
@@ -154,26 +162,26 @@
             text-align: center;
             margin: 40px 0;
             padding: 30px;
-            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             border-radius: 16px;
         }
         
         .cta-title {
             font-size: 20px;
             font-weight: 600;
-            color: #2f3e46;
+            color: #1f2937;
             margin-bottom: 15px;
         }
         
         .cta-description {
             font-size: 14px;
-            color: #52796f;
+            color: #4b5563;
             margin-bottom: 25px;
         }
         
         .cta-button {
             display: inline-block;
-            background: linear-gradient(135deg, #0ea5e9 0%, #52796f 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
             color: white;
             text-decoration: none;
             padding: 16px 32px;
@@ -182,32 +190,32 @@
             font-size: 16px;
             letter-spacing: 0.5px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
             margin: 5px 10px;
         }
         
         .cta-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
         }
         
         .cta-button.secondary {
-            background: linear-gradient(135deg, #84a98c 0%, #52796f 100%);
-            box-shadow: 0 4px 15px rgba(132, 169, 140, 0.3);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
         
         .tips-section {
-            background-color: #f0f4f1;
+            background-color: #f1f5f9;
             padding: 30px;
             border-radius: 12px;
             margin: 30px 0;
-            border: 1px solid #c8d6cc;
+            border: 1px solid #e5e7eb;
         }
         
         .tips-title {
             font-size: 18px;
             font-weight: 600;
-            color: #2f3e46;
+            color: #1f2937;
             margin-bottom: 15px;
             text-align: center;
         }
@@ -220,37 +228,37 @@
         .tips-list li {
             padding: 8px 0;
             font-size: 14px;
-            color: #52796f;
+            color: #4b5563;
             position: relative;
             padding-left: 25px;
         }
         
         .tips-list li::before {
-            content: "✨";
+            content: "📚";
             position: absolute;
             left: 0;
             top: 8px;
         }
         
         .social-proof {
-            background: linear-gradient(135deg, #fff 0%, #f0f9ff 100%);
+            background: linear-gradient(135deg, #fff 0%, #eff6ff 100%);
             padding: 25px;
             border-radius: 12px;
             margin: 30px 0;
             text-align: center;
-            border: 1px solid #bae6fd;
+            border: 1px solid #93c5fd;
         }
         
         .social-proof-title {
             font-size: 16px;
             font-weight: 600;
-            color: #2f3e46;
+            color: #1f2937;
             margin-bottom: 10px;
         }
         
         .social-proof-text {
             font-size: 14px;
-            color: #52796f;
+            color: #4b5563;
             margin-bottom: 15px;
         }
         
@@ -267,19 +275,19 @@
         .stat-number {
             font-size: 24px;
             font-weight: 700;
-            color: #0ea5e9;
+            color: #3b82f6;
             display: block;
         }
         
         .stat-label {
             font-size: 12px;
-            color: #52796f;
+            color: #4b5563;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
         .footer {
-            background-color: #2f3e46;
+            background-color: #1f2937;
             padding: 40px 30px;
             text-align: center;
             color: white;
@@ -288,13 +296,17 @@
         .footer-brand {
             font-size: 24px;
             font-weight: 700;
-            color: #7dd3fc;
+            color: #3b82f6;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
         
         .footer-message {
             font-size: 16px;
-            color: #c8d6cc;
+            color: #d1d5db;
             line-height: 1.6;
             margin-bottom: 25px;
         }
@@ -302,7 +314,7 @@
         .contact-info {
             margin: 25px 0;
             padding: 20px;
-            background-color: #354f52;
+            background-color: #374151;
             border-radius: 12px;
         }
         
@@ -310,12 +322,12 @@
             font-size: 16px;
             font-weight: 600;
             margin-bottom: 10px;
-            color: #84a98c;
+            color: #60a5fa;
         }
         
         .contact-item {
             font-size: 14px;
-            color: #c8d6cc;
+            color: #d1d5db;
             margin: 5px 0;
         }
         
@@ -326,7 +338,7 @@
         .social-link {
             display: inline-block;
             margin: 0 15px;
-            color: #84a98c;
+            color: #9ca3af;
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
@@ -334,25 +346,25 @@
         }
         
         .social-link:hover {
-            color: #7dd3fc;
+            color: #3b82f6;
         }
         
         .copyright {
             font-size: 12px;
-            color: #a8bfad;
-            border-top: 1px solid #52796f;
+            color: #9ca3af;
+            border-top: 1px solid #374151;
             padding-top: 25px;
             margin-top: 25px;
         }
         
         .unsubscribe {
             font-size: 11px;
-            color: #84a98c;
+            color: #9ca3af;
             margin-top: 15px;
         }
         
         .unsubscribe a {
-            color: #84a98c;
+            color: #9ca3af;
             text-decoration: none;
         }
         
@@ -363,7 +375,7 @@
             .footer { padding: 30px 20px; }
             .stats { flex-direction: column; gap: 15px; }
             .cta-button { display: block; margin: 10px 0; }
-            .brand-name { font-size: 24px; }
+            .brand-name { font-size: 28px; }
             .greeting { font-size: 20px; }
         }
     </style>
@@ -373,8 +385,11 @@
         <!-- Header -->
         <div class="header">
             <div class="welcome-icon">🎉</div>
-            <h1 class="brand-name">TUWI</h1>
-            <h2 class="header-title">Bem-vindo(a) à nossa família!</h2>
+            <h1 class="brand-name">
+                <span class="logo-icon">🇬🇧</span>
+                ProEnglish
+            </h1>
+            <h2 class="header-title">Bem-vindo(a) à nossa comunidade!</h2>
             <p class="header-subtitle">Sua conta foi ativada com sucesso</p>
         </div>
         
@@ -383,8 +398,8 @@
             <div class="greeting">Olá {{ user_name }}! 👋</div>
             
             <div class="welcome-message">
-                É com imenso prazer que te damos as boas-vindas ao <strong>Tuwi</strong>! 
-                Sua jornada no mundo das tranças mais belas começa agora. ✨
+                É com imenso prazer que te damos as boas-vindas ao <strong>ProEnglish</strong>! 
+                Sua jornada de aprendizado de inglês com os melhores professores começa agora. ✨
             </div>
             
             <!-- Features Section -->
@@ -393,34 +408,34 @@
                 
                 <div class="features-grid">
                     <div class="feature-item">
-                        <span class="feature-icon">👩‍🦱</span>
-                        <div class="feature-title">Encontre Profissionais</div>
+                        <span class="feature-icon">👨‍🏫</span>
+                        <div class="feature-title">Encontre Professores</div>
                         <div class="feature-description">
-                            Descubra as melhores trancistas da sua região com avaliações reais
+                            Descubra os melhores professores de inglês com avaliações reais e metodologias comprovadas
                         </div>
                     </div>
                     
                     <div class="feature-item">
                         <span class="feature-icon">📅</span>
-                        <div class="feature-title">Agende Facilmente</div>
+                        <div class="feature-title">Agende Aulas</div>
                         <div class="feature-description">
-                            Marque seus horários de forma rápida e prática, direto pelo app
+                            Marque suas aulas de forma rápida e prática, direto pela plataforma
                         </div>
                     </div>
                     
                     <div class="feature-item">
-                        <span class="feature-icon">💬</span>
-                        <div class="feature-title">Chat Direto</div>
+                        <span class="feature-icon">📚</span>
+                        <div class="feature-title">Cursos Personalizados</div>
                         <div class="feature-description">
-                            Converse diretamente com as profissionais para tirar suas dúvidas
+                            Acesse cursos adaptados ao seu nível e objetivos específicos
                         </div>
                     </div>
                     
                     <div class="feature-item">
-                        <span class="feature-icon">⭐</span>
-                        <div class="feature-title">Avalie & Compartilhe</div>
+                        <span class="feature-icon">🎯</span>
+                        <div class="feature-title">Acompanhe Progresso</div>
                         <div class="feature-description">
-                            Compartilhe sua experiência e ajude outras pessoas a encontrar o melhor
+                            Monitore seu desenvolvimento e conquiste seus objetivos no inglês
                         </div>
                     </div>
                 </div>
@@ -430,10 +445,10 @@
             <div class="cta-section">
                 <h3 class="cta-title">Pronto para começar?</h3>
                 <p class="cta-description">
-                    Explore nossa plataforma e encontre a profissional perfeita para você!
+                    Explore nossa plataforma e encontre o professor perfeito para você!
                 </p>
                 <a href="{{ platform_url }}" class="cta-button">
-                    🚀 Explorar Profissionais
+                    🚀 Explorar Professores
                 </a>
                 <a href="{{ profile_url }}" class="cta-button secondary">
                     👤 Completar Perfil
@@ -445,10 +460,11 @@
                 <h3 class="tips-title">💡 Dicas para começar bem:</h3>
                 <ul class="tips-list">
                     <li>Complete seu perfil com foto e informações pessoais</li>
-                    <li>Navegue pelos portfólios das profissionais</li>
-                    <li>Leia as avaliações de outros clientes</li>
-                    <li>Use o chat para esclarecer dúvidas antes de agendar</li>
-                    <li>Não esqueça de avaliar após o serviço!</li>
+                    <li>Navegue pelos perfis dos professores disponíveis</li>
+                    <li>Leia as avaliações de outros estudantes</li>
+                    <li>Defina seus objetivos de aprendizado claramente</li>
+                    <li>Agende uma aula experimental para conhecer o professor</li>
+                    <li>Pratique regularmente para melhores resultados</li>
                 </ul>
             </div>
             
@@ -456,16 +472,16 @@
             <div class="social-proof">
                 <h3 class="social-proof-title">Você fez a escolha certa! 🎯</h3>
                 <p class="social-proof-text">
-                    Junte-se a milhares de pessoas que já transformaram seu visual conosco
+                    Junte-se a milhares de pessoas que já melhoraram seu inglês conosco
                 </p>
                 <div class="stats">
                     <div class="stat">
-                        <span class="stat-number">5000+</span>
-                        <span class="stat-label">Clientes Felizes</span>
+                        <span class="stat-number">10,000+</span>
+                        <span class="stat-label">Estudantes</span>
                     </div>
                     <div class="stat">
-                        <span class="stat-number">300+</span>
-                        <span class="stat-label">Profissionais</span>
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Professores</span>
                     </div>
                     <div class="stat">
                         <span class="stat-number">4.9⭐</span>
@@ -477,15 +493,18 @@
         
         <!-- Footer -->
         <div class="footer">
-            <div class="footer-brand">TUWI</div>
+            <div class="footer-brand">
+                <span class="logo-icon">🇬🇧</span>
+                ProEnglish
+            </div>
             <div class="footer-message">
-                Conectando você com as melhores profissionais de tranças.<br>
-                Beleza, estilo e tradição em suas mãos. 💫
+                Conectando você com os melhores professores de inglês.<br>
+                Aprenda inglês de forma eficiente e personalizada. 💫
             </div>
             
             <div class="contact-info">
                 <div class="contact-title">📞 Precisa de ajuda?</div>
-                <div class="contact-item">📧 Email: contact@tuwi.pt</div>
+                <div class="contact-item">📧 Email: support@proenglish.com</div>
                 <div class="contact-item">💬 WhatsApp: (11) 99999-9999</div>
                 <div class="contact-item">🕒 Seg-Sex: 8h às 18h | Sáb: 8h às 14h</div>
             </div>
@@ -493,12 +512,12 @@
             <div class="social-links">
                 <a href="#" class="social-link">📱 Instagram</a>
                 <a href="#" class="social-link">📘 Facebook</a>
-                <a href="#" class="social-link">💬 WhatsApp</a>
-                <a href="#" class="social-link">🎵 TikTok</a>
+                <a href="#" class="social-link">💼 LinkedIn</a>
+                <a href="#" class="social-link">📺 YouTube</a>
             </div>
             
             <div class="copyright">
-                © {{ current_year }} Tuwi. Todos os direitos reservados.<br>
+                © {{ current_year }} ProEnglish. Todos os direitos reservados.<br>
                 Este email foi enviado para {{ user_email }}
             </div>
             
