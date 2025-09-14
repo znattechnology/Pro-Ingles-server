@@ -16,6 +16,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 from django.db import models
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 
 from .models import User, UserAddress, NotificationSettings, EmailVerification
 from .serializers import (
@@ -30,9 +32,10 @@ from .serializers import (
 from .email_service import EmailVerificationService
 
 
+@method_decorator(ratelimit(key='ip', rate='5/m', method='POST', block=True), name='post')
 class UserRegistrationView(generics.CreateAPIView):
     """
-    View for user registration.
+    View for user registration with rate limiting (5 registrations per minute per IP).
     """
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
@@ -81,9 +84,10 @@ class UserRegistrationView(generics.CreateAPIView):
         )
 
 
+@method_decorator(ratelimit(key='ip', rate='10/m', method='POST', block=True), name='post')
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
-    Custom JWT token obtain view with additional user data.
+    Custom JWT token obtain view with additional user data and rate limiting (10 attempts per minute per IP).
     """
     serializer_class = CustomTokenObtainPairSerializer
 
@@ -152,9 +156,10 @@ class NotificationSettingsView(generics.RetrieveUpdateAPIView):
         return settings
 
 
+@method_decorator(ratelimit(key='ip', rate='3/m', method='POST', block=True), name='post')
 class PasswordResetRequestView(generics.GenericAPIView):
     """
-    View for password reset request - now using 6-digit codes like email verification.
+    View for password reset request with rate limiting (3 requests per minute per IP).
     """
     serializer_class = PasswordResetRequestSerializer
     permission_classes = [permissions.AllowAny]
@@ -268,9 +273,10 @@ class PasswordResetConfirmView(generics.GenericAPIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@method_decorator(ratelimit(key='ip', rate='10/m', method='POST', block=True), name='post')
 class EmailVerificationView(generics.GenericAPIView):
     """
-    View for email verification with 6-digit code.
+    View for email verification with 6-digit code and rate limiting (10 attempts per minute per IP).
     """
     permission_classes = [permissions.AllowAny]
     

@@ -16,8 +16,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # CORE SETTINGS
 # =============================================================================
 
+# Security: SECRET_KEY must be provided via environment variable
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-development-only-key-change-in-production')
 DEBUG = config('DEBUG', default=True, cast=bool)
+
+# Validate SECRET_KEY in production
+if not DEBUG and SECRET_KEY == 'django-insecure-development-only-key-change-in-production':
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured(
+        "SECRET_KEY deve ser definido via variável de ambiente em produção. "
+        "Use: python manage.py generate_secret_key"
+    )
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
 
 # =============================================================================
@@ -204,13 +213,27 @@ SIMPLE_JWT = {
 # CORS SETTINGS
 # =============================================================================
 
+# CORS: Always use explicit origins, never allow all
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
     default='http://localhost:3000,http://127.0.0.1:3000',
     cast=Csv()
 )
 
+# Additional CORS security settings
 CORS_ALLOW_CREDENTIALS = True
+CORS_PREFLIGHT_MAX_AGE = 86400  # 24 hours
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 # =============================================================================
 # INTERNATIONALIZATION
@@ -470,11 +493,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # =============================================================================
 
 if DEBUG:
-    # Allow all hosts in development
+    # Allow all hosts in development (but not in production)
     ALLOWED_HOSTS = ['*']
     
-    # Disable CORS in development
-    CORS_ALLOW_ALL_ORIGINS = True
+    # In development, we still use explicit CORS origins for security practice
+    # If you need to add development origins, update CORS_ALLOWED_ORIGINS in .env
+    # Example: CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
+    pass  # Removed CORS_ALLOW_ALL_ORIGINS = True for security
 
 # Create logs directory if it doesn't exist
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)

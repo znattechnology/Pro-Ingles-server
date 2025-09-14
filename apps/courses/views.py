@@ -30,6 +30,10 @@ from .serializers import (
     ChapterQuizSerializer, ChapterQuizCreateSerializer,
     StudentQuizAttemptSerializer, StudentQuizAttemptCreateSerializer
 )
+from .pagination import (
+    CourseListPagination, TransactionListPagination, CommentListPagination,
+    QuizAttemptPagination, StandardResultsSetPagination, optimize_paginated_queryset
+)
 
 
 class CourseListCreateView(generics.ListCreateAPIView):
@@ -40,8 +44,17 @@ class CourseListCreateView(generics.ListCreateAPIView):
     POST /api/v1/courses/ - Create new course (teachers only)
     
     Maps to Express: GET /courses and POST /courses
+    
+    Query Parameters for GET:
+    - page: Page number (default: 1)
+    - page_size: Items per page (default: 12, max: 100)
+    - category: Filter by category ('all' for no filter)
+    - ordering: Sort order (-created_at, title, price, level)
+    - include_description: Include description field (default: true)
+    - include_enrollment_count: Include enrollment count (default: false)
     """
     serializer_class = CourseListSerializer
+    pagination_class = CourseListPagination
     
     def get_permissions(self):
         if self.request.method == 'POST':
@@ -60,10 +73,19 @@ class CourseListCreateView(generics.ListCreateAPIView):
             # Public/students see only published courses
             queryset = Course.objects.filter(status='Published')
         
+        # Apply category filter
         category = self.request.query_params.get('category')
         if category and category != 'all':
             queryset = queryset.filter(category=category)
-        return queryset.order_by('-created_at')
+        
+        # Use optimized queryset from serializer
+        include_enrollment_count = self.request.query_params.get('include_enrollment_count', 'false').lower() == 'true'
+        queryset = CourseListSerializer.optimize_queryset(
+            queryset, 
+            include_enrollment_count=include_enrollment_count
+        )
+        
+        return optimize_paginated_queryset(queryset, self.request, '-created_at')
     
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -93,7 +115,13 @@ class CourseListCreateView(generics.ListCreateAPIView):
     
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-        serializer = self.get_serializer(queryset, many=True)
+        
+        # Prepare serializer context for conditional fields
+        context = {'request': request}
+        context['include_description'] = request.query_params.get('include_description', 'true').lower() == 'true'
+        context['include_enrollment_count'] = request.query_params.get('include_enrollment_count', 'false').lower() == 'true'
+        
+        serializer = self.get_serializer(queryset, many=True, context=context)
         
         return Response({
             'message': 'Cursos recuperados com sucesso',
@@ -111,6 +139,7 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     
     Maps to Express: GET/PUT/DELETE /courses/:id
     """
+    # Base queryset - optimization handled by serializer
     queryset = Course.objects.all()
     lookup_field = 'id'
     lookup_url_kwarg = 'courseId'
@@ -132,8 +161,37 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
                 raise PermissionDenied("Apenas o professor pode editar/deletar este curso")
     
     def retrieve(self, request, *args, **kwargs):
+        # Get base queryset and apply optimizations
         instance = self.get_object()
-        serializer = self.get_serializer(instance)
+        
+        # Get fresh instance with optimizations based on query parameters
+        include_sections = request.query_params.get('include_sections', 'true').lower() == 'true'
+        include_enrollments = request.query_params.get('include_enrollments', 'true').lower() == 'true'
+        include_chapters = request.query_params.get('include_chapters', 'true').lower() == 'true'
+        include_comments = request.query_params.get('include_chapter_comments', 'false').lower() == 'true'
+        
+        # Re-fetch with optimizations
+        optimized_queryset = CourseDetailSerializer.optimize_queryset(
+            Course.objects.filter(id=instance.id),
+            include_sections=include_sections,
+            include_enrollments=include_enrollments
+        )
+        instance = optimized_queryset.first()
+        
+        # Set prefetch flags for serializer
+        if include_sections:
+            instance._prefetched_sections = True
+        if include_enrollments:
+            instance._prefetched_enrollments = True
+        
+        # Prepare context
+        context = {'request': request}
+        context['include_sections'] = include_sections
+        context['include_enrollments'] = include_enrollments
+        context['include_chapters'] = include_chapters
+        context['include_chapter_comments'] = include_comments
+        
+        serializer = self.get_serializer(instance, context=context)
         
         return Response({
             'message': 'Curso recuperado com sucesso',
@@ -216,35 +274,60 @@ def create_transaction(request):
     }, status=status.HTTP_201_CREATED)
 
 
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def list_transactions(request):
+class TransactionListView(generics.ListAPIView):
     """
     List transactions for the authenticated user or all (for admins).
     
     GET /api/v1/courses/transactions/
     
     Maps to Express: GET /transactions
+    
+    Query Parameters:
+    - page: Page number (default: 1)
+    - page_size: Items per page (default: 15, max: 50)
+    - userId: Filter by user ID (admin only)
+    - ordering: Sort order (-dateTime, amount, paymentProvider)
     """
-    user_id = request.query_params.get('userId')
+    serializer_class = TransactionSerializer
+    pagination_class = TransactionListPagination
+    permission_classes = [permissions.IsAuthenticated]
     
-    if user_id and request.user.role == 'admin':
-        # Admin can view transactions for specific user
-        transactions = Transaction.objects.filter(user_id=user_id)
-    elif user_id and str(request.user.id) == user_id:
-        # User can view their own transactions
-        transactions = Transaction.objects.filter(user=request.user)
-    else:
-        # Regular users see only their own transactions
-        transactions = Transaction.objects.filter(user=request.user)
+    def get_queryset(self):
+        user_id = self.request.query_params.get('userId')
+        
+        if user_id and self.request.user.role == 'admin':
+            # Admin can view transactions for specific user
+            queryset = Transaction.objects.filter(user_id=user_id)
+        elif user_id and str(self.request.user.id) == user_id:
+            # User can view their own transactions
+            queryset = Transaction.objects.filter(user=self.request.user)
+        else:
+            # Regular users see only their own transactions
+            queryset = Transaction.objects.filter(user=self.request.user)
+        
+        # Optimize queries
+        queryset = queryset.select_related('user', 'course')
+        
+        return optimize_paginated_queryset(queryset, self.request, '-dateTime')
     
-    transactions = transactions.order_by('-dateTime')
-    serializer = TransactionSerializer(transactions, many=True)
-    
-    return Response({
-        'message': 'Transações recuperadas com sucesso',
-        'data': serializer.data
-    })
+    def list(self, request, *args, **kwargs):
+        """Add transaction summary to response context."""
+        queryset = self.filter_queryset(self.get_queryset())
+        
+        # Calculate summary for current user's transactions
+        from django.db.models import Sum, Count
+        summary = queryset.aggregate(
+            total_amount=Sum('amount'),
+            total_transactions=Count('id')
+        )
+        
+        # Add summary to request for pagination response
+        request.transaction_summary = {
+            'total_spent': summary['total_amount'] or 0,
+            'total_transactions': summary['total_transactions'] or 0
+        }
+        
+        return super().list(request, *args, **kwargs)
 
 
 @api_view(['GET'])
@@ -375,7 +458,17 @@ class CourseSectionListCreateView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         course_id = self.kwargs['courseId']
-        return CourseSection.objects.filter(course__id=course_id).order_by('order')
+        include_comments = self.request.query_params.get('include_comments', 'false').lower() == 'true'
+        
+        queryset = CourseSection.objects.filter(course__id=course_id)
+        
+        # Optimize based on requirements
+        if include_comments:
+            queryset = queryset.prefetch_related('chapters__comments__user')
+        else:
+            queryset = queryset.prefetch_related('chapters')
+        
+        return queryset.order_by('order')
     
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -398,7 +491,8 @@ class CourseSectionDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a course section.
     """
-    queryset = CourseSection.objects.all()
+    # Base queryset - optimization handled by views and serializers
+    queryset = CourseSection.objects.select_related('course', 'course__teacher')
     serializer_class = CourseSectionSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
@@ -444,7 +538,12 @@ class ChapterDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a chapter.
     """
-    queryset = Chapter.objects.all()
+    # Base queryset - selective optimization in views
+    queryset = Chapter.objects.select_related(
+        'section', 
+        'section__course', 
+        'section__course__teacher'
+    )
     serializer_class = ChapterSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
@@ -461,13 +560,20 @@ class ChapterDetailView(generics.RetrieveUpdateDestroyAPIView):
 class ChapterCommentListCreateView(generics.ListCreateAPIView):
     """
     List comments for a chapter or create new comment.
+    
+    Query Parameters for GET:
+    - page: Page number (default: 1)
+    - page_size: Items per page (default: 20, max: 50)
+    - ordering: Sort order (-timestamp, user__name)
     """
     serializer_class = ChapterCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = CommentListPagination
     
     def get_queryset(self):
         chapter_id = self.kwargs['chapterId']
-        return ChapterComment.objects.filter(chapter__id=chapter_id).order_by('-timestamp')
+        queryset = ChapterComment.objects.filter(chapter__id=chapter_id)
+        return ChapterCommentSerializer.optimize_queryset(queryset)
     
     def perform_create(self, serializer):
         chapter_id = self.kwargs['chapterId']
@@ -742,12 +848,20 @@ class ChapterResourceListCreateView(generics.ListCreateAPIView):
     
     GET /api/v1/courses/chapters/{chapterId}/resources/
     POST /api/v1/courses/chapters/{chapterId}/resources/
+    
+    Query Parameters for GET:
+    - page: Page number (default: 1)  
+    - page_size: Items per page (default: 20, max: 100)
+    - ordering: Sort order (order, -created_at, resource_type)
     """
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
     
     def get_queryset(self):
         chapter_id = self.kwargs['chapterId']
-        return ChapterResource.objects.filter(chapter__id=chapter_id).order_by('order', 'created_at')
+        queryset = ChapterResource.objects.filter(chapter__id=chapter_id)
+        queryset = queryset.select_related('chapter', 'created_by')
+        return optimize_paginated_queryset(queryset, self.request, 'order')
     
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -980,8 +1094,14 @@ class StudentQuizAttemptListCreateView(generics.ListCreateAPIView):
     
     GET /api/v1/courses/chapters/{chapterId}/quiz/attempts/
     POST /api/v1/courses/chapters/{chapterId}/quiz/attempts/
+    
+    Query Parameters for GET:
+    - page: Page number (default: 1)
+    - page_size: Items per page (default: 25, max: 50)
+    - ordering: Sort order (-created_at, score, attempt_number)
     """
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = QuizAttemptPagination
     
     def get_queryset(self):
         chapter_id = self.kwargs['chapterId']

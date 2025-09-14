@@ -52,11 +52,13 @@ class User(AbstractUser):
         blank=True,
         validators=[
             RegexValidator(
-                regex=r'^\+?1?\d{9,15}$',
-                message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+                # Updated regex for better international phone validation
+                # Supports Angola (+244), Brazil (+55), Portugal (+351), etc.
+                regex=r'^\+(?:[1-9]\d{0,3})?[1-9]\d{8,14}$',
+                message="Número de telefone deve estar no formato internacional: '+244912345678' (Angola) ou '+351912345678' (Portugal)."
             )
         ],
-        help_text="User's phone number"
+        help_text="Número de telefone no formato internacional (ex: +244912345678 para Angola)"
     )
     avatar = models.ImageField(
         upload_to='avatars/%Y/%m/',

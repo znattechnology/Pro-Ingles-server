@@ -109,11 +109,17 @@ class Course(BaseModel):
         verbose_name = 'Course'
         verbose_name_plural = 'Courses'
         indexes = [
+            # Single field indexes for basic filtering
             models.Index(fields=['teacher']),
             models.Index(fields=['category']),
             models.Index(fields=['level']),
             models.Index(fields=['status']),
             models.Index(fields=['created_at']),
+            # Composite indexes for common query patterns
+            models.Index(fields=['status', 'category'], name='course_status_category_idx'),
+            models.Index(fields=['teacher', 'status'], name='course_teacher_status_idx'),
+            models.Index(fields=['status', 'created_at'], name='course_status_date_idx'),
+            models.Index(fields=['category', 'level'], name='course_category_level_idx'),
         ]
         ordering = ['-created_at']
     
@@ -134,7 +140,12 @@ class Course(BaseModel):
     @property
     def total_chapters(self):
         """Return total number of chapters across all sections."""
-        return sum(section.chapters.count() for section in self.sections.all())
+        # Optimized query to avoid N+1 problem
+        from django.db.models import Count
+        result = self.sections.aggregate(
+            total=Count('chapters')
+        )
+        return result['total'] or 0
     
     @property
     def total_enrollments(self):
@@ -628,6 +639,8 @@ class CourseEnrollment(BaseModel):
             models.Index(fields=['user']),
             models.Index(fields=['course']),
             models.Index(fields=['enrollment_date']),
+            # Composite index for recent enrollments by course
+            models.Index(fields=['course', 'enrollment_date'], name='enrollment_course_date_idx'),
         ]
     
     def __str__(self):

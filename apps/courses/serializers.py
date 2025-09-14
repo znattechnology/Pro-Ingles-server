@@ -17,6 +17,7 @@ from apps.users.serializers import UserProfileSerializer
 class ChapterCommentSerializer(serializers.ModelSerializer):
     """
     Serializer for chapter comments - matches Express comments structure.
+    Optimized with selective fields to avoid N+1 queries.
     """
     user_name = serializers.CharField(source='user.name', read_only=True)
     
@@ -30,13 +31,19 @@ class ChapterCommentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
+    
+    @classmethod
+    def optimize_queryset(cls, queryset):
+        """Optimize queryset with select_related for performance."""
+        return queryset.select_related('user').order_by('-timestamp')
 
 
 class ChapterSerializer(serializers.ModelSerializer):
     """
     Serializer for chapters - matches Express chapter structure.
+    Optimized for performance with conditional field loading.
     """
-    comments = ChapterCommentSerializer(many=True, read_only=True)
+    comments = serializers.SerializerMethodField()
     
     class Meta:
         model = Chapter
@@ -45,6 +52,24 @@ class ChapterSerializer(serializers.ModelSerializer):
             'order', 'comments', 'created_at'
         ]
         read_only_fields = ['chapterId', 'created_at']
+    
+    def __init__(self, *args, **kwargs):
+        # Allow conditional field inclusion via context
+        include_comments = kwargs.get('context', {}).get('include_comments', True)
+        if not include_comments:
+            self.fields.pop('comments', None)
+        super().__init__(*args, **kwargs)
+    
+    def get_comments(self, obj):
+        """Get comments with optimized query."""
+        if not hasattr(obj, '_prefetched_comments'):
+            # If not prefetched, return empty list to avoid N+1
+            return []
+        
+        comments = ChapterCommentSerializer.optimize_queryset(
+            obj.comments.all()
+        )
+        return ChapterCommentSerializer(comments, many=True).data
 
 
 class ChapterCreateSerializer(serializers.ModelSerializer):
@@ -62,8 +87,9 @@ class ChapterCreateSerializer(serializers.ModelSerializer):
 class CourseSectionSerializer(serializers.ModelSerializer):
     """
     Serializer for course sections - matches Express sections structure.
+    Optimized with conditional chapter loading.
     """
-    chapters = ChapterSerializer(many=True, read_only=True)
+    chapters = serializers.SerializerMethodField()
     
     class Meta:
         model = CourseSection
@@ -72,6 +98,28 @@ class CourseSectionSerializer(serializers.ModelSerializer):
             'order', 'chapters', 'created_at'
         ]
         read_only_fields = ['sectionId', 'created_at']
+    
+    def __init__(self, *args, **kwargs):
+        # Allow conditional chapter inclusion via context
+        include_chapters = kwargs.get('context', {}).get('include_chapters', True)
+        if not include_chapters:
+            self.fields.pop('chapters', None)
+        super().__init__(*args, **kwargs)
+    
+    def get_chapters(self, obj):
+        """Get chapters with optimized query."""
+        if not hasattr(obj, '_prefetched_chapters'):
+            # If not prefetched, return empty list to avoid N+1
+            return []
+        
+        context = self.context.copy()
+        context['include_comments'] = context.get('include_chapter_comments', False)
+        
+        return ChapterSerializer(
+            obj.chapters.all().order_by('order'),
+            many=True,
+            context=context
+        ).data
 
 
 class CourseSectionCreateSerializer(serializers.ModelSerializer):
@@ -89,29 +137,69 @@ class CourseSectionCreateSerializer(serializers.ModelSerializer):
 class CourseListSerializer(serializers.ModelSerializer):
     """
     Serializer for course list view - lighter version without nested data.
+    Optimized for performance with selective fields.
     """
     teacherId = serializers.CharField(source='teacher.id', read_only=True)
+    total_enrollments = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
         fields = [
             'courseId', 'title', 'description', 'category', 'image',
             'price', 'level', 'status', 'template', 'teacher', 'teacherId', 'teacherName', 
+            'total_enrollments', 'created_at', 'updated_at'
+        ]
+        read_only_fields = [
+            'courseId', 'teacher', 'teacherId', 'teacherName', 'total_enrollments',
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['courseId', 'teacher', 'teacherId', 'teacherName', 'created_at', 'updated_at']
+    
+    def __init__(self, *args, **kwargs):
+        # Remove heavy fields if not needed
+        context = kwargs.get('context', {})
+        fields_to_remove = []
+        
+        if not context.get('include_description', True):
+            fields_to_remove.append('description')
+        if not context.get('include_enrollment_count', False):
+            fields_to_remove.append('total_enrollments')
+        
+        super().__init__(*args, **kwargs)
+        
+        for field_name in fields_to_remove:
+            self.fields.pop(field_name, None)
+    
+    def get_total_enrollments(self, obj):
+        """Get enrollment count efficiently."""
+        if hasattr(obj, '_enrollment_count'):
+            return obj._enrollment_count
+        return getattr(obj, 'total_enrollments', 0)
+    
+    @classmethod
+    def optimize_queryset(cls, queryset, include_enrollment_count=False):
+        """Optimize queryset for list view."""
+        queryset = queryset.select_related('teacher')
+        
+        if include_enrollment_count:
+            from django.db.models import Count
+            queryset = queryset.annotate(
+                _enrollment_count=Count('enrollments')
+            )
+        
+        return queryset
 
 
 class CourseDetailSerializer(serializers.ModelSerializer):
     """
     Serializer for course detail view - matches Express Course response structure.
+    Optimized with conditional loading and efficient queries.
     """
     teacherId = serializers.CharField(source='teacher.id', read_only=True)
-    sections = CourseSectionSerializer(many=True, read_only=True)
+    sections = serializers.SerializerMethodField()
     enrollments = serializers.SerializerMethodField()
-    total_sections = serializers.ReadOnlyField()
-    total_chapters = serializers.ReadOnlyField()
-    total_enrollments = serializers.ReadOnlyField()
+    total_sections = serializers.SerializerMethodField()
+    total_chapters = serializers.SerializerMethodField()
+    total_enrollments = serializers.SerializerMethodField()
     
     class Meta:
         model = Course
@@ -127,11 +215,97 @@ class CourseDetailSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
     
+    def __init__(self, *args, **kwargs):
+        # Allow conditional field inclusion
+        context = kwargs.get('context', {})
+        fields_to_remove = []
+        
+        if not context.get('include_sections', True):
+            fields_to_remove.append('sections')
+        if not context.get('include_enrollments', True):
+            fields_to_remove.append('enrollments')
+        
+        super().__init__(*args, **kwargs)
+        
+        for field_name in fields_to_remove:
+            self.fields.pop(field_name, None)
+    
+    def get_sections(self, obj):
+        """Get sections with optimized query."""
+        if not hasattr(obj, '_prefetched_sections'):
+            return []
+        
+        context = self.context.copy()
+        context['include_chapters'] = context.get('include_chapters', True)
+        context['include_chapter_comments'] = context.get('include_chapter_comments', False)
+        
+        return CourseSectionSerializer(
+            obj.sections.all().order_by('order'),
+            many=True,
+            context=context
+        ).data
+    
     def get_enrollments(self, obj):
         """
         Return enrollments in the same format as Express - array of userId objects.
+        Optimized to avoid N+1 queries.
         """
-        return [{'userId': str(enrollment.user.id)} for enrollment in obj.enrollments.all()]
+        if hasattr(obj, '_prefetched_enrollments'):
+            return [{'userId': str(enrollment.user.id)} 
+                   for enrollment in obj.enrollments.all()]
+        return []
+    
+    def get_total_sections(self, obj):
+        """Get total sections count efficiently."""
+        if hasattr(obj, '_sections_count'):
+            return obj._sections_count
+        return getattr(obj, 'total_sections', 0)
+    
+    def get_total_chapters(self, obj):
+        """Get total chapters count efficiently."""
+        if hasattr(obj, '_chapters_count'):
+            return obj._chapters_count
+        return getattr(obj, 'total_chapters', 0)
+    
+    def get_total_enrollments(self, obj):
+        """Get total enrollments count efficiently."""
+        if hasattr(obj, '_enrollments_count'):
+            return obj._enrollments_count
+        return getattr(obj, 'total_enrollments', 0)
+    
+    @classmethod
+    def optimize_queryset(cls, queryset, include_sections=True, include_enrollments=True):
+        """Optimize queryset for detail view."""
+        from django.db.models import Count
+        
+        # Always select related teacher
+        queryset = queryset.select_related('teacher')
+        
+        # Add counts as annotations to avoid property calculations
+        queryset = queryset.annotate(
+            _sections_count=Count('sections', distinct=True),
+            _chapters_count=Count('sections__chapters', distinct=True),
+            _enrollments_count=Count('enrollments', distinct=True)
+        )
+        
+        # Prefetch related objects if needed
+        prefetch_list = []
+        
+        if include_sections:
+            prefetch_list.extend([
+                'sections',
+                'sections__chapters',
+                'sections__chapters__comments__user'
+            ])
+        
+        if include_enrollments:
+            prefetch_list.append('enrollments__user')
+        
+        if prefetch_list:
+            from django.db.models import Prefetch
+            queryset = queryset.prefetch_related(*prefetch_list)
+        
+        return queryset
 
 
 class CourseCreateSerializer(serializers.ModelSerializer):
