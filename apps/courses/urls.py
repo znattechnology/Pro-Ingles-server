@@ -75,7 +75,3 @@ urlpatterns = [
          views.get_student_quiz_summary, name='quiz_summary'),
 ]
 
-# Add version discovery endpoint
-urlpatterns += [
-    path('_versions/', views.api_versions, name='api_versions'),
-]

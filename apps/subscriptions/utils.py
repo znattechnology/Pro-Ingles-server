@@ -25,14 +25,10 @@ def get_user_subscription(user):
         user=user,
         defaults={
             'plan': SubscriptionPlan.objects.get(plan_type='FREE'),
-            'status': 'ACTIVE'
+            'status': 'ACTIVE',
+            'expires_at': timezone.now() + timedelta(days=365*10)  # 10 anos para free
         }
     )
-    
-    if created:
-        # Configurar expiração para plano gratuito (10 anos)
-        subscription.expires_at = timezone.now() + timedelta(days=365*10)
-        subscription.save()
     
     return subscription
 
@@ -279,7 +275,7 @@ def get_subscription_analytics(user):
             'plan_type': plan.plan_type,
             'status': subscription.status,
             'expires_at': subscription.expires_at,
-            'days_remaining': subscription.days_until_expiry,
+            'days_remaining': subscription.days_until_expiry(),
             'is_trial': subscription.is_trial(),
             'is_active': subscription.is_active()
         },

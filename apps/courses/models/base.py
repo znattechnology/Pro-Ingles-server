@@ -30,6 +30,11 @@ class CourseChoices:
         ('medical', 'Inglês Médico'),
         ('legal', 'Inglês Jurídico'),
     ]
+    
+    COURSE_TYPE_CHOICES = [
+        ('video', 'Curso de Vídeo'),
+        ('practice', 'Curso do Laboratório'),
+    ]
 
 
 class ChapterChoices:

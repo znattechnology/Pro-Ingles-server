@@ -82,6 +82,7 @@ class PracticeChallenge(models.Model):
         ('SPEAKING', 'Speaking/Pronunciation'),
         ('MATCH_PAIRS', 'Match Pairs'),
         ('SENTENCE_ORDER', 'Sentence Order'),
+        ('TRUE_FALSE', 'True/False Questions'),
         
         # 🆕 AI SPEAKING CHALLENGE TYPES
         ('PRONUNCIATION', 'Pronunciation Practice'),

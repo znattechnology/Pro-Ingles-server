@@ -47,40 +47,17 @@ urlpatterns = [
     # Transactions - enhanced with better tracking
     path('transactions/', views.TransactionListView.as_view(), name='transaction_list'),
     path('transactions/create/', views.create_transaction, name='transaction_create'),
-    path('transactions/<uuid:transactionId>/', views.get_transaction_detail, name='transaction_detail'),
     
     # 🆕 NEW IN V2: Enhanced User Progress Tracking
     path('users/<uuid:userId>/enrolled/', views.get_user_enrolled_courses, name='user_enrolled_courses'),
     path('users/<uuid:userId>/progress/<uuid:courseId>/', views.get_user_course_progress, name='user_course_progress'),
     path('users/<uuid:userId>/progress/<uuid:courseId>/update/', views.update_user_course_progress, name='update_user_course_progress'),
-    path('users/<uuid:userId>/progress/<uuid:courseId>/analytics/', views.get_user_progress_analytics, name='user_progress_analytics'),
     
-    # 🆕 NEW IN V2: Course Analytics and Reporting
-    path('<uuid:courseId>/analytics/', views.get_course_analytics, name='course_analytics'),
-    path('<uuid:courseId>/students/', views.get_course_students, name='course_students'),
-    path('<uuid:courseId>/performance/', views.get_course_performance, name='course_performance'),
-    
-    # Enhanced payments with more providers
+    # Enhanced payments with Stripe
     path('payments/stripe/intent/', views.create_stripe_payment_intent, name='stripe_payment_intent'),
-    path('payments/methods/', views.get_payment_methods, name='payment_methods'),
-    path('payments/methods/<uuid:methodId>/', views.manage_payment_method, name='manage_payment_method'),
     
-    # Enhanced file uploads with better organization
+    # Enhanced file uploads
     path('<uuid:courseId>/sections/<uuid:sectionId>/chapters/<uuid:chapterId>/get-upload-url/', 
          views.get_upload_video_url, name='get_upload_video_url'),
     path('<uuid:courseId>/upload-image/', views.upload_course_image, name='upload_course_image'),
-    path('chapters/<uuid:chapterId>/resources/upload/', views.upload_chapter_resource, name='upload_chapter_resource'),
-    
-    # 🆕 NEW IN V2: Bulk Operations
-    path('bulk/enroll/', views.bulk_enroll_users, name='bulk_enroll'),
-    path('bulk/progress-update/', views.bulk_update_progress, name='bulk_progress_update'),
-    
-    # 🆕 NEW IN V2: Search and Filtering
-    path('search/', views.search_courses, name='search_courses'),
-    path('categories/', views.get_course_categories, name='course_categories'),
-    path('tags/', views.get_course_tags, name='course_tags'),
-    
-    # 🆕 NEW IN V2: Performance Metrics (for development/monitoring)
-    path('_metrics/', views.get_performance_metrics, name='performance_metrics'),
-    path('_health/', views.health_check, name='health_check'),
 ]

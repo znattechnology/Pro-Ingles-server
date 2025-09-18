@@ -61,6 +61,7 @@ from .serializers import (
     PracticeChallengeSerializer,
     ChallengeOptionSerializer,
     ChallengeOptionWithAnswerSerializer,
+    ChallengeOptionCreateSerializer,
     UserProgressSerializer,
     UserProgressUpdateSerializer,
     ChallengeProgressCreateSerializer,
@@ -114,13 +115,24 @@ class CoursesListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
-        # For teachers (management), show all courses
-        # For students, show only published courses
+        # Show practice lab courses for teachers (including Draft status for course management)
+        # For students, show only published practice lab courses
         user = self.request.user
+        
+        # Get query parameter to include drafts
+        query_params = getattr(self.request, 'query_params', self.request.GET)
+        include_drafts = query_params.get('include_drafts', 'false').lower() == 'true'
+        
         if hasattr(user, 'role') and user.role == 'teacher':
-            return Course.objects.all()
+            # For teachers: show ALL practice lab courses (including Draft) if include_drafts=true
+            if include_drafts:
+                return Course.objects.filter(course_type='practice').distinct().order_by('-created_at')
+            else:
+                # Only return published practice lab courses
+                return Course.objects.filter(course_type='practice', status='Published').distinct()
         else:
-            return Course.objects.filter(status='Published')
+            # For students: only published practice lab courses
+            return Course.objects.filter(course_type='practice', status='Published').distinct()
     
     def list(self, request, *args, **kwargs):
         courses = self.get_queryset()
@@ -187,6 +199,7 @@ class CreateCourseView(APIView):
                 teacher=request.user,  # Set the current user as teacher
                 teacherName=f"{request.user.first_name} {request.user.last_name}".strip() or request.user.email,
                 price=0,  # Free for practice courses
+                course_type='practice',  # Set as practice lab course
             )
             
             logger.info(f"Course created successfully with ID: {course.id}")
@@ -243,7 +256,7 @@ class LessonDetailView(generics.RetrieveAPIView):
     lookup_field = 'id'
     lookup_url_kwarg = 'lesson_id'
     
-    @subscription_required('lesson')
+    # @subscription_required('lesson')  # Commented out - will implement later
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
     
@@ -330,7 +343,7 @@ class ChallengeProgressView(APIView):
     """
     permission_classes = [IsAuthenticated]
     
-    @hearts_required()
+    # @hearts_required()  # Commented out - will implement later
     def post(self, request):
         """Complete a challenge and update user progress"""
         import logging
@@ -503,6 +516,288 @@ class RefillHeartsView(APIView):
         })
 
 
+class ValidateTextAnswerView(APIView):
+    """
+    POST /api/v1/practice/validate-text-answer/
+    
+    Validate text-based answers for FILL_BLANK, TRANSLATION, and other text input challenges.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """Validate user's text answer against correct option"""
+        import logging
+        logger = logging.getLogger(__name__)
+        
+        challenge_id = request.data.get('challenge_id')
+        user_answer = request.data.get('user_answer', '').strip()
+        
+        if not challenge_id or not user_answer:
+            return Response(
+                {'error': 'challenge_id and user_answer are required'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            challenge = PracticeChallenge.objects.get(id=challenge_id)
+        except PracticeChallenge.DoesNotExist:
+            return Response(
+                {'error': 'Challenge not found'}, 
+                status=status_module.HTTP_404_NOT_FOUND
+            )
+        
+        # Get user progress
+        user_progress, created = UserProgress.objects.get_or_create(
+            user=request.user,
+            defaults={'hearts': 5, 'points': 0}
+        )
+        
+        # Check if user already completed this challenge
+        existing_progress = ChallengeProgress.objects.filter(
+            user=request.user,
+            challenge=challenge
+        ).first()
+        
+        is_practice = existing_progress is not None
+        logger.info(f"Text answer validation - Practice mode: {is_practice}")
+        
+        # Check hearts for new challenges
+        if user_progress.hearts == 0 and not is_practice:
+            return Response(
+                {'error': 'hearts', 'message': 'No hearts remaining'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get the correct answer from challenge options
+        correct_option = challenge.options.filter(is_correct=True).first()
+        if not correct_option:
+            return Response(
+                {'error': 'No correct answer found for this challenge'}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+        # Normalize answers for comparison
+        user_answer_normalized = user_answer.lower().strip()
+        correct_answer_normalized = correct_option.text.lower().strip()
+        
+        # Check if answers match (case-insensitive, whitespace trimmed)
+        is_correct = user_answer_normalized == correct_answer_normalized
+        
+        # Additional flexible matching for fill-blank
+        if not is_correct and challenge.type == 'FILL_BLANK':
+            # Remove extra spaces and check again
+            user_words = user_answer_normalized.split()
+            correct_words = correct_answer_normalized.split()
+            is_correct = user_words == correct_words
+        
+        if is_correct:
+            # Correct answer: mark challenge as completed
+            if existing_progress:
+                existing_progress.completed = True
+                existing_progress.save()
+                progress = existing_progress
+            else:
+                progress = ChallengeProgress.objects.create(
+                    user=request.user,
+                    challenge=challenge,
+                    completed=True
+                )
+            
+            # Update user progress based on practice mode
+            if is_practice:
+                # Practice mode: restore hearts and add points
+                user_progress.add_hearts(1)
+                user_progress.add_points(10)
+            else:
+                # New challenge: just add points
+                user_progress.add_points(10)
+            
+            return Response({
+                'success': True,
+                'correct': True,
+                'user_answer': user_answer,
+                'correct_answer': correct_option.text,
+                'challenge_progress': {
+                    'id': str(progress.id),
+                    'completed': progress.completed,
+                    'completed_at': progress.completed_at
+                },
+                'user_progress': {
+                    'hearts': user_progress.hearts,
+                    'points': user_progress.points
+                }
+            }, status=status_module.HTTP_200_OK)
+        else:
+            # Wrong answer: don't complete challenge, reduce hearts if not practice
+            if not is_practice and user_progress.hearts > 0:
+                user_progress.reduce_hearts()
+            
+            return Response({
+                'success': True,
+                'correct': False,
+                'user_answer': user_answer,
+                'correct_answer': correct_option.text,
+                'user_progress': {
+                    'hearts': user_progress.hearts,
+                    'points': user_progress.points
+                }
+            }, status=status_module.HTTP_200_OK)
+
+
+class GetAudioUploadUrlView(APIView):
+    """
+    POST /api/v1/practice/challenges/{challenge_id}/get-audio-upload-url/
+    
+    Get presigned S3 URL for audio upload in listening challenges.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, challenge_id):
+        """Generate presigned URL for audio upload to S3"""
+        import boto3
+        import uuid
+        from django.conf import settings
+        
+        try:
+            # Validate request data
+            lesson_id = request.data.get('lessonId')
+            file_name = request.data.get('fileName')
+            file_type = request.data.get('fileType')
+            
+            if not all([lesson_id, file_name, file_type]):
+                return Response(
+                    {'error': 'lessonId, fileName, and fileType are required'}, 
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+            
+            # Verify challenge exists
+            try:
+                challenge = PracticeChallenge.objects.get(id=challenge_id)
+            except PracticeChallenge.DoesNotExist:
+                return Response(
+                    {'error': 'Challenge not found'}, 
+                    status=status_module.HTTP_404_NOT_FOUND
+                )
+            
+            # Generate unique file name to avoid conflicts
+            file_extension = file_name.split('.')[-1] if '.' in file_name else 'mp3'
+            unique_filename = f"audio/{lesson_id}/{challenge_id}/{uuid.uuid4().hex}.{file_extension}"
+            
+            # Initialize S3 client
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_S3_REGION_NAME or 'us-east-1'
+            )
+            
+            # Generate presigned URL for upload
+            presigned_url = s3_client.generate_presigned_url(
+                'put_object',
+                Params={
+                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                    'Key': unique_filename,
+                    'ContentType': file_type
+                },
+                ExpiresIn=3600  # 1 hour
+            )
+            
+            # Construct the final audio URL
+            audio_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{unique_filename}"
+            
+            return Response({
+                'message': 'Audio upload URL generated successfully',
+                'data': {
+                    'uploadUrl': presigned_url,
+                    'audioUrl': audio_url,
+                    'fileName': unique_filename
+                }
+            }, status=status_module.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Failed to generate upload URL: {str(e)}'}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GetImageUploadUrlView(APIView):
+    """
+    POST /api/v1/practice/challenges/{challenge_id}/get-image-upload-url/
+    
+    Get presigned S3 URL for image upload in listening challenges.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, challenge_id):
+        """Generate presigned URL for image upload to S3"""
+        import boto3
+        import uuid
+        from django.conf import settings
+        
+        try:
+            # Validate request data
+            lesson_id = request.data.get('lessonId')
+            file_name = request.data.get('fileName')
+            file_type = request.data.get('fileType')
+            
+            if not all([lesson_id, file_name, file_type]):
+                return Response(
+                    {'error': 'lessonId, fileName, and fileType are required'}, 
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+            
+            # Verify challenge exists
+            try:
+                challenge = PracticeChallenge.objects.get(id=challenge_id)
+            except PracticeChallenge.DoesNotExist:
+                return Response(
+                    {'error': 'Challenge not found'}, 
+                    status=status_module.HTTP_404_NOT_FOUND
+                )
+            
+            # Generate unique file name to avoid conflicts
+            file_extension = file_name.split('.')[-1] if '.' in file_name else 'jpg'
+            unique_filename = f"images/{lesson_id}/{challenge_id}/{uuid.uuid4().hex}.{file_extension}"
+            
+            # Initialize S3 client
+            s3_client = boto3.client(
+                's3',
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                region_name=settings.AWS_S3_REGION_NAME or 'us-east-1'
+            )
+            
+            # Generate presigned URL for upload
+            presigned_url = s3_client.generate_presigned_url(
+                'put_object',
+                Params={
+                    'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                    'Key': unique_filename,
+                    'ContentType': file_type
+                },
+                ExpiresIn=3600  # 1 hour
+            )
+            
+            # Construct the final image URL
+            image_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{unique_filename}"
+            
+            return Response({
+                'message': 'Image upload URL generated successfully',
+                'data': {
+                    'uploadUrl': presigned_url,
+                    'imageUrl': image_url,
+                    'fileName': unique_filename
+                }
+            }, status=status_module.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Failed to generate upload URL: {str(e)}'}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_units_with_progress(request, course_id):
@@ -642,7 +937,7 @@ class ChallengeOptionCreateView(generics.CreateAPIView):
     Create a new challenge option (Teacher only).
     """
     queryset = ChallengeOption.objects.all()
-    serializer_class = ChallengeOptionWithAnswerSerializer
+    serializer_class = ChallengeOptionCreateSerializer
     permission_classes = [IsAuthenticated]
 
 
@@ -2408,3 +2703,541 @@ def analyze_listening_comprehension(request):
     ]
     
     return Response(analysis_results)
+
+
+# =============================================================================
+# AI TRANSLATION ENDPOINTS - Intelligent translation validation
+# =============================================================================
+
+class AITranslationValidationView(APIView):
+    """
+    POST /api/v1/practice/validate-ai-translation/
+    
+    Validate user translation using AI analysis with detailed feedback
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """Validate translation using AI with intelligent scoring"""
+        import asyncio
+        from .services.ai_translation import AITranslationValidator
+        
+        # Extract request data
+        source_text = request.data.get('source_text', '').strip()
+        user_translation = request.data.get('user_translation', '').strip()
+        challenge_id = request.data.get('challenge_id')
+        difficulty_level = request.data.get('difficulty_level', 'intermediate')
+        
+        # Validate required fields
+        if not source_text or not user_translation:
+            return Response(
+                {'error': 'source_text and user_translation are required'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate challenge exists if provided
+        challenge = None
+        if challenge_id:
+            try:
+                challenge = PracticeChallenge.objects.get(id=challenge_id)
+            except PracticeChallenge.DoesNotExist:
+                return Response(
+                    {'error': 'Challenge not found'}, 
+                    status=status_module.HTTP_404_NOT_FOUND
+                )
+        
+        # Get user progress for hearts/points management
+        user_progress, created = UserProgress.objects.get_or_create(
+            user=request.user,
+            defaults={'hearts': 5, 'points': 0}
+        )
+        
+        # Check if this is practice mode (challenge already completed)
+        is_practice = False
+        existing_progress = None
+        if challenge:
+            existing_progress = ChallengeProgress.objects.filter(
+                user=request.user,
+                challenge=challenge
+            ).first()
+            is_practice = existing_progress is not None
+        
+        # Check hearts for new challenges
+        if not is_practice and user_progress.hearts == 0:
+            return Response(
+                {'error': 'hearts', 'message': 'No hearts remaining'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Validate translation using AI
+            validator = AITranslationValidator()
+            
+            # Run async validation in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                result = loop.run_until_complete(
+                    validator.validate_translation(
+                        source_text=source_text,
+                        user_translation=user_translation,
+                        difficulty_level=difficulty_level
+                    )
+                )
+            finally:
+                loop.close()
+            
+            # Process results and update progress
+            response_data = {
+                'success': True,
+                'ai_validation': {
+                    'semantic_score': result.semantic_score,
+                    'fluency_score': result.fluency_score,
+                    'fidelity_score': result.fidelity_score,
+                    'overall_score': result.overall_score,
+                    'is_acceptable': result.is_acceptable,
+                    'partial_credit': result.partial_credit
+                },
+                'feedback': {
+                    'message': result.feedback,
+                    'explanation': result.explanation,
+                    'suggestions': result.suggestions
+                },
+                'user_answer': user_translation,
+                'source_text': source_text
+            }
+            
+            # Update challenge progress if challenge provided
+            if challenge and result.is_acceptable:
+                if existing_progress:
+                    existing_progress.completed = True
+                    existing_progress.save()
+                    progress = existing_progress
+                else:
+                    progress = ChallengeProgress.objects.create(
+                        user=request.user,
+                        challenge=challenge,
+                        completed=True
+                    )
+                
+                response_data['challenge_progress'] = {
+                    'id': str(progress.id),
+                    'completed': progress.completed,
+                    'completed_at': progress.completed_at
+                }
+            
+            # Update user progress based on AI result
+            if result.is_acceptable:
+                if is_practice:
+                    # Practice mode: restore hearts and add points
+                    user_progress.add_hearts(1)
+                else:
+                    # New challenge: just add points
+                    pass
+                
+                # Add points based on AI scoring
+                points_earned = result.partial_credit
+                user_progress.add_points(points_earned)
+                
+                response_data['points_earned'] = points_earned
+            else:
+                # Incorrect translation: reduce hearts if not practice
+                if not is_practice and user_progress.hearts > 0:
+                    user_progress.reduce_hearts()
+                
+                response_data['points_earned'] = 0
+            
+            # Add current user progress to response
+            response_data['user_progress'] = {
+                'hearts': user_progress.hearts,
+                'points': user_progress.points
+            }
+            
+            return Response(response_data, status=status_module.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"AI Translation validation error: {e}")
+            return Response(
+                {'error': 'Translation validation failed', 'details': str(e)}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GenerateTranslationSuggestionsView(APIView):
+    """
+    POST /api/v1/practice/generate-translation-suggestions/
+    
+    Generate multiple correct translation alternatives for teachers
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """Generate translation alternatives using AI"""
+        import asyncio
+        from .services.ai_translation import AITranslationValidator
+        
+        source_text = request.data.get('source_text', '').strip()
+        difficulty_level = request.data.get('difficulty_level', 'intermediate')
+        count = min(int(request.data.get('count', 3)), 5)  # Limit to 5 suggestions
+        
+        if not source_text:
+            return Response(
+                {'error': 'source_text is required'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            validator = AITranslationValidator()
+            
+            # Run async operation in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                suggestions = loop.run_until_complete(
+                    validator.generate_translation_suggestions(
+                        source_text=source_text,
+                        difficulty_level=difficulty_level,
+                        count=count
+                    )
+                )
+            finally:
+                loop.close()
+            
+            return Response({
+                'success': True,
+                'source_text': source_text,
+                'suggestions': suggestions,
+                'difficulty_level': difficulty_level
+            })
+            
+        except Exception as e:
+            print(f"Translation suggestions error: {e}")
+            return Response(
+                {'error': 'Failed to generate suggestions', 'details': str(e)}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GenerateTranslationExerciseView(APIView):
+    """
+    POST /api/v1/practice/generate-translation-exercise/
+    
+    Generate complete translation exercise with AI
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """Generate a complete translation exercise"""
+        import asyncio
+        from .services.ai_translation import AITranslationValidator
+        
+        topic = request.data.get('topic', 'general conversation')
+        difficulty_level = request.data.get('difficulty_level', 'intermediate')
+        exercise_type = request.data.get('exercise_type', 'sentence')
+        
+        try:
+            validator = AITranslationValidator()
+            
+            # Run async operation in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                exercise_data = loop.run_until_complete(
+                    validator.generate_translation_exercise(
+                        topic=topic,
+                        difficulty_level=difficulty_level,
+                        exercise_type=exercise_type
+                    )
+                )
+            finally:
+                loop.close()
+            
+            return Response({
+                'success': True,
+                'exercise': exercise_data,
+                'generated_at': timezone.now(),
+                'parameters': {
+                    'topic': topic,
+                    'difficulty_level': difficulty_level,
+                    'exercise_type': exercise_type
+                }
+            })
+            
+        except Exception as e:
+            print(f"Exercise generation error: {e}")
+            return Response(
+                {'error': 'Failed to generate exercise', 'details': str(e)}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+# =============================================================================
+# AI PRONUNCIATION ENDPOINTS - Intelligent pronunciation analysis
+# =============================================================================
+
+class AIPronunciationAnalysisView(APIView):
+    """
+    POST /api/v1/practice/analyze-ai-pronunciation/
+    
+    Analyze student pronunciation using AI (Whisper + GPT-4)
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """Analyze pronunciation using AI with detailed feedback"""
+        import asyncio
+        import io
+        from .services.ai_pronunciation import AIPronunciationAnalyzer
+        
+        # Extract request data
+        audio_file = request.FILES.get('audio')
+        expected_text = request.data.get('expected_text', '').strip()
+        challenge_id = request.data.get('challenge_id')
+        difficulty_level = request.data.get('difficulty_level', 'intermediate')
+        
+        # Validate required fields
+        if not audio_file or not expected_text:
+            return Response(
+                {'error': 'audio file and expected_text are required'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validate challenge exists if provided
+        challenge = None
+        if challenge_id:
+            try:
+                challenge = PracticeChallenge.objects.get(id=challenge_id)
+            except PracticeChallenge.DoesNotExist:
+                return Response(
+                    {'error': 'Challenge not found'}, 
+                    status=status_module.HTTP_404_NOT_FOUND
+                )
+        
+        # Get user progress for hearts/points management
+        user_progress, created = UserProgress.objects.get_or_create(
+            user=request.user,
+            defaults={'hearts': 5, 'points': 0}
+        )
+        
+        # Check if this is practice mode
+        is_practice = False
+        existing_progress = None
+        if challenge:
+            existing_progress = ChallengeProgress.objects.filter(
+                user=request.user,
+                challenge=challenge
+            ).first()
+            is_practice = existing_progress is not None
+        
+        # Check hearts for new challenges
+        if not is_practice and user_progress.hearts == 0:
+            return Response(
+                {'error': 'hearts', 'message': 'No hearts remaining'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Convert uploaded file to BytesIO
+            audio_bytes = io.BytesIO(audio_file.read())
+            audio_bytes.name = audio_file.name
+            
+            # Analyze pronunciation using AI
+            analyzer = AIPronunciationAnalyzer()
+            
+            # Run async analysis in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                result = loop.run_until_complete(
+                    analyzer.analyze_pronunciation(
+                        audio_file=audio_bytes,
+                        expected_text=expected_text,
+                        difficulty_level=difficulty_level
+                    )
+                )
+            finally:
+                loop.close()
+            
+            # Process results and update progress
+            response_data = {
+                'success': True,
+                'ai_analysis': {
+                    'transcribed_text': result.transcribed_text,
+                    'expected_text': result.expected_text,
+                    'pronunciation_score': result.pronunciation_score,
+                    'fluency_score': result.fluency_score,
+                    'clarity_score': result.clarity_score,
+                    'overall_score': result.overall_score,
+                    'is_acceptable': result.is_acceptable,
+                    'partial_credit': result.partial_credit,
+                    'confidence_level': result.confidence_level
+                },
+                'feedback': {
+                    'message': result.feedback,
+                    'problematic_words': result.problematic_words,
+                    'suggestions': result.suggestions
+                }
+            }
+            
+            # Update challenge progress if challenge provided
+            if challenge and result.is_acceptable:
+                if existing_progress:
+                    existing_progress.completed = True
+                    existing_progress.save()
+                    progress = existing_progress
+                else:
+                    progress = ChallengeProgress.objects.create(
+                        user=request.user,
+                        challenge=challenge,
+                        completed=True
+                    )
+                
+                response_data['challenge_progress'] = {
+                    'id': str(progress.id),
+                    'completed': progress.completed,
+                    'completed_at': progress.completed_at
+                }
+            
+            # Update user progress based on AI result
+            if result.is_acceptable:
+                if is_practice:
+                    # Practice mode: restore hearts and add points
+                    user_progress.add_hearts(1)
+                else:
+                    # New challenge: just add points
+                    pass
+                
+                # Add points based on AI scoring
+                points_earned = result.partial_credit
+                user_progress.add_points(points_earned)
+                
+                response_data['points_earned'] = points_earned
+            else:
+                # Incorrect pronunciation: reduce hearts if not practice
+                if not is_practice and user_progress.hearts > 0:
+                    user_progress.reduce_hearts()
+                
+                response_data['points_earned'] = 0
+            
+            # Add current user progress to response
+            response_data['user_progress'] = {
+                'hearts': user_progress.hearts,
+                'points': user_progress.points
+            }
+            
+            return Response(response_data, status=status_module.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"AI Pronunciation analysis error: {e}")
+            return Response(
+                {'error': 'Pronunciation analysis failed', 'details': str(e)}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GeneratePronunciationExerciseView(APIView):
+    """
+    POST /api/v1/practice/generate-pronunciation-exercise/
+    
+    Generate pronunciation exercise with AI
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """Generate pronunciation exercise using AI"""
+        import asyncio
+        from .services.ai_pronunciation import AIPronunciationAnalyzer
+        
+        topic = request.data.get('topic', 'daily conversation')
+        difficulty_level = request.data.get('difficulty_level', 'intermediate')
+        exercise_type = request.data.get('exercise_type', 'sentence')
+        
+        try:
+            analyzer = AIPronunciationAnalyzer()
+            
+            # Run async operation in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                exercise_data = loop.run_until_complete(
+                    analyzer.generate_pronunciation_exercise(
+                        topic=topic,
+                        difficulty_level=difficulty_level,
+                        exercise_type=exercise_type
+                    )
+                )
+            finally:
+                loop.close()
+            
+            return Response({
+                'success': True,
+                'exercise': exercise_data,
+                'generated_at': timezone.now(),
+                'parameters': {
+                    'topic': topic,
+                    'difficulty_level': difficulty_level,
+                    'exercise_type': exercise_type
+                }
+            })
+            
+        except Exception as e:
+            print(f"Pronunciation exercise generation error: {e}")
+            return Response(
+                {'error': 'Failed to generate pronunciation exercise', 'details': str(e)}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GenerateReferenceAudioView(APIView):
+    """
+    POST /api/v1/practice/generate-reference-audio/
+    
+    Generate reference audio pronunciation using TTS
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """Generate reference audio for pronunciation practice"""
+        import asyncio
+        from django.http import HttpResponse
+        from .services.ai_pronunciation import AIPronunciationAnalyzer
+        
+        text = request.data.get('text', '').strip()
+        voice = request.data.get('voice', 'alloy')  # alloy, echo, fable, onyx, nova, shimmer
+        
+        if not text:
+            return Response(
+                {'error': 'text is required'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            analyzer = AIPronunciationAnalyzer()
+            
+            # Run async operation in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                audio_bytes = loop.run_until_complete(
+                    analyzer.generate_reference_audio(text=text, voice=voice)
+                )
+            finally:
+                loop.close()
+            
+            if audio_bytes:
+                # Return audio file directly
+                response = HttpResponse(audio_bytes, content_type='audio/mpeg')
+                response['Content-Disposition'] = f'attachment; filename="reference_{hash(text)}.mp3"'
+                return response
+            else:
+                return Response(
+                    {'error': 'Failed to generate audio'}, 
+                    status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+            
+        except Exception as e:
+            print(f"Reference audio generation error: {e}")
+            return Response(
+                {'error': 'Failed to generate reference audio', 'details': str(e)}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )

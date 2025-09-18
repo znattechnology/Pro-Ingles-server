@@ -65,13 +65,15 @@ class CourseListCreateView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return Course.objects.all()
         
-        # For GET requests, different logic for authenticated teachers vs public
-        if self.request.user.is_authenticated and getattr(self.request.user, 'role', None) == 'teacher':
-            # Teachers see all their own courses (Draft + Published)
-            queryset = Course.objects.filter(teacher=self.request.user)
+        # Check if this is for teacher's own course management or public exploration
+        view_mode = self.request.query_params.get('view_mode', 'public')
+        
+        if view_mode == 'teacher_courses' and self.request.user.is_authenticated and getattr(self.request.user, 'role', None) == 'teacher':
+            # Teachers managing their own VIDEO courses (Draft + Published)
+            queryset = Course.objects.filter(teacher=self.request.user, course_type='video')
         else:
-            # Public/students see only published courses
-            queryset = Course.objects.filter(status='Published')
+            # Public exploration - everyone sees only published VIDEO courses
+            queryset = Course.objects.filter(status='Published', course_type='video')
         
         # Apply category filter
         category = self.request.query_params.get('category')
@@ -98,7 +100,8 @@ class CourseListCreateView(generics.ListCreateAPIView):
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("Apenas professores podem criar cursos")
         
-        serializer.save()
+        # Ensure video courses are created with course_type='video'
+        serializer.save(teacher=self.request.user, course_type='video')
     
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -181,6 +184,10 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
         # Set prefetch flags for serializer
         if include_sections:
             instance._prefetched_sections = True
+            # Also set prefetch flags for chapters in each section
+            if include_chapters:
+                for section in instance.sections.all():
+                    section._prefetched_chapters = True
         if include_enrollments:
             instance._prefetched_enrollments = True
         
@@ -352,9 +359,9 @@ def get_user_enrolled_courses(request, userId):
     except User.DoesNotExist:
         return Response({'error': 'Usuário não encontrado'}, status=404)
     
-    # Get enrolled courses
+    # Get enrolled courses - only video courses
     enrollments = CourseEnrollment.objects.filter(user=user).select_related('course')
-    courses = [enrollment.course for enrollment in enrollments]
+    courses = [enrollment.course for enrollment in enrollments if enrollment.course.course_type == 'video']
     
     serializer = CourseListSerializer(courses, many=True)
     
@@ -646,8 +653,21 @@ def get_upload_video_url(request, courseId, sectionId, chapterId):
     
     Maps to Express: POST /:courseId/sections/:sectionId/chapters/:chapterId/get-upload-url
     """
+    # Debug logging
+    print(f"🔍 Django DEBUG - Request data: {request.data}")
+    print(f"🔍 Django DEBUG - Content type: {request.content_type}")
+    print(f"🔍 Django DEBUG - Method: {request.method}")
+    
+    # Try both camelCase and snake_case (RTK Query may be converting)
     fileName = request.data.get('fileName')
-    fileType = request.data.get('fileType')
+    if not fileName:
+        fileName = request.data.get('file_name')
+    
+    fileType = request.data.get('fileType') 
+    if not fileType:
+        fileType = request.data.get('file_type')
+    
+    print(f"🔍 Django DEBUG - Extracted fileName: '{fileName}', fileType: '{fileType}'")
     
     if not fileName or not fileType:
         return Response({
@@ -732,43 +752,64 @@ def upload_course_image(request, courseId):
     
     Handles image upload similar to Express multer approach but with S3 storage
     """
+    print(f"🖼️ Upload image request for course: {courseId}")
+    print(f"   User: {request.user}")
+    print(f"   Files in request: {list(request.FILES.keys())}")
+    
     if 'image' not in request.FILES:
+        print("❌ No image file in request")
         return Response({
             'message': 'Nenhuma imagem fornecida'
         }, status=status.HTTP_400_BAD_REQUEST)
     
     try:
+        print("📝 Step 1: Verify course ownership")
         # Verify course ownership
         course = get_object_or_404(Course, id=courseId)
+        print(f"   Found course: {course.title}")
+        print(f"   Course teacher: {course.teacher}")
+        print(f"   Request user: {request.user}")
+        
         if course.teacher != request.user:
+            print("❌ Permission denied - user is not course teacher")
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("Apenas o professor pode alterar a imagem do curso")
         
+        print("📝 Step 2: Get image file")
         image_file = request.FILES['image']
+        print(f"   Image file: {image_file.name}")
+        print(f"   Content type: {image_file.content_type}")
+        print(f"   Size: {image_file.size} bytes")
         
+        print("📝 Step 3: Validate image file")
         # Validate image file type
         allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
         if image_file.content_type not in allowed_types:
+            print(f"❌ Invalid file type: {image_file.content_type}")
             return Response({
                 'message': 'Tipo de arquivo não suportado. Use JPG, PNG ou WebP.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Check file size (max 2MB)
         if image_file.size > 2 * 1024 * 1024:
+            print(f"❌ File too large: {image_file.size} bytes")
             return Response({
                 'message': 'Arquivo muito grande. Máximo 2MB.'
             }, status=status.HTTP_400_BAD_REQUEST)
         
+        print("📝 Step 4: Import libraries and check settings")
         import boto3
         import uuid
         from django.conf import settings
         from botocore.exceptions import ClientError
         
         if not all([settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, settings.AWS_STORAGE_BUCKET_NAME]):
+            print("❌ S3 configuration incomplete")
             return Response({
                 'error': 'Configuração S3 incompleta'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+        print("📝 Step 5: Create S3 client")
         # Create S3 client
         s3_client = boto3.client(
             's3',
@@ -776,23 +817,29 @@ def upload_course_image(request, courseId):
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
             region_name=settings.AWS_S3_REGION_NAME
         )
+        print("✅ S3 client created successfully")
         
+        print("📝 Step 6: Generate filename and upload to S3")
         # Generate unique filename
         file_extension = image_file.name.split('.')[-1].lower()
         unique_filename = f"{uuid.uuid4()}.{file_extension}"
         s3_key = f'courses/images/{unique_filename}'
         
+        print(f"   Generated filename: {unique_filename}")
+        print(f"   S3 key: {s3_key}")
+        
         # Upload file to S3
+        print("📤 Uploading to S3...")
         s3_client.upload_fileobj(
             image_file,
             settings.AWS_STORAGE_BUCKET_NAME,
             s3_key,
             ExtraArgs={
                 'ContentType': image_file.content_type,
-                'ACL': 'public-read',
                 'CacheControl': 'max-age=86400'
             }
         )
+        print("✅ Upload to S3 successful")
         
         # Generate final image URL
         if settings.AWS_CLOUDFRONT_DOMAIN:

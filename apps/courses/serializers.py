@@ -108,15 +108,22 @@ class CourseSectionSerializer(serializers.ModelSerializer):
     
     def get_chapters(self, obj):
         """Get chapters with optimized query."""
-        if not hasattr(obj, '_prefetched_chapters'):
-            # If not prefetched, return empty list to avoid N+1
+        # Check if chapters should be included via context
+        if not self.context.get('include_chapters', True):
             return []
+        
+        # Use prefetched chapters if available, otherwise query directly
+        if hasattr(obj, '_prefetched_chapters') or hasattr(obj, '_prefetched_objects_cache'):
+            chapters_queryset = obj.chapters.all().order_by('order')
+        else:
+            # Fallback to direct query if not prefetched
+            chapters_queryset = obj.chapters.all().order_by('order')
         
         context = self.context.copy()
         context['include_comments'] = context.get('include_chapter_comments', False)
         
         return ChapterSerializer(
-            obj.chapters.all().order_by('order'),
+            chapters_queryset,
             many=True,
             context=context
         ).data
@@ -344,15 +351,144 @@ class CourseCreateSerializer(serializers.ModelSerializer):
 
 class CourseUpdateSerializer(serializers.ModelSerializer):
     """
-    Serializer for updating courses.
+    Serializer for updating courses with sections and chapters support.
     """
+    sections = serializers.ListField(child=serializers.DictField(), required=False, write_only=True)
     
     class Meta:
         model = Course
         fields = [
             'title', 'description', 'category', 'image',
-            'price', 'level', 'status', 'template'
+            'price', 'level', 'status', 'template', 'sections'
         ]
+        
+    def update(self, instance, validated_data):
+        # Extract sections data before updating course
+        sections_data = validated_data.pop('sections', [])
+        
+        # Update course basic fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        # Handle sections and chapters if provided
+        if sections_data:
+            self._update_sections_and_chapters(instance, sections_data)
+        
+        return instance
+    
+    def _update_sections_and_chapters(self, course, sections_data):
+        """
+        Update sections and chapters for the course.
+        This method handles creating, updating, and deleting sections/chapters.
+        """
+        from .models import CourseSection, Chapter
+        
+        # Get existing section IDs
+        existing_section_ids = set(
+            course.sections.values_list('id', flat=True)
+        )
+        
+        # Track processed section IDs
+        processed_section_ids = set()
+        
+        for section_data in sections_data:
+            section_id = section_data.get('sectionId')
+            
+            # Create or update section
+            if section_id and str(section_id) in [str(sid) for sid in existing_section_ids]:
+                # Update existing section
+                try:
+                    section = course.sections.get(id=section_id)
+                    section.sectionTitle = section_data.get('sectionTitle', section.sectionTitle)
+                    section.sectionDescription = section_data.get('sectionDescription', section.sectionDescription)
+                    section.order = section_data.get('order', section.order)
+                    section.save()
+                    processed_section_ids.add(section.id)
+                except CourseSection.DoesNotExist:
+                    # Create new section if ID doesn't exist
+                    section = CourseSection.objects.create(
+                        course=course,
+                        sectionTitle=section_data.get('sectionTitle', ''),
+                        sectionDescription=section_data.get('sectionDescription', ''),
+                        order=section_data.get('order', 0)
+                    )
+                    processed_section_ids.add(section.id)
+            else:
+                # Create new section
+                section = CourseSection.objects.create(
+                    course=course,
+                    sectionTitle=section_data.get('sectionTitle', ''),
+                    sectionDescription=section_data.get('sectionDescription', ''),
+                    order=section_data.get('order', 0)
+                )
+                processed_section_ids.add(section.id)
+            
+            # Handle chapters for this section
+            chapters_data = section_data.get('chapters', [])
+            self._update_chapters(section, chapters_data)
+        
+        # Delete sections that are no longer present
+        sections_to_delete = existing_section_ids - processed_section_ids
+        if sections_to_delete:
+            course.sections.filter(id__in=sections_to_delete).delete()
+    
+    def _update_chapters(self, section, chapters_data):
+        """
+        Update chapters for a section.
+        """
+        from .models import Chapter
+        
+        # Get existing chapter IDs for this section
+        existing_chapter_ids = set(
+            section.chapters.values_list('id', flat=True)
+        )
+        
+        # Track processed chapter IDs
+        processed_chapter_ids = set()
+        
+        for chapter_data in chapters_data:
+            chapter_id = chapter_data.get('chapterId')
+            
+            # Create or update chapter
+            if chapter_id and str(chapter_id) in [str(cid) for cid in existing_chapter_ids]:
+                # Update existing chapter
+                try:
+                    chapter = section.chapters.get(id=chapter_id)
+                    chapter.title = chapter_data.get('title', chapter.title)
+                    chapter.content = chapter_data.get('content', chapter.content)
+                    chapter.type = chapter_data.get('type', chapter.type)
+                    chapter.video = chapter_data.get('video', chapter.video)
+                    chapter.order = chapter_data.get('order', chapter.order)
+                    chapter.save()
+                    processed_chapter_ids.add(chapter.id)
+                except Chapter.DoesNotExist:
+                    # Create new chapter if ID doesn't exist
+                    chapter = Chapter.objects.create(
+                        section=section,
+                        title=chapter_data.get('title', ''),
+                        content=chapter_data.get('content', ''),
+                        type=chapter_data.get('type', 'Text'),
+                        video=chapter_data.get('video', ''),
+                        order=chapter_data.get('order', 0)
+                    )
+                    processed_chapter_ids.add(chapter.id)
+            else:
+                # Create new chapter
+                chapter = Chapter.objects.create(
+                    section=section,
+                    title=chapter_data.get('title', ''),
+                    content=chapter_data.get('content', ''),
+                    type=chapter_data.get('type', 'Text'),
+                    video=chapter_data.get('video', ''),
+                    order=chapter_data.get('order', 0)
+                )
+                processed_chapter_ids.add(chapter.id)
+        
+        # Delete chapters that are no longer present
+        chapters_to_delete = existing_chapter_ids - processed_chapter_ids
+        if chapters_to_delete:
+            section.chapters.filter(id__in=chapters_to_delete).delete()
 
 
 class TransactionSerializer(serializers.ModelSerializer):

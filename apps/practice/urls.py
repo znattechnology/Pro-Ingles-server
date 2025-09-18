@@ -71,6 +71,13 @@ urlpatterns = [
         name='challenge-progress'
     ),
     
+    # Text answer validation for fill-blank challenges
+    path(
+        'validate-text-answer/',
+        views.ValidateTextAnswerView.as_view(),
+        name='validate-text-answer'
+    ),
+    
     # Hearts management
     # Maps to reduceHearts action from client project
     path(
@@ -129,6 +136,20 @@ urlpatterns = [
         'challenges/<uuid:challenge_id>/', 
         views.PracticeChallengeUpdateView.as_view(), 
         name='challenges-update'
+    ),
+    
+    # Audio upload for listening challenges
+    path(
+        'challenges/<uuid:challenge_id>/get-audio-upload-url/',
+        views.GetAudioUploadUrlView.as_view(),
+        name='get-audio-upload-url'
+    ),
+    
+    # Image upload for listening challenges
+    path(
+        'challenges/<uuid:challenge_id>/get-image-upload-url/',
+        views.GetImageUploadUrlView.as_view(),
+        name='get-image-upload-url'
     ),
     
     # Challenge options management
@@ -382,5 +403,55 @@ urlpatterns = [
         'listening/stats/',
         views.get_listening_stats,
         name='listening-stats'
+    ),
+    
+    # ========================================================================
+    # AI TRANSLATION ENDPOINTS - Intelligent translation validation
+    # ========================================================================
+    
+    # AI-powered translation validation with detailed feedback
+    path(
+        'validate-ai-translation/',
+        views.AITranslationValidationView.as_view(),
+        name='validate-ai-translation'
+    ),
+    
+    # Generate multiple correct translation alternatives for teachers
+    path(
+        'generate-translation-suggestions/',
+        views.GenerateTranslationSuggestionsView.as_view(),
+        name='generate-translation-suggestions'
+    ),
+    
+    # Generate complete translation exercises with AI
+    path(
+        'generate-translation-exercise/',
+        views.GenerateTranslationExerciseView.as_view(),
+        name='generate-translation-exercise'
+    ),
+    
+    # ========================================================================
+    # AI PRONUNCIATION ENDPOINTS - Intelligent pronunciation analysis
+    # ========================================================================
+    
+    # AI-powered pronunciation analysis with detailed feedback
+    path(
+        'analyze-ai-pronunciation/',
+        views.AIPronunciationAnalysisView.as_view(),
+        name='analyze-ai-pronunciation'
+    ),
+    
+    # Generate pronunciation exercises with AI
+    path(
+        'generate-pronunciation-exercise/',
+        views.GeneratePronunciationExerciseView.as_view(),
+        name='generate-pronunciation-exercise'
+    ),
+    
+    # Generate reference audio for pronunciation practice
+    path(
+        'generate-reference-audio/',
+        views.GenerateReferenceAudioView.as_view(),
+        name='generate-reference-audio'
     ),
 ]

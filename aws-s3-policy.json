@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "LMSUploadPolicy",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:GetObjectAcl",
+                "s3:PutObjectAcl"
+            ],
+            "Resource": "arn:aws:s3:::lms-s3-backet/*"
+        },
+        {
+            "Sid": "LMSBucketAccess",
+            "Effect": "Allow",
+            "Action": [
+                "s3:ListBucket",
+                "s3:HeadBucket"
+            ],
+            "Resource": "arn:aws:s3:::lms-s3-backet"
+        }
+    ]
+}

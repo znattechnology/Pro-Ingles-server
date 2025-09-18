@@ -90,6 +90,14 @@ class Course(BaseModel):
         help_text="Course template type for styling and content focus"
     )
     
+    # Course type to distinguish between video courses and practice lab courses
+    course_type = models.CharField(
+        max_length=20,
+        choices=CourseChoices.COURSE_TYPE_CHOICES,
+        default='video',
+        help_text="Type of course: video lessons or practice laboratory"
+    )
+    
     class Meta:
         db_table = 'courses'
         verbose_name = 'Course'

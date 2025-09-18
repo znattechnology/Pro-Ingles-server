@@ -70,9 +70,39 @@ class ChallengeOptionWithAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChallengeOption
         fields = [
-            'id', 'text', 'is_correct', 'imageSrc', 
+            'id', 'challenge', 'text', 'is_correct', 'imageSrc', 
             'audioSrc', 'order'
         ]
+
+
+class ChallengeOptionCreateSerializer(serializers.ModelSerializer):
+    """
+    Challenge Option creation serializer - for creating new options.
+    Accepts challenge_id from frontend and maps it to challenge field.
+    """
+    id = serializers.UUIDField(read_only=True)
+    challenge_id = serializers.UUIDField(write_only=True)
+    imageSrc = serializers.URLField(source='image_url', allow_null=True, required=False)
+    audioSrc = serializers.URLField(source='audio_url', allow_null=True, required=False)
+    
+    class Meta:
+        model = ChallengeOption
+        fields = [
+            'id', 'challenge_id', 'text', 'is_correct', 'imageSrc', 
+            'audioSrc', 'order'
+        ]
+    
+    def create(self, validated_data):
+        """Create challenge option with proper challenge mapping"""
+        challenge_id = validated_data.pop('challenge_id')
+        
+        try:
+            challenge = PracticeChallenge.objects.get(id=challenge_id)
+            validated_data['challenge'] = challenge
+        except PracticeChallenge.DoesNotExist:
+            raise serializers.ValidationError(f"Challenge with id {challenge_id} does not exist")
+        
+        return super().create(validated_data)
 
 
 class ChallengeProgressSerializer(serializers.ModelSerializer):

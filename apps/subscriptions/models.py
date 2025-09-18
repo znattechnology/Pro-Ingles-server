@@ -14,6 +14,11 @@ from django.conf import settings
 from django.utils import timezone
 
 
+def get_current_date():
+    """Helper function to get current date for default values"""
+    return timezone.now().date()
+
+
 class SubscriptionPlan(models.Model):
     """
     Plano de Assinatura - Define os diferentes tipos de planos disponíveis
@@ -155,8 +160,8 @@ class UserSubscription(models.Model):
     last_payment_at = models.DateTimeField(null=True, blank=True)
     next_billing_date = models.DateTimeField(null=True, blank=True)
     
-    # Controle de uso diário
-    last_reset_date = models.DateField(default=timezone.now)
+    # Controle de uso diário  
+    last_reset_date = models.DateField(default=get_current_date)
     daily_lessons_used = models.IntegerField(default=0)
     daily_speaking_minutes_used = models.IntegerField(default=0)
     daily_listening_minutes_used = models.IntegerField(default=0)
