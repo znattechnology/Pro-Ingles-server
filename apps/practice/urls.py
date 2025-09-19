@@ -25,6 +25,13 @@ urlpatterns = [
         name='courses-create'
     ),
     
+    # Course management (delete/publish/unpublish)
+    path(
+        'courses/<uuid:course_id>/', 
+        views.PracticeCourseManagementView.as_view(), 
+        name='course-management'
+    ),
+    
     # Course units endpoint
     # Maps to getCourse query from client project
     path(
@@ -453,5 +460,122 @@ urlpatterns = [
         'generate-reference-audio/',
         views.GenerateReferenceAudioView.as_view(),
         name='generate-reference-audio'
+    ),
+    
+    # ========================================================================
+    # 🆕 COURSE-SPECIFIC PRACTICE ENDPOINTS - Práticas contextualizadas por curso
+    # ========================================================================
+    
+    # Speaking exercises for specific course
+    path(
+        'courses/<uuid:course_id>/speaking/',
+        views.CourseSpeakingExercisesView.as_view(),
+        name='course-speaking-exercises'
+    ),
+    
+    # Listening exercises for specific course
+    path(
+        'courses/<uuid:course_id>/listening/',
+        views.CourseListeningExercisesView.as_view(),
+        name='course-listening-exercises'
+    ),
+    
+    # Practice progress for specific course
+    path(
+        'courses/<uuid:course_id>/progress/',
+        views.CoursePracticeProgressView.as_view(),
+        name='course-practice-progress'
+    ),
+    
+    # ========================================================================
+    # TEACHER ACHIEVEMENT MANAGEMENT ENDPOINTS
+    # ========================================================================
+    
+    # List and create achievements (Teacher only)
+    path(
+        'teacher/achievements/',
+        views.TeacherAchievementListCreateView.as_view(),
+        name='teacher-achievements-list-create'
+    ),
+    
+    # Update/delete specific achievement (Teacher only)
+    path(
+        'teacher/achievements/<uuid:pk>/',
+        views.TeacherAchievementDetailView.as_view(),
+        name='teacher-achievement-detail'
+    ),
+    
+    # Achievement statistics for teacher dashboard
+    path(
+        'teacher/achievements/stats/',
+        views.teacher_achievement_stats,
+        name='teacher-achievement-stats'
+    ),
+    
+    # Toggle achievement active/inactive status
+    path(
+        'teacher/achievements/<uuid:achievement_id>/toggle-status/',
+        views.toggle_achievement_status,
+        name='toggle-achievement-status'
+    ),
+    
+    # Bulk operations on achievements
+    path(
+        'teacher/achievements/bulk-update/',
+        views.bulk_update_achievements,
+        name='bulk-update-achievements'
+    ),
+    
+    # Achievement unlock analytics
+    path(
+        'teacher/achievements/<uuid:achievement_id>/analytics/',
+        views.achievement_unlock_analytics,
+        name='achievement-unlock-analytics'
+    ),
+    
+    # ========================================================================
+    # STUDENT ACHIEVEMENT ENDPOINTS
+    # ========================================================================
+    
+    # List user achievements with progress
+    path(
+        'achievements/',
+        views.StudentAchievementListView.as_view(),
+        name='student-achievements-list'
+    ),
+    
+    # Achievement statistics for student
+    path(
+        'achievements/stats/',
+        views.student_achievement_stats,
+        name='student-achievement-stats'
+    ),
+    
+    # Achievement categories for student
+    path(
+        'achievements/categories/',
+        views.student_achievement_categories,
+        name='student-achievement-categories'
+    ),
+    
+    # Achievement notifications for student
+    path(
+        'achievements/notifications/',
+        views.student_achievement_notifications,
+        name='student-achievement-notifications'
+    ),
+    
+    # Mark notification as read
+    path(
+        'achievements/notifications/<uuid:notification_id>/read/',
+        views.mark_notification_read,
+        name='mark-notification-read'
+    ),
+    
+    # Mark achievement as celebrated
+    path(
+        'achievements/<uuid:achievement_id>/celebrate/',
+        views.mark_achievement_celebrated,
+        name='mark-achievement-celebrated'
     ),
 ]

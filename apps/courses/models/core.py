@@ -7,7 +7,7 @@ and content hierarchy.
 
 import uuid
 from django.db import models
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator
 from apps.core.models import BaseModel
 from apps.users.models import User
 
@@ -62,13 +62,6 @@ class Course(BaseModel):
     )
     
     # Course details
-    price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        validators=[MinValueValidator(0)],
-        help_text="Course price in EUR"
-    )
     level = models.CharField(
         max_length=20,
         choices=CourseChoices.LEVEL_CHOICES,

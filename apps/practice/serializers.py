@@ -477,14 +477,19 @@ class LeaderboardSnapshotSerializer(serializers.ModelSerializer):
 class AchievementSerializer(serializers.ModelSerializer):
     """Achievement serializer for achievement definitions"""
     rarity_color = serializers.CharField(source='get_rarity_color', read_only=True)
+    unlocked_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Achievement
         fields = [
             'id', 'title', 'description', 'icon', 'category', 'rarity',
             'points', 'requirement_type', 'requirement_target', 'requirement_unit',
-            'is_secret', 'order', 'rarity_color'
+            'is_active', 'is_secret', 'order', 'created_at', 'rarity_color', 'unlocked_count'
         ]
+    
+    def get_unlocked_count(self, obj):
+        """Get count of users who unlocked this achievement"""
+        return obj.user_achievements.filter(is_unlocked=True).count()
 
 
 class UserAchievementSerializer(serializers.ModelSerializer):

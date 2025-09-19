@@ -153,7 +153,7 @@ class CourseListSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'courseId', 'title', 'description', 'category', 'image',
-            'price', 'level', 'status', 'template', 'teacher', 'teacherId', 'teacherName', 
+            'level', 'status', 'template', 'teacher', 'teacherId', 'teacherName', 
             'total_enrollments', 'created_at', 'updated_at'
         ]
         read_only_fields = [
@@ -212,7 +212,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'courseId', 'title', 'description', 'category', 'image',
-            'price', 'level', 'status', 'template', 'teacher', 'teacherId', 'teacherName',
+            'level', 'status', 'template', 'teacher', 'teacherId', 'teacherName',
             'sections', 'enrollments', 'total_sections', 'total_chapters',
             'total_enrollments', 'created_at', 'updated_at'
         ]
@@ -326,14 +326,13 @@ class CourseCreateSerializer(serializers.ModelSerializer):
     category = serializers.CharField(required=False, default="Inglês Geral")
     level = serializers.CharField(required=False, default="Beginner")
     status = serializers.CharField(required=False, default="Draft")
-    price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, default=0)
     template = serializers.CharField(required=False, default="general")
     
     class Meta:
         model = Course
         fields = [
             'title', 'description', 'category', 'image',
-            'price', 'level', 'status', 'template'
+            'level', 'status', 'template'
         ]
     
     def create(self, validated_data):
@@ -359,7 +358,7 @@ class CourseUpdateSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'title', 'description', 'category', 'image',
-            'price', 'level', 'status', 'template', 'sections'
+            'level', 'status', 'template', 'sections'
         ]
         
     def update(self, instance, validated_data):

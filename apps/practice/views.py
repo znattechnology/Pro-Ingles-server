@@ -7,12 +7,16 @@ implementing all necessary endpoints for the Duolingo-style learning experience.
 
 from django.shortcuts import get_object_or_404
 from django.db import models
+from django.utils import timezone
 from rest_framework import generics, status as status_module
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
+
+# Import course management views
+from .views_course_management import PracticeCourseManagementView
 
 # Import subscription decorators
 from apps.subscriptions.decorators import (
@@ -198,7 +202,6 @@ class CreateCourseView(APIView):
                 # Add required fields
                 teacher=request.user,  # Set the current user as teacher
                 teacherName=f"{request.user.first_name} {request.user.last_name}".strip() or request.user.email,
-                price=0,  # Free for practice courses
                 course_type='practice',  # Set as practice lab course
             )
             
@@ -805,20 +808,48 @@ def get_units_with_progress(request, course_id):
     GET /api/v1/practice/courses/{course_id}/units-with-progress/
     
     Get course units with user completion progress.
-    Enhanced version that includes lesson completion status.
+    Enhanced version that includes lesson completion status and course details.
     """
-    course = get_object_or_404(Course, id=course_id)
+    # Filter specifically for practice courses
+    course = get_object_or_404(Course, id=course_id, course_type='practice')
     units = PracticeUnit.objects.filter(course=course).prefetch_related(
         'lessons__challenges'
     )
     
-    serializer = PracticeUnitSerializer(
+    # Serialize course data manually for practice courses
+    course_data = {
+        'id': str(course.id),
+        'title': course.title,
+        'description': course.description,
+        'category': course.category,
+        'level': course.level,
+        'status': course.status,
+        'course_type': course.course_type,
+        'template': course.template,
+        'image': course.image,
+        'created_at': course.created_at.isoformat(),
+        'updated_at': course.updated_at.isoformat(),
+        'teacher': {
+            'id': str(course.teacher.id),
+            'username': course.teacher.username,
+            'email': course.teacher.email,
+            'first_name': getattr(course.teacher, 'first_name', ''),
+            'last_name': getattr(course.teacher, 'last_name', ''),
+        } if course.teacher else None,
+        'teacherName': course.teacherName,
+    }
+    
+    # Serialize units data
+    units_serializer = PracticeUnitSerializer(
         units, 
         many=True, 
         context={'request': request}
     )
     
-    return Response(serializer.data)
+    return Response({
+        'course': course_data,
+        'units': units_serializer.data
+    })
 
 
 @api_view(['GET'])
@@ -3241,3 +3272,725 @@ class GenerateReferenceAudioView(APIView):
                 {'error': 'Failed to generate reference audio', 'details': str(e)}, 
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+# ========================================================================
+# 🆕 COURSE-SPECIFIC PRACTICE ENDPOINTS - Práticas contextualizadas por curso
+# ========================================================================
+
+class CourseSpeakingExercisesView(APIView):
+    """
+    GET /api/v1/practice/courses/{course_id}/speaking/
+    
+    Exercícios de speaking específicos para um curso
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, course_id):
+        """Lista exercícios de speaking para um curso específico"""
+        try:
+            from apps.courses.models import Course
+            course = Course.objects.get(id=course_id, course_type='practice')
+        except Course.DoesNotExist:
+            return Response(
+                {'error': 'Curso não encontrado'}, 
+                status=status_module.HTTP_404_NOT_FOUND
+            )
+        
+        # Buscar exercícios específicos do curso
+        exercises = SpeakingExercise.objects.filter(
+            course=course,
+            is_course_specific=True,
+            is_active=True
+        ).order_by('difficulty', 'created_at')
+        
+        # Se não há exercícios específicos, gera automaticamente
+        if not exercises.exists():
+            exercises = self.generate_course_exercises(course, request.user)
+        
+        from .serializers import SpeakingExerciseSerializer
+        serializer = SpeakingExerciseSerializer(exercises, many=True)
+        
+        return Response({
+            'message': f'Exercícios de speaking para {course.title}',
+            'course': {
+                'id': str(course.id),
+                'title': course.title,
+                'level': course.level
+            },
+            'exercises': serializer.data
+        })
+    
+    def generate_course_exercises(self, course, user):
+        """Gera exercícios de speaking baseados no conteúdo do curso"""
+        exercises = []
+        
+        # Get course lessons for context
+        practice_units = course.practice_units.all()[:3]  # Primeiras 3 unidades
+        
+        for unit in practice_units:
+            lessons = unit.lessons.all()[:2]  # Primeiras 2 lições por unidade
+            
+            for lesson in lessons:
+                # Gerar exercício de pronúncia
+                pronunciation_exercise = SpeakingExercise.objects.create(
+                    course=course,
+                    is_course_specific=True,
+                    auto_generated=True,
+                    title=f"Pronúncia: {lesson.title}",
+                    description=f"Pratique a pronúncia do vocabulário da lição '{lesson.title}'",
+                    exercise_type='PRONUNCIATION',
+                    difficulty=course.level.upper(),
+                    lesson_context=lesson.title,
+                    target_text=f"Vocabulary from {lesson.title}: pronunciation practice",
+                    vocabulary_words=["hello", "world", "practice"],  # Seria extraído do conteúdo real
+                    created_by=user
+                )
+                exercises.append(pronunciation_exercise)
+                
+                # Gerar exercício de conversação
+                conversation_exercise = SpeakingExercise.objects.create(
+                    course=course,
+                    is_course_specific=True,
+                    auto_generated=True,
+                    title=f"Conversação: {lesson.title}",
+                    description=f"Pratique conversação baseada na lição '{lesson.title}'",
+                    exercise_type='CONVERSATION',
+                    difficulty=course.level.upper(),
+                    lesson_context=lesson.title,
+                    conversation_prompt=f"Let's practice conversation about the topic: {lesson.title}",
+                    vocabulary_words=["conversation", "practice", "topic"],
+                    created_by=user
+                )
+                exercises.append(conversation_exercise)
+        
+        return exercises
+
+
+class CourseListeningExercisesView(APIView):
+    """
+    GET /api/v1/practice/courses/{course_id}/listening/
+    
+    Exercícios de listening específicos para um curso
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, course_id):
+        """Lista exercícios de listening para um curso específico"""
+        try:
+            from apps.courses.models import Course
+            course = Course.objects.get(id=course_id, course_type='practice')
+        except Course.DoesNotExist:
+            return Response(
+                {'error': 'Curso não encontrado'}, 
+                status=status_module.HTTP_404_NOT_FOUND
+            )
+        
+        # Buscar exercícios específicos do curso
+        exercises = ListeningExercise.objects.filter(
+            course=course,
+            is_course_specific=True,
+            is_active=True
+        ).order_by('difficulty', 'created_at')
+        
+        # Se não há exercícios específicos, gera automaticamente
+        if not exercises.exists():
+            exercises = self.generate_course_exercises(course, request.user)
+        
+        from .serializers import ListeningExerciseSerializer
+        serializer = ListeningExerciseSerializer(exercises, many=True)
+        
+        return Response({
+            'message': f'Exercícios de listening para {course.title}',
+            'course': {
+                'id': str(course.id),
+                'title': course.title,
+                'level': course.level
+            },
+            'exercises': serializer.data
+        })
+    
+    def generate_course_exercises(self, course, user):
+        """Gera exercícios de listening baseados no conteúdo do curso"""
+        exercises = []
+        
+        # Get course lessons for context
+        practice_units = course.practice_units.all()[:3]  # Primeiras 3 unidades
+        
+        for unit in practice_units:
+            lessons = unit.lessons.all()[:2]  # Primeiras 2 lições por unidade
+            
+            for lesson in lessons:
+                # Gerar exercício de compreensão auditiva
+                comprehension_exercise = ListeningExercise.objects.create(
+                    course=course,
+                    is_course_specific=True,
+                    auto_generated=True,
+                    title=f"Compreensão: {lesson.title}",
+                    description=f"Pratique compreensão auditiva com conteúdo da lição '{lesson.title}'",
+                    exercise_type='AUDIO_COMPREHENSION',
+                    difficulty=course.level.upper(),
+                    lesson_context=lesson.title,
+                    audio_url="https://example.com/audio/sample.mp3",  # Seria gerado dinamicamente
+                    audio_duration="0:02:00",
+                    transcript=f"Audio content for lesson: {lesson.title}",
+                    questions=[
+                        {"question": "What is the main topic?", "type": "multiple_choice"},
+                        {"question": "What words did you hear?", "type": "text_input"}
+                    ],
+                    correct_answers=["topic", "words"],
+                    created_by=user
+                )
+                exercises.append(comprehension_exercise)
+        
+        return exercises
+
+
+class CoursePracticeProgressView(APIView):
+    """
+    GET /api/v1/practice/courses/{course_id}/progress/
+    
+    Progresso das práticas específicas de um curso
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, course_id):
+        """Retorna progresso das práticas de um curso específico"""
+        try:
+            from apps.courses.models import Course, UserCourseProgress
+            course = Course.objects.get(id=course_id, course_type='practice')
+            
+            # Buscar progresso do usuário no curso
+            user_progress, created = UserCourseProgress.objects.get_or_create(
+                user=request.user,
+                course=course,
+                defaults={'enrollmentDate': timezone.now()}
+            )
+            
+            # Buscar exercícios específicos do curso
+            speaking_exercises = SpeakingExercise.objects.filter(
+                course=course, is_course_specific=True
+            ).count()
+            
+            listening_exercises = ListeningExercise.objects.filter(
+                course=course, is_course_specific=True
+            ).count()
+            
+            practice_summary = user_progress.get_practice_summary()
+            
+            return Response({
+                'message': f'Progresso das práticas para {course.title}',
+                'course': {
+                    'id': str(course.id),
+                    'title': course.title,
+                    'level': course.level
+                },
+                'progress': {
+                    'overall_with_practices': user_progress.get_overall_progress_with_practices(),
+                    'main_progress': user_progress.overallProgress,
+                    'speaking': {
+                        **practice_summary['speaking'],
+                        'available_exercises': speaking_exercises
+                    },
+                    'listening': {
+                        **practice_summary['listening'],
+                        'available_exercises': listening_exercises
+                    }
+                }
+            })
+            
+        except Course.DoesNotExist:
+            return Response(
+                {'error': 'Curso não encontrado'}, 
+                status=status_module.HTTP_404_NOT_FOUND
+            )
+
+
+# ============================================================================
+# TEACHER ACHIEVEMENT MANAGEMENT VIEWS
+# ============================================================================
+
+class TeacherAchievementListCreateView(generics.ListCreateAPIView):
+    """
+    GET/POST /api/v1/practice/teacher/achievements/
+    
+    List all achievements or create new achievement (Teacher only).
+    """
+    queryset = Achievement.objects.all().order_by('category', 'order')
+    serializer_class = AchievementSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['category', 'rarity', 'is_active']
+    
+    def get_queryset(self):
+        """Filter achievements with additional stats"""
+        queryset = super().get_queryset()
+        
+        # Add unlock count annotation
+        queryset = queryset.annotate(
+            unlocked_count=models.Count(
+                'user_achievements',
+                filter=models.Q(user_achievements__is_unlocked=True)
+            )
+        )
+        
+        return queryset
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['include_stats'] = True
+        return context
+
+
+class TeacherAchievementDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET/PUT/PATCH/DELETE /api/v1/practice/teacher/achievements/{id}/
+    
+    Retrieve, update or delete specific achievement (Teacher only).
+    """
+    queryset = Achievement.objects.all()
+    serializer_class = AchievementSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        """Add unlock count annotation"""
+        return super().get_queryset().annotate(
+            unlocked_count=models.Count(
+                'user_achievements',
+                filter=models.Q(user_achievements__is_unlocked=True)
+            )
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def teacher_achievement_stats(request):
+    """
+    GET /api/v1/practice/teacher/achievements/stats/
+    
+    Get achievement statistics for teacher dashboard.
+    """
+    try:
+        total_achievements = Achievement.objects.count()
+        active_achievements = Achievement.objects.filter(is_active=True).count()
+        inactive_achievements = total_achievements - active_achievements
+        
+        # Total unlocks across all achievements
+        total_unlocked = UserAchievement.objects.filter(is_unlocked=True).count()
+        
+        # Achievements by category
+        category_stats = Achievement.objects.values('category').annotate(
+            count=models.Count('id'),
+            unlocked_count=models.Count(
+                'user_achievements',
+                filter=models.Q(user_achievements__is_unlocked=True)
+            )
+        ).order_by('category')
+        
+        # Achievements by rarity
+        rarity_stats = Achievement.objects.values('rarity').annotate(
+            count=models.Count('id'),
+            unlocked_count=models.Count(
+                'user_achievements',
+                filter=models.Q(user_achievements__is_unlocked=True)
+            )
+        ).order_by('rarity')
+        
+        # Recent unlocks (last 7 days)
+        from datetime import timedelta
+        recent_date = timezone.now() - timedelta(days=7)
+        recent_unlocks = UserAchievement.objects.filter(
+            is_unlocked=True,
+            unlocked_at__gte=recent_date
+        ).count()
+        
+        return Response({
+            'total_achievements': total_achievements,
+            'active_achievements': active_achievements,
+            'inactive_achievements': inactive_achievements,
+            'total_unlocked': total_unlocked,
+            'recent_unlocks': recent_unlocks,
+            'category_breakdown': list(category_stats),
+            'rarity_breakdown': list(rarity_stats)
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao buscar estatísticas: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def toggle_achievement_status(request, achievement_id):
+    """
+    POST /api/v1/practice/teacher/achievements/{id}/toggle-status/
+    
+    Toggle achievement active/inactive status.
+    """
+    try:
+        achievement = get_object_or_404(Achievement, id=achievement_id)
+        achievement.is_active = not achievement.is_active
+        achievement.save()
+        
+        return Response({
+            'message': f'Conquista {"ativada" if achievement.is_active else "desativada"} com sucesso',
+            'is_active': achievement.is_active
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao alterar status: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def bulk_update_achievements(request):
+    """
+    POST /api/v1/practice/teacher/achievements/bulk-update/
+    
+    Bulk update achievement properties (activate/deactivate multiple, reorder, etc.).
+    """
+    try:
+        action = request.data.get('action')
+        achievement_ids = request.data.get('achievement_ids', [])
+        
+        if not action or not achievement_ids:
+            return Response(
+                {'error': 'Ação e IDs das conquistas são obrigatórios'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        achievements = Achievement.objects.filter(id__in=achievement_ids)
+        
+        if action == 'activate':
+            achievements.update(is_active=True)
+            message = f'{achievements.count()} conquistas ativadas'
+            
+        elif action == 'deactivate':
+            achievements.update(is_active=False)
+            message = f'{achievements.count()} conquistas desativadas'
+            
+        elif action == 'delete':
+            count = achievements.count()
+            achievements.delete()
+            message = f'{count} conquistas removidas'
+            
+        elif action == 'reorder':
+            # Update order based on provided order list
+            order_data = request.data.get('order_data', [])
+            for item in order_data:
+                Achievement.objects.filter(id=item['id']).update(order=item['order'])
+            message = 'Ordem das conquistas atualizada'
+            
+        else:
+            return Response(
+                {'error': 'Ação inválida'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        return Response({'message': message})
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro na operação em lote: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def achievement_unlock_analytics(request, achievement_id):
+    """
+    GET /api/v1/practice/teacher/achievements/{id}/analytics/
+    
+    Get detailed analytics for specific achievement (unlock trends, user stats, etc.).
+    """
+    try:
+        achievement = get_object_or_404(Achievement, id=achievement_id)
+        
+        # Basic unlock stats
+        total_unlocks = UserAchievement.objects.filter(
+            achievement=achievement, 
+            is_unlocked=True
+        ).count()
+        
+        # Unlock timeline (last 30 days)
+        from datetime import timedelta
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        
+        unlock_timeline = UserAchievement.objects.filter(
+            achievement=achievement,
+            is_unlocked=True,
+            unlocked_at__gte=thirty_days_ago
+        ).extra(
+            select={'day': 'date(unlocked_at)'}
+        ).values('day').annotate(
+            count=models.Count('id')
+        ).order_by('day')
+        
+        # Users in progress
+        users_in_progress = UserAchievement.objects.filter(
+            achievement=achievement,
+            is_unlocked=False,
+            current_progress__gt=0
+        ).count()
+        
+        # Average time to unlock (for unlocked achievements)
+        avg_progress = UserAchievement.objects.filter(
+            achievement=achievement,
+            is_unlocked=False
+        ).aggregate(
+            avg_progress=models.Avg('current_progress')
+        )
+        
+        return Response({
+            'achievement': {
+                'id': str(achievement.id),
+                'title': achievement.title,
+                'description': achievement.description,
+                'category': achievement.category,
+                'rarity': achievement.rarity,
+                'requirement_target': achievement.requirement_target
+            },
+            'stats': {
+                'total_unlocks': total_unlocks,
+                'users_in_progress': users_in_progress,
+                'average_progress': avg_progress['avg_progress'] or 0,
+                'unlock_timeline': list(unlock_timeline)
+            }
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao buscar analytics: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+# ============================================================================
+# STUDENT ACHIEVEMENT VIEWS - Public achievement endpoints for students
+# ============================================================================
+
+class StudentAchievementListView(generics.ListAPIView):
+    """
+    GET /api/v1/practice/achievements/
+    
+    List all achievements with user progress (Student view).
+    """
+    serializer_class = UserAchievementSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['achievement__category', 'achievement__rarity', 'is_unlocked']
+    
+    def get_queryset(self):
+        """Get user achievements or create them if they don't exist"""
+        user = self.request.user
+        
+        # Get all active achievements
+        all_achievements = Achievement.objects.filter(is_active=True)
+        
+        # Create UserAchievement records for any missing achievements
+        for achievement in all_achievements:
+            UserAchievement.objects.get_or_create(
+                user=user,
+                achievement=achievement,
+                defaults={
+                    'current_progress': 0,
+                    'is_unlocked': False
+                }
+            )
+        
+        # Return all user achievements
+        return UserAchievement.objects.filter(
+            user=user,
+            achievement__is_active=True
+        ).select_related('achievement').order_by(
+            'achievement__category', 'achievement__order'
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def student_achievement_stats(request):
+    """
+    GET /api/v1/practice/achievements/stats/
+    
+    Get achievement statistics for student dashboard.
+    """
+    try:
+        user = request.user
+        
+        # Get user achievements
+        user_achievements = UserAchievement.objects.filter(user=user)
+        unlocked_achievements = user_achievements.filter(is_unlocked=True)
+        
+        total_available = Achievement.objects.filter(is_active=True).count()
+        total_unlocked = unlocked_achievements.count()
+        total_points = sum(ua.achievement.points for ua in unlocked_achievements)
+        
+        # Count rare achievements (epic and legendary)
+        rare_achievements = unlocked_achievements.filter(
+            achievement__rarity__in=['epic', 'legendary']
+        ).count()
+        
+        # Recent unlocks (last 7 days)
+        from datetime import timedelta
+        recent_date = timezone.now() - timedelta(days=7)
+        recent_unlocked = unlocked_achievements.filter(
+            unlocked_at__gte=recent_date
+        ).count()
+        
+        return Response({
+            'totalUnlocked': total_unlocked,
+            'totalAvailable': total_available,
+            'totalPoints': total_points,
+            'rareAchievements': rare_achievements,
+            'recentUnlocked': recent_unlocked
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao buscar estatísticas: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def student_achievement_categories(request):
+    """
+    GET /api/v1/practice/achievements/categories/
+    
+    Get achievement categories with user progress.
+    """
+    try:
+        user = request.user
+        
+        # Get category stats
+        categories = AchievementCategory.objects.filter(is_active=True).order_by('order')
+        
+        category_data = []
+        for category in categories:
+            # Count achievements in this category
+            total_in_category = Achievement.objects.filter(
+                category=category.name, 
+                is_active=True
+            ).count()
+            
+            # Count unlocked by user
+            unlocked_in_category = UserAchievement.objects.filter(
+                user=user,
+                achievement__category=category.name,
+                achievement__is_active=True,
+                is_unlocked=True
+            ).count()
+            
+            category_data.append({
+                'name': category.name,
+                'display_name': category.display_name,
+                'description': category.description,
+                'icon_class': category.icon_class,
+                'color': category.color,
+                'order': category.order,
+                'achievement_count': total_in_category,
+                'unlocked_count': unlocked_in_category
+            })
+        
+        return Response(category_data)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao buscar categorias: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def student_achievement_notifications(request):
+    """
+    GET /api/v1/practice/achievements/notifications/
+    
+    Get unread achievement notifications for user.
+    """
+    try:
+        user = request.user
+        
+        notifications = AchievementNotification.objects.filter(
+            user=user,
+            is_read=False
+        ).select_related('achievement').order_by('-created_at')[:10]
+        
+        serializer = AchievementNotificationSerializer(
+            notifications, 
+            many=True,
+            context={'request': request}
+        )
+        
+        return Response(serializer.data)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao buscar notificações: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_notification_read(request, notification_id):
+    """
+    POST /api/v1/practice/achievements/notifications/{id}/read/
+    
+    Mark achievement notification as read.
+    """
+    try:
+        notification = get_object_or_404(
+            AchievementNotification,
+            id=notification_id,
+            user=request.user
+        )
+        
+        notification.is_read = True
+        notification.save()
+        
+        return Response({'message': 'Notificação marcada como lida'})
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao marcar notificação: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_achievement_celebrated(request, achievement_id):
+    """
+    POST /api/v1/practice/achievements/{id}/celebrate/
+    
+    Mark achievement as celebrated (popup shown).
+    """
+    try:
+        # Find the notification for this achievement
+        notification = AchievementNotification.objects.filter(
+            user=request.user,
+            achievement_id=achievement_id,
+            is_celebrated=False
+        ).first()
+        
+        if notification:
+            notification.is_celebrated = True
+            notification.save()
+        
+        return Response({'message': 'Conquista marcada como celebrada'})
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao marcar celebração: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )

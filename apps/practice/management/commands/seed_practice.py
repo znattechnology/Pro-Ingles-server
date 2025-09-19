@@ -105,7 +105,6 @@ class Command(BaseCommand):
                         'teacherName': teacher.name,
                         'description': course_data['description'],
                         'image': course_data['image'],
-                        'price': 0.00,
                         'category': course_data['category'],
                         'level': course_data['level'],
                         'status': 'Published'

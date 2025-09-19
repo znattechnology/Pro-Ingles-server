@@ -276,6 +276,14 @@ class UserProgress(models.Model):
         """Add points for correct answers"""
         self.points += amount
         self.save()
+        
+        # Trigger achievement progress check
+        self._check_achievements_for_points()
+    
+    def _check_achievements_for_points(self):
+        """Check and update achievements related to points"""
+        from .views import check_achievement_progress
+        check_achievement_progress(self.user, 'points_earned', self.points)
 
 
 class ChallengeProgress(models.Model):
@@ -299,6 +307,46 @@ class ChallengeProgress(models.Model):
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        """Save and trigger achievement check if challenge was completed"""
+        is_new_completion = self.pk is None and self.completed
+        was_just_completed = False
+        
+        if self.pk:
+            # Check if this is a new completion
+            try:
+                old_instance = ChallengeProgress.objects.get(pk=self.pk)
+                was_just_completed = not old_instance.completed and self.completed
+            except ChallengeProgress.DoesNotExist:
+                pass
+        
+        super().save(*args, **kwargs)
+        
+        # Trigger achievement checks for new completions
+        if is_new_completion or was_just_completed:
+            self._check_achievements_for_completion()
+    
+    def _check_achievements_for_completion(self):
+        """Check and update achievements related to challenge completions"""
+        from .views import check_achievement_progress
+        
+        # Count total challenges completed by this user
+        total_completed = ChallengeProgress.objects.filter(
+            user=self.user, 
+            completed=True
+        ).count()
+        
+        check_achievement_progress(self.user, 'challenges_completed', total_completed)
+        
+        # Also check for lessons completed (challenges can be part of lessons)
+        from apps.practice.models import PracticeLesson
+        completed_lessons = PracticeLesson.objects.filter(
+            units__challenges__user_progress__user=self.user,
+            units__challenges__user_progress__completed=True
+        ).distinct().count()
+        
+        check_achievement_progress(self.user, 'lessons_completed', completed_lessons)
     
     class Meta:
         unique_together = ['user', 'challenge']
@@ -584,6 +632,14 @@ class UserStreak(models.Model):
         
         self.last_practice_date = today
         self.save()
+        
+        # Trigger achievement progress check for streaks
+        self._check_achievements_for_streak()
+    
+    def _check_achievements_for_streak(self):
+        """Check and update achievements related to streaks"""
+        from .views import check_achievement_progress
+        check_achievement_progress(self.user, 'streak_days', self.current_streak)
     
     def __str__(self):
         return f"{self.user.name} - {self.current_streak} days streak"
@@ -844,7 +900,10 @@ class SpeakingExercise(models.Model):
     course = models.ForeignKey(
         'courses.Course', 
         on_delete=models.CASCADE, 
-        related_name='speaking_exercises'
+        related_name='speaking_exercises',
+        null=True,
+        blank=True,
+        help_text="Curso específico para exercício contextualizado (opcional para exercícios genéricos)"
     )
     
     # Configurações do exercício
@@ -852,6 +911,21 @@ class SpeakingExercise(models.Model):
     description = models.TextField()
     exercise_type = models.CharField(max_length=20, choices=EXERCISE_TYPES)
     difficulty = models.CharField(max_length=15, choices=DIFFICULTY_CHOICES)
+    
+    # 🆕 CONTEXTUALIZAÇÃO POR CURSO
+    is_course_specific = models.BooleanField(
+        default=False, 
+        help_text="Indica se o exercício é específico para um curso ou genérico"
+    )
+    lesson_context = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Contexto da lição específica (ex: 'Business Meetings', 'Family Vocabulary')"
+    )
+    auto_generated = models.BooleanField(
+        default=False,
+        help_text="Indica se o exercício foi gerado automaticamente baseado no conteúdo do curso"
+    )
     
     # Conteúdo do exercício
     target_text = models.TextField(help_text="Texto alvo para leitura/repetição")
@@ -876,6 +950,10 @@ class SpeakingExercise(models.Model):
     
     class Meta:
         ordering = ['difficulty', 'created_at']
+        indexes = [
+            models.Index(fields=['course', 'is_course_specific']),
+            models.Index(fields=['is_course_specific', 'exercise_type']),
+        ]
     
     def __str__(self):
         return f"{self.title} ({self.get_exercise_type_display()})"
@@ -1065,7 +1143,10 @@ class ListeningExercise(models.Model):
     course = models.ForeignKey(
         'courses.Course', 
         on_delete=models.CASCADE, 
-        related_name='listening_exercises'
+        related_name='listening_exercises',
+        null=True,
+        blank=True,
+        help_text="Curso específico para exercício contextualizado (opcional para exercícios genéricos)"
     )
     
     # Configurações do exercício
@@ -1074,6 +1155,21 @@ class ListeningExercise(models.Model):
     exercise_type = models.CharField(max_length=25, choices=EXERCISE_TYPES)
     difficulty = models.CharField(max_length=15, choices=DIFFICULTY_CHOICES)
     accent_type = models.CharField(max_length=15, choices=ACCENT_TYPES, default='NEUTRAL')
+    
+    # 🆕 CONTEXTUALIZAÇÃO POR CURSO
+    is_course_specific = models.BooleanField(
+        default=False, 
+        help_text="Indica se o exercício é específico para um curso ou genérico"
+    )
+    lesson_context = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Contexto da lição específica (ex: 'Business Meetings', 'Family Vocabulary')"
+    )
+    auto_generated = models.BooleanField(
+        default=False,
+        help_text="Indica se o exercício foi gerado automaticamente baseado no conteúdo do curso"
+    )
     
     # Conteúdo de áudio
     audio_url = models.URLField(help_text="URL do arquivo de áudio principal")
@@ -1121,6 +1217,10 @@ class ListeningExercise(models.Model):
     
     class Meta:
         ordering = ['difficulty', 'created_at']
+        indexes = [
+            models.Index(fields=['course', 'is_course_specific']),
+            models.Index(fields=['is_course_specific', 'exercise_type']),
+        ]
     
     def __str__(self):
         return f"{self.title} ({self.get_exercise_type_display()})"

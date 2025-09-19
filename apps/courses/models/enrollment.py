@@ -151,6 +151,34 @@ class UserCourseProgress(BaseModel, TimestampedModelMixin):
         help_text="When the course was completed (if completed)"
     )
     
+    # 🆕 PROGRESSO DAS PRÁTICAS AUXILIARES
+    speaking_practice_progress = models.JSONField(
+        default=dict,
+        help_text="Progresso nas práticas de speaking específicas do curso"
+    )
+    listening_practice_progress = models.JSONField(
+        default=dict,
+        help_text="Progresso nas práticas de listening específicas do curso"
+    )
+    
+    # Estatísticas das práticas
+    total_speaking_sessions = models.PositiveIntegerField(
+        default=0,
+        help_text="Total de sessões de speaking completadas"
+    )
+    total_listening_sessions = models.PositiveIntegerField(
+        default=0,
+        help_text="Total de sessões de listening completadas"
+    )
+    avg_speaking_score = models.FloatField(
+        default=0.0,
+        help_text="Pontuação média nas práticas de speaking"
+    )
+    avg_listening_score = models.FloatField(
+        default=0.0,
+        help_text="Pontuação média nas práticas de listening"
+    )
+    
     class Meta:
         db_table = 'user_course_progress'
         verbose_name = 'User Course Progress'
@@ -209,6 +237,79 @@ class UserCourseProgress(BaseModel, TimestampedModelMixin):
         """Add time spent studying to the total."""
         self.total_time_spent += minutes
         self.save(update_fields=['total_time_spent', 'lastAccessedTimestamp'])
+    
+    # 🆕 MÉTODOS PARA PRÁTICAS AUXILIARES
+    def update_speaking_progress(self, exercise_id, score, completed=True):
+        """Atualiza progresso de exercício de speaking específico."""
+        if not self.speaking_practice_progress:
+            self.speaking_practice_progress = {}
+        
+        self.speaking_practice_progress[str(exercise_id)] = {
+            'completed': completed,
+            'score': score,
+            'completed_at': timezone.now().isoformat() if completed else None
+        }
+        
+        if completed:
+            self.total_speaking_sessions += 1
+            # Recalcular média
+            total_scores = sum(ex['score'] for ex in self.speaking_practice_progress.values() if ex['completed'])
+            self.avg_speaking_score = total_scores / len([ex for ex in self.speaking_practice_progress.values() if ex['completed']])
+        
+        self.save(update_fields=['speaking_practice_progress', 'total_speaking_sessions', 'avg_speaking_score'])
+    
+    def update_listening_progress(self, exercise_id, score, completed=True):
+        """Atualiza progresso de exercício de listening específico."""
+        if not self.listening_practice_progress:
+            self.listening_practice_progress = {}
+        
+        self.listening_practice_progress[str(exercise_id)] = {
+            'completed': completed,
+            'score': score,
+            'completed_at': timezone.now().isoformat() if completed else None
+        }
+        
+        if completed:
+            self.total_listening_sessions += 1
+            # Recalcular média
+            total_scores = sum(ex['score'] for ex in self.listening_practice_progress.values() if ex['completed'])
+            self.avg_listening_score = total_scores / len([ex for ex in self.listening_practice_progress.values() if ex['completed']])
+        
+        self.save(update_fields=['listening_practice_progress', 'total_listening_sessions', 'avg_listening_score'])
+    
+    def get_overall_progress_with_practices(self):
+        """Calcula progresso geral incluindo práticas (80% trilha principal, 20% práticas)."""
+        main_progress = self.overallProgress
+        
+        # Calcular progresso das práticas
+        practice_progress = 0.0
+        if self.total_speaking_sessions > 0 or self.total_listening_sessions > 0:
+            speaking_weight = 0.5
+            listening_weight = 0.5
+            
+            speaking_progress = min(100.0, (self.total_speaking_sessions / 10) * 100)  # Máximo 10 sessões
+            listening_progress = min(100.0, (self.total_listening_sessions / 10) * 100)  # Máximo 10 sessões
+            
+            practice_progress = (speaking_progress * speaking_weight) + (listening_progress * listening_weight)
+        
+        # Ponderação: 80% trilha principal, 20% práticas
+        overall_with_practices = (main_progress * 0.8) + (practice_progress * 0.2)
+        return round(overall_with_practices, 1)
+    
+    def get_practice_summary(self):
+        """Retorna resumo das práticas do curso."""
+        return {
+            'speaking': {
+                'total_sessions': self.total_speaking_sessions,
+                'avg_score': round(self.avg_speaking_score, 1),
+                'exercises_completed': len([ex for ex in self.speaking_practice_progress.values() if ex.get('completed', False)])
+            },
+            'listening': {
+                'total_sessions': self.total_listening_sessions,
+                'avg_score': round(self.avg_listening_score, 1),
+                'exercises_completed': len([ex for ex in self.listening_practice_progress.values() if ex.get('completed', False)])
+            }
+        }
 
 
 class ChapterProgress(BaseModel, ProgressTrackingMixin, TimestampedModelMixin):
