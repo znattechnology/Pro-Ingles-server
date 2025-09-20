@@ -534,6 +534,59 @@ urlpatterns = [
     ),
     
     # ========================================================================
+    # TEACHER LEADERBOARD MANAGEMENT ENDPOINTS
+    # ========================================================================
+    
+    # Teacher class rankings
+    path(
+        'teacher/leaderboard/rankings/',
+        views.TeacherClassRankingsView.as_view(),
+        name='teacher-class-rankings'
+    ),
+    
+    # Teacher leaderboard statistics
+    path(
+        'teacher/leaderboard/stats/',
+        views.TeacherLeaderboardStatsView.as_view(),
+        name='teacher-leaderboard-stats'
+    ),
+    
+    # Teacher competitions management
+    path(
+        'teacher/leaderboard/competitions/',
+        views.TeacherCompetitionsView.as_view(),
+        name='teacher-competitions'
+    ),
+    
+    # Teacher competition detail
+    path(
+        'teacher/leaderboard/competitions/<uuid:pk>/',
+        views.TeacherCompetitionDetailView.as_view(),
+        name='teacher-competition-detail'
+    ),
+    
+    # Competition analytics
+    path(
+        'teacher/leaderboard/competitions/<uuid:competition_id>/analytics/',
+        views.teacher_competition_analytics,
+        name='teacher-competition-analytics'
+    ),
+    
+    # Student engagement details
+    path(
+        'teacher/leaderboard/students/<uuid:student_id>/details/',
+        views.teacher_student_engagement_details,
+        name='teacher-student-engagement'
+    ),
+    
+    # Bulk enroll students in competition
+    path(
+        'teacher/leaderboard/competitions/<uuid:competition_id>/enroll/',
+        views.bulk_enroll_students_in_competition,
+        name='bulk-enroll-competition'
+    ),
+    
+    # ========================================================================
     # STUDENT ACHIEVEMENT ENDPOINTS
     # ========================================================================
     

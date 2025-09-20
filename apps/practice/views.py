@@ -3994,3 +3994,642 @@ def mark_achievement_celebrated(request, achievement_id):
             {'error': f'Erro ao marcar celebração: {str(e)}'}, 
             status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+# ============================================================================
+# TEACHER LEADERBOARD VIEWS - Analytics and management for teachers
+# ============================================================================
+
+
+
+
+class TeacherCompetitionsView(generics.ListCreateAPIView):
+    """
+    GET/POST /api/v1/practice/teacher/leaderboard/competitions/
+    
+    List teacher competitions or create new ones.
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        """Get competitions relevant to teacher"""
+        status_filter = self.request.GET.get('status', 'all')
+        
+        queryset = Competition.objects.all().order_by('-created_at')
+        
+        if status_filter != 'all':
+            if status_filter == 'active':
+                queryset = queryset.filter(status='active', end_date__gte=timezone.now())
+            elif status_filter == 'finished':
+                queryset = queryset.filter(end_date__lt=timezone.now())
+        
+        return queryset
+    
+    def list(self, request):
+        """List competitions with teacher-specific data"""
+        try:
+            competitions = self.get_queryset()
+            
+            competitions_data = []
+            for comp in competitions:
+                # Get participation count
+                participants_count = CompetitionParticipant.objects.filter(competition=comp).count()
+                
+                # Determine status
+                now = timezone.now()
+                if comp.start_date > now:
+                    status = 'upcoming'
+                elif comp.end_date < now:
+                    status = 'finished'
+                else:
+                    status = 'active'
+                
+                competitions_data.append({
+                    'id': str(comp.id),
+                    'title': comp.title,
+                    'description': comp.description,
+                    'type': comp.type,
+                    'status': status,
+                    'createdBy': 'Teacher',  # Mock
+                    'participants': participants_count,
+                    'maxParticipants': comp.max_participants,
+                    'startDate': comp.start_date.strftime('%Y-%m-%d'),
+                    'endDate': comp.end_date.strftime('%Y-%m-%d'),
+                    'prize': comp.first_place_prize or 'Badge especial',
+                    'targetMetric': 'points',  # Mock
+                    'targetValue': 1000,  # Mock
+                    'created_at': comp.created_at.isoformat(),
+                })
+            
+            return Response(competitions_data)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Erro ao buscar competições: {str(e)}'}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def create(self, request):
+        """Create new competition"""
+        try:
+            data = request.data
+            
+            # Calculate end date based on type and duration
+            start_date = timezone.now()
+            if data.get('type') == 'weekly':
+                end_date = start_date + timezone.timedelta(days=7)
+            elif data.get('type') == 'monthly':
+                end_date = start_date + timezone.timedelta(days=30)
+            else:
+                duration = int(data.get('duration', 7))
+                end_date = start_date + timezone.timedelta(days=duration)
+            
+            competition = Competition.objects.create(
+                title=data['title'],
+                description=data.get('description', ''),
+                type=data.get('type', 'custom'),
+                start_date=start_date,
+                end_date=end_date,
+                first_place_prize=data.get('prize', 'Badge especial + 500 pontos'),
+                max_participants=data.get('maxParticipants'),
+                status='active'
+            )
+            
+            return Response({
+                'id': str(competition.id),
+                'title': competition.title,
+                'description': competition.description,
+                'type': competition.type,
+                'status': 'active',
+                'participants': 0,
+                'startDate': competition.start_date.strftime('%Y-%m-%d'),
+                'endDate': competition.end_date.strftime('%Y-%m-%d'),
+                'prize': competition.first_place_prize,
+                'created_at': competition.created_at.isoformat(),
+            }, status=status_module.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Erro ao criar competição: {str(e)}'}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class TeacherCompetitionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET/PUT/PATCH/DELETE /api/v1/practice/teacher/leaderboard/competitions/{id}/
+    
+    Manage specific competition.
+    """
+    permission_classes = [IsAuthenticated]
+    queryset = Competition.objects.all()
+    
+    def retrieve(self, request, pk=None):
+        """Get competition details"""
+        try:
+            competition = self.get_object()
+            participants_count = CompetitionParticipant.objects.filter(competition=competition).count()
+            
+            # Determine status
+            now = timezone.now()
+            if competition.start_date > now:
+                status = 'upcoming'
+            elif competition.end_date < now:
+                status = 'finished'
+            else:
+                status = 'active'
+            
+            return Response({
+                'id': str(competition.id),
+                'title': competition.title,
+                'description': competition.description,
+                'type': competition.type,
+                'status': status,
+                'participants': participants_count,
+                'maxParticipants': competition.max_participants,
+                'startDate': competition.start_date.strftime('%Y-%m-%d'),
+                'endDate': competition.end_date.strftime('%Y-%m-%d'),
+                'prize': competition.first_place_prize or 'Badge especial',
+                'created_at': competition.created_at.isoformat(),
+            })
+            
+        except Competition.DoesNotExist:
+            return Response(
+                {'error': 'Competição não encontrada'}, 
+                status=status_module.HTTP_404_NOT_FOUND
+            )
+    
+    def update(self, request, pk=None):
+        """Update competition"""
+        try:
+            competition = self.get_object()
+            data = request.data
+            
+            # Update fields
+            if 'title' in data:
+                competition.title = data['title']
+            if 'description' in data:
+                competition.description = data['description']
+            if 'prize' in data:
+                competition.first_place_prize = data['prize']
+            
+            competition.save()
+            
+            return Response({'message': 'Competição atualizada com sucesso'})
+            
+        except Competition.DoesNotExist:
+            return Response(
+                {'error': 'Competição não encontrada'}, 
+                status=status_module.HTTP_404_NOT_FOUND
+            )
+    
+    def destroy(self, request, pk=None):
+        """Delete competition"""
+        try:
+            competition = self.get_object()
+            
+            # Only allow deletion if not started or no participants
+            participants_count = CompetitionParticipant.objects.filter(competition=competition).count()
+            if participants_count > 0 and competition.start_date <= timezone.now():
+                return Response(
+                    {'error': 'Não é possível deletar competição com participantes ativa'}, 
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+            
+            competition.delete()
+            return Response({'message': 'Competição deletada com sucesso'})
+            
+        except Competition.DoesNotExist:
+            return Response(
+                {'error': 'Competição não encontrada'}, 
+                status=status_module.HTTP_404_NOT_FOUND
+            )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def teacher_competition_analytics(request, competition_id):
+    """
+    GET /api/v1/practice/teacher/leaderboard/competitions/{id}/analytics/
+    
+    Get detailed analytics for a specific competition.
+    """
+    try:
+        competition = Competition.objects.get(id=competition_id)
+        participants = CompetitionParticipant.objects.filter(competition=competition)
+        
+        # Mock analytics data
+        analytics = {
+            'competitionId': str(competition_id),
+            'participationRate': 67.5,
+            'averageProgress': 45.2,
+            'progressChart': [
+                {'date': '2024-01-15', 'participants': 8, 'averageProgress': 10},
+                {'date': '2024-01-16', 'participants': 12, 'averageProgress': 25},
+                {'date': '2024-01-17', 'participants': 15, 'averageProgress': 35},
+                {'date': '2024-01-18', 'participants': 18, 'averageProgress': 45},
+            ],
+            'engagementMetrics': {
+                'dailyActiveParticipants': 14,
+                'dropoffRate': 8.3,
+                'completionRate': 45.2
+            }
+        }
+        
+        return Response(analytics)
+        
+    except Competition.DoesNotExist:
+        return Response(
+            {'error': 'Competição não encontrada'}, 
+            status=status_module.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def teacher_student_engagement_details(request, student_id):
+    """
+    GET /api/v1/practice/teacher/leaderboard/students/{id}/details/
+    
+    Get detailed engagement information for a specific student.
+    """
+    try:
+        from apps.users.models import User
+        student = User.objects.get(id=student_id, role='student')
+        
+        # Get user progress and streak
+        user_progress, _ = UserProgress.objects.get_or_create(
+            user=student,
+            defaults={'points': 0, 'hearts': 5}
+        )
+        streak, _ = UserStreak.objects.get_or_create(
+            user=student,
+            defaults={'current_streak': 0}
+        )
+        
+        # Mock detailed data
+        details = {
+            'student': {
+                'id': str(student.id),
+                'name': student.name,
+                'points': user_progress.points,
+                'streak': streak.current_streak,
+                'league': 'silver',
+                'engagementScore': 85
+            },
+            'weeklyProgress': [
+                {'date': '2024-01-15', 'points': 150, 'lessons': 3, 'streak': 5},
+                {'date': '2024-01-16', 'points': 200, 'lessons': 4, 'streak': 6},
+                {'date': '2024-01-17', 'points': 180, 'lessons': 3, 'streak': 7},
+            ],
+            'competitionHistory': [
+                {'competition': 'Desafio Semanal', 'rank': 3, 'completed': True, 'progress': 100},
+                {'competition': 'Maratona de Lições', 'rank': 5, 'completed': False, 'progress': 67},
+            ],
+            'achievements': [
+                {'title': 'Primeiro Passo', 'unlockedAt': '2024-01-10', 'points': 10},
+                {'title': 'Sequência Iniciante', 'unlockedAt': '2024-01-12', 'points': 15},
+            ]
+        }
+        
+        return Response(details)
+        
+    except User.DoesNotExist:
+        return Response(
+            {'error': 'Estudante não encontrado'}, 
+            status=status_module.HTTP_404_NOT_FOUND
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def bulk_enroll_students_in_competition(request, competition_id):
+    """
+    POST /api/v1/practice/teacher/leaderboard/competitions/{id}/enroll/
+    
+    Bulk enroll students in a competition.
+    """
+    try:
+        competition = Competition.objects.get(id=competition_id)
+        student_ids = request.data.get('student_ids', [])
+        
+        enrolled_count = 0
+        for student_id in student_ids:
+            try:
+                from apps.users.models import User
+                student = User.objects.get(id=student_id, role='student')
+                
+                # Create participation record if doesn't exist
+                participant, created = CompetitionParticipant.objects.get_or_create(
+                    competition=competition,
+                    user=student,
+                    defaults={'points_earned': 0}
+                )
+                
+                if created:
+                    enrolled_count += 1
+                    
+            except User.DoesNotExist:
+                continue
+        
+        return Response({
+            'enrolled': enrolled_count,
+            'message': f'{enrolled_count} estudantes inscritos na competição'
+        })
+        
+    except Competition.DoesNotExist:
+        return Response(
+            {'error': 'Competição não encontrada'}, 
+            status=status_module.HTTP_404_NOT_FOUND
+        )
+
+
+# =============================================================================
+# TEACHER LEADERBOARD VIEWS - Class rankings and competition management
+# =============================================================================
+
+class TeacherClassRankingsView(APIView):
+    """
+    GET /api/v1/practice/teacher/leaderboard/rankings/
+    
+    Get student rankings for teacher's classes
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            from apps.users.models import User
+            from django.db.models import Sum, Count, Avg, Q
+            from datetime import datetime, timedelta
+            
+            # Get time range parameter
+            time_range = request.GET.get('time_range', 'week')
+            course_id = request.GET.get('course_id', None)
+            
+            # Calculate date filter based on time range
+            now = timezone.now()
+            if time_range == 'week':
+                date_filter = now - timedelta(days=7)
+            elif time_range == 'month':
+                date_filter = now - timedelta(days=30)
+            else:
+                date_filter = None
+            
+            # Get all students with their progress
+            students = User.objects.filter(role='student')
+            
+            rankings = []
+            for student in students:
+                # Get user progress
+                try:
+                    progress = UserProgress.objects.get(user=student)
+                    
+                    # Calculate points based on time range
+                    if date_filter:
+                        # Count completed challenges in time range (10 points each)
+                        recent_completed = ChallengeProgress.objects.filter(
+                            user=student,
+                            completed=True,
+                            completed_at__gte=date_filter
+                        ).count()
+                        points = recent_completed * 10  # 10 points per challenge
+                    else:
+                        points = progress.points
+                    
+                    # Get streak
+                    try:
+                        user_streak = UserStreak.objects.get(user=student)
+                        streak = user_streak.current_streak
+                    except UserStreak.DoesNotExist:
+                        streak = 0
+                    
+                    # Calculate league based on points
+                    if points >= 2000:
+                        league = 'gold'
+                    elif points >= 1000:
+                        league = 'silver'
+                    elif points >= 500:
+                        league = 'bronze'
+                    else:
+                        league = 'bronze'
+                    
+                    # Get completed lessons count
+                    completed_lessons = ChallengeProgress.objects.filter(
+                        user=student,
+                        completed=True
+                    ).values('challenge__lesson').distinct().count()
+                    
+                    # Calculate weekly points
+                    week_ago = now - timedelta(days=7)
+                    weekly_completed = ChallengeProgress.objects.filter(
+                        user=student,
+                        completed=True,
+                        completed_at__gte=week_ago
+                    ).count()
+                    weekly_points = weekly_completed * 10  # 10 points per challenge
+                    
+                    # Calculate monthly points
+                    month_ago = now - timedelta(days=30)
+                    monthly_completed = ChallengeProgress.objects.filter(
+                        user=student,
+                        completed=True,
+                        completed_at__gte=month_ago
+                    ).count()
+                    monthly_points = monthly_completed * 10  # 10 points per challenge
+                    
+                    # Get last activity
+                    last_activity = ChallengeProgress.objects.filter(
+                        user=student
+                    ).order_by('-completed_at').first()
+                    
+                    if last_activity:
+                        time_diff = now - last_activity.completed_at
+                        if time_diff.total_seconds() < 3600:  # Less than 1 hour
+                            last_activity_str = f"{int(time_diff.total_seconds() / 60)} minutes ago"
+                        elif time_diff.days == 0:
+                            last_activity_str = f"{int(time_diff.total_seconds() / 3600)} hours ago"
+                        else:
+                            last_activity_str = f"{time_diff.days} days ago"
+                    else:
+                        last_activity_str = "Never"
+                    
+                    rankings.append({
+                        'id': str(student.id),
+                        'name': student.name,
+                        'username': student.email,
+                        'points': points,
+                        'streak': streak,
+                        'league': league,
+                        'weeklyPoints': weekly_points,
+                        'monthlyPoints': monthly_points,
+                        'completedLessons': completed_lessons,
+                        'totalLessons': 100,  # This should be calculated based on available lessons
+                        'change': 'same',  # This would require historical data
+                        'changeAmount': 0,
+                        'lastActivity': last_activity_str,
+                        'engagementScore': min(100, (weekly_points / 10) + (streak * 2))
+                    })
+                
+                except UserProgress.DoesNotExist:
+                    # Create default progress for user
+                    UserProgress.objects.create(user=student)
+                    rankings.append({
+                        'id': str(student.id),
+                        'name': student.name,
+                        'username': student.email,
+                        'points': 0,
+                        'streak': 0,
+                        'league': 'bronze',
+                        'weeklyPoints': 0,
+                        'monthlyPoints': 0,
+                        'completedLessons': 0,
+                        'totalLessons': 100,
+                        'change': 'new',
+                        'changeAmount': 0,
+                        'lastActivity': "Never",
+                        'engagementScore': 0
+                    })
+            
+            # Sort by points descending and add ranks
+            rankings.sort(key=lambda x: x['points'], reverse=True)
+            for i, ranking in enumerate(rankings):
+                ranking['rank'] = i + 1
+            
+            return Response(rankings)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Failed to get rankings: {str(e)}'}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class TeacherLeaderboardStatsView(APIView):
+    """
+    GET /api/v1/practice/teacher/leaderboard/stats/
+    
+    Get comprehensive teacher leaderboard statistics
+    """
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            from apps.users.models import User
+            from django.db.models import Sum, Count, Avg, Q
+            from datetime import datetime, timedelta
+            
+            # Get time range parameter
+            time_range = request.GET.get('time_range', 'week')
+            
+            # Calculate date filter
+            now = timezone.now()
+            if time_range == 'week':
+                date_filter = now - timedelta(days=7)
+            elif time_range == 'month':
+                date_filter = now - timedelta(days=30)
+            else:
+                date_filter = None
+            
+            # Get all students
+            students = User.objects.filter(role='student')
+            total_students = students.count()
+            
+            # Count active students (those who have activity in the time range)
+            if date_filter:
+                active_students = students.filter(
+                    challenge_progress__completed_at__gte=date_filter
+                ).distinct().count()
+            else:
+                active_students = students.filter(
+                    challenge_progress__isnull=False
+                ).distinct().count()
+            
+            # Calculate average points from UserProgress
+            avg_points = UserProgress.objects.aggregate(
+                avg=Avg('points')
+            )['avg'] or 0
+            
+            # Calculate average streak from UserStreak model
+            avg_streak = UserStreak.objects.aggregate(
+                avg=Avg('current_streak')
+            )['avg'] or 0
+            
+            # Count competitions
+            active_competitions = Competition.objects.filter(
+                end_date__gte=now,
+                start_date__lte=now
+            ).count()
+            
+            completed_competitions = Competition.objects.filter(
+                end_date__lt=now
+            ).count()
+            
+            # Calculate engagement rate
+            engagement_rate = (active_students / total_students * 100) if total_students > 0 else 0
+            
+            # League distribution
+            league_distribution = {
+                'bronze': 0,
+                'silver': 0,
+                'gold': 0,
+                'diamond': 0
+            }
+            
+            for student in students:
+                try:
+                    progress = UserProgress.objects.get(user=student)
+                    points = progress.points
+                    if points >= 2000:
+                        league_distribution['gold'] += 1
+                    elif points >= 1000:
+                        league_distribution['silver'] += 1
+                    else:
+                        league_distribution['bronze'] += 1
+                except UserProgress.DoesNotExist:
+                    league_distribution['bronze'] += 1
+            
+            # Weekly activity (simplified)
+            weekly_activity = []
+            for i in range(7):
+                day = now - timedelta(days=i)
+                day_name = day.strftime('%a')
+                
+                activity = ChallengeProgress.objects.filter(
+                    completed_at__date=day.date()
+                ).aggregate(
+                    active_students=Count('user', distinct=True),
+                    lessons_completed=Count('challenge__lesson', distinct=True)
+                )
+                
+                weekly_activity.append({
+                    'day': day_name,
+                    'activeStudents': activity['active_students'] or 0,
+                    'pointsEarned': 0,  # Points are tracked in UserProgress, not per challenge
+                    'lessonsCompleted': activity['lessons_completed'] or 0
+                })
+            
+            weekly_activity.reverse()  # Show in chronological order
+            
+            stats = {
+                'totalStudents': total_students,
+                'activeStudents': active_students,
+                'averagePoints': avg_points,
+                'averageStreak': avg_streak,
+                'activeCompetitions': active_competitions,
+                'completedCompetitions': completed_competitions,
+                'engagementRate': engagement_rate,
+                'leagueDistribution': league_distribution,
+                'weeklyActivity': weekly_activity,
+                'topPerformers': [],  # Would need more complex query
+                'strugglingStudents': []  # Would need more complex query
+            }
+            
+            return Response(stats)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Failed to get stats: {str(e)}'}, 
+                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
