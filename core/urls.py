@@ -23,6 +23,12 @@ urlpatterns = [
     
     # API endpoints
     path('api/v1/users/', include('apps.users.urls')),
+    
+    # Student APIs (organized)
+    path('api/v1/student/video-courses/', include('apps.courses.api.student.video_courses.urls')),
+    path('api/v1/student/practice-courses/', include('apps.courses.api.student.practice_courses.urls')),
+    
+    # Legacy endpoints (for backward compatibility)
     path('api/v1/courses/', include('apps.courses.urls')),
     path('api/v1/practice/', include('apps.practice.urls')),
     
