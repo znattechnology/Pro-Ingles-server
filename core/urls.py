@@ -25,6 +25,8 @@ urlpatterns = [
     path('api/v1/users/', include('apps.users.urls')),
     path('api/v1/courses/', include('apps.courses.urls')),
     path('api/v1/practice/', include('apps.practice.urls')),
+    
+    # Other endpoints
     path('api/v1/subscriptions/', include('apps.subscriptions.urls')),
     path('api/v1/cms/', include('apps.cms.urls')),
 ]

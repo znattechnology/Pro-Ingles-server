@@ -25,8 +25,13 @@ class CourseChoices:
     
     TEMPLATE_CHOICES = [
         ('general', 'Inglês Geral'),
+        ('oil-gas', 'Inglês para Petróleo & Gás'),
+        ('banking', 'Inglês Bancário'),
+        ('technology', 'Inglês para TI & Telecomunicações'),
+        ('executive', 'Inglês Executivo'),
+        ('ai-personal', 'Inglês com IA Personal Tutor'),
+        # Manter templates antigos para compatibilidade
         ('business', 'Inglês para Negócios'),
-        ('technology', 'Inglês para Tecnologia'),
         ('medical', 'Inglês Médico'),
         ('legal', 'Inglês Jurídico'),
     ]

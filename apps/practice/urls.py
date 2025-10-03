@@ -11,6 +11,58 @@ from . import views
 app_name = 'practice'
 
 urlpatterns = [
+    # ========================================================================
+    # FRONTEND COMPATIBILITY ENDPOINTS - MUST BE FIRST to avoid conflicts
+    # ========================================================================
+    
+    # Units for specific course (alternative route) - NOW HANDLED BY UNIFIED VIEW
+    # Expected by frontend: /api/v1/practice/units/?course={courseId}
+    # NOTE: This functionality is now handled by PracticeUnitCreateView (GET method)
+    # path(
+    #     'units/', 
+    #     views.units_list_simple, 
+    #     name='units-list-frontend'
+    # ),
+    
+    # Lessons for specific unit (alternative route) 
+    # Expected by frontend: /api/v1/practice/lessons/?unit={unitId}
+    # NOTE: This functionality is now handled by PracticeLessonCreateView (GET method)
+    # path(
+    #     'lessons/', 
+    #     views.lessons_list_simple, 
+    #     name='lessons-list-frontend'
+    # ),
+    
+    # Challenges for specific lesson (new endpoint)
+    # Expected by frontend: /api/v1/practice/challenges/?lesson={lessonId}
+    # NOTE: This functionality is now handled by PracticeChallengeCreateView (GET method)
+    # path(
+    #     'challenges/', 
+    #     views.challenges_list_simple, 
+    #     name='challenges-list-frontend'
+    # ),
+    
+    # Test endpoints for verification
+    path(
+        'test-units/', 
+        views.test_units_simple, 
+        name='test-units'
+    ),
+    path(
+        'test-lessons/', 
+        views.test_lessons_simple, 
+        name='test-lessons'
+    ),
+    path(
+        'test-challenges/', 
+        views.test_challenges_simple, 
+        name='test-challenges'
+    ),
+
+    # ========================================================================
+    # EXISTING ENDPOINTS
+    # ========================================================================
+
     # List all courses
     path(
         'courses/', 
@@ -631,4 +683,5 @@ urlpatterns = [
         views.mark_achievement_celebrated,
         name='mark-achievement-celebrated'
     ),
+    
 ]

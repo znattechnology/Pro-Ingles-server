@@ -272,13 +272,14 @@ class UserProgress(models.Model):
         self.hearts = min(5, self.hearts + amount)
         self.save()
     
-    def add_points(self, amount=10):
+    def add_points(self, amount=10, check_achievements=True):
         """Add points for correct answers"""
         self.points += amount
         self.save()
         
-        # Trigger achievement progress check
-        self._check_achievements_for_points()
+        # Trigger achievement progress check (unless disabled to prevent recursion)
+        if check_achievements:
+            self._check_achievements_for_points()
     
     def _check_achievements_for_points(self):
         """Check and update achievements related to points"""
@@ -775,12 +776,12 @@ class UserAchievement(models.Model):
             self.is_unlocked = True
             self.unlocked_at = timezone.now()
             
-            # Award points to user
+            # Award points to user (without triggering achievement check to prevent recursion)
             user_progress, created = UserProgress.objects.get_or_create(
                 user=self.user,
                 defaults={'hearts': 5, 'points': 0}
             )
-            user_progress.add_points(self.achievement.points)
+            user_progress.add_points(self.achievement.points, check_achievements=False)
         
         self.save()
         return self.is_unlocked

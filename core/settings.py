@@ -220,6 +220,13 @@ CORS_ALLOWED_ORIGINS = config(
     cast=Csv()
 )
 
+# CSRF Settings - Add trusted origins for frontend requests
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='http://localhost:3000,http://127.0.0.1:3000',
+    cast=Csv()
+)
+
 # Additional CORS security settings
 CORS_ALLOW_CREDENTIALS = True
 CORS_PREFLIGHT_MAX_AGE = 86400  # 24 hours
