@@ -1,12 +1,12 @@
 """
-Serializers for the ProEnglish course management system.
+Serializers for the ProEnglish course management system - Student Video Courses API.
 
-This module contains all serializers for course-related models,
+This module contains all serializers for student video course-related models,
 following the same structure and response format as the Express API.
 """
 
 from rest_framework import serializers
-from .models import (
+from apps.courses.models import (
     Course, CourseSection, Chapter, ChapterComment,
     CourseEnrollment, Transaction, UserCourseProgress, ChapterProgress,
     ChapterResource, ChapterQuiz, StudentQuizAttempt
@@ -42,7 +42,6 @@ class ChapterSerializer(serializers.ModelSerializer):
     """
     Serializer for chapters - matches Express chapter structure.
     Optimized for performance with conditional field loading.
-    SUPPORTS: Quiz, Exercise, Text, Video chapters with complete data.
     """
     comments = serializers.SerializerMethodField()
     
@@ -388,7 +387,7 @@ class CourseUpdateSerializer(serializers.ModelSerializer):
         Update sections and chapters for the course.
         This method handles creating, updating, and deleting sections/chapters.
         """
-        from .models import CourseSection, Chapter
+        from ....models import CourseSection, Chapter
         
         # Get existing section IDs
         existing_section_ids = set(
@@ -443,7 +442,7 @@ class CourseUpdateSerializer(serializers.ModelSerializer):
         """
         Update chapters for a section.
         """
-        from .models import Chapter
+        from ....models import Chapter
         
         # Get existing chapter IDs for this section
         existing_chapter_ids = set(

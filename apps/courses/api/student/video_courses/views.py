@@ -19,7 +19,7 @@ from ....models import (
     CourseEnrollment, Transaction, UserCourseProgress, ChapterProgress,
     ChapterResource, ChapterQuiz, StudentQuizAttempt
 )
-from ....serializers import (
+from .serializers import (
     CourseListSerializer, CourseDetailSerializer, CourseCreateSerializer, CourseUpdateSerializer,
     CourseSectionSerializer, CourseSectionCreateSerializer,
     ChapterSerializer, ChapterCreateSerializer, ChapterCommentSerializer,
@@ -276,9 +276,10 @@ def get_user_enrolled_courses(request, userId):
     except User.DoesNotExist:
         return Response({'error': 'Usuário não encontrado'}, status=404)
     
-    # Get enrolled courses - only video courses
+    # Get enrolled courses - only published video courses
     enrollments = CourseEnrollment.objects.filter(user=user).select_related('course')
-    courses = [enrollment.course for enrollment in enrollments if enrollment.course.course_type == 'video']
+    courses = [enrollment.course for enrollment in enrollments 
+              if enrollment.course.course_type == 'video' and enrollment.course.status == 'Published']
     
     serializer = CourseListSerializer(courses, many=True)
     

@@ -3619,3 +3619,174 @@ def test_challenges_simple(request):
         'message': 'Challenges endpoint working',
         'data': []
     })
+
+
+# =============================================================================
+# 🏆 STUDENT ACHIEVEMENT VIEWS (COPIED FROM PRACTICE APP)
+# =============================================================================
+
+from apps.practice.serializers import UserAchievementSerializer, AchievementNotificationSerializer
+
+class StudentAchievementListView(generics.ListAPIView):
+    """
+    GET /api/v1/student/practice-courses/achievements/
+    
+    List all achievements with user progress (Student view).
+    """
+    serializer_class = UserAchievementSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['achievement__category', 'achievement__rarity', 'is_unlocked']
+    
+    def get_queryset(self):
+        """Get user achievements or create them if they don't exist"""
+        user = self.request.user
+        
+        # Get all active achievements
+        all_achievements = Achievement.objects.filter(is_active=True)
+        
+        # Create UserAchievement records for any missing achievements
+        for achievement in all_achievements:
+            UserAchievement.objects.get_or_create(
+                user=user,
+                achievement=achievement,
+                defaults={
+                    'current_progress': 0,
+                    'is_unlocked': False
+                }
+            )
+        
+        # Return all user achievements
+        return UserAchievement.objects.filter(
+            user=user,
+            achievement__is_active=True
+        ).select_related('achievement').order_by(
+            'achievement__category', 'achievement__order'
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def student_achievement_stats(request):
+    """
+    GET /api/v1/student/practice-courses/achievements/stats/
+    
+    Get achievement statistics for student dashboard.
+    """
+    try:
+        user = request.user
+        
+        # Get user achievements
+        user_achievements = UserAchievement.objects.filter(user=user)
+        unlocked_achievements = user_achievements.filter(is_unlocked=True)
+        
+        total_available = Achievement.objects.filter(is_active=True).count()
+        total_unlocked = unlocked_achievements.count()
+        total_points = sum(ua.achievement.points for ua in unlocked_achievements)
+        
+        # Count rare achievements (epic and legendary)
+        rare_achievements = unlocked_achievements.filter(
+            achievement__rarity__in=['epic', 'legendary']
+        ).count()
+        
+        # Recent unlocks (last 7 days)
+        from datetime import timedelta
+        recent_date = timezone.now() - timedelta(days=7)
+        recent_unlocked = unlocked_achievements.filter(
+            unlocked_at__gte=recent_date
+        ).count()
+        
+        return Response({
+            'totalUnlocked': total_unlocked,
+            'totalAvailable': total_available,
+            'totalPoints': total_points,
+            'rareAchievements': rare_achievements,
+            'recentUnlocked': recent_unlocked
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao buscar estatísticas: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def student_achievement_categories(request):
+    """
+    GET /api/v1/student/practice-courses/achievements/categories/
+    
+    Get achievement categories with user progress.
+    """
+    try:
+        user = request.user
+        
+        # Get category stats
+        categories = AchievementCategory.objects.filter(is_active=True).order_by('order')
+        
+        category_data = []
+        for category in categories:
+            # Count achievements in this category
+            total_in_category = Achievement.objects.filter(
+                category=category.name, 
+                is_active=True
+            ).count()
+            
+            # Count unlocked by user
+            unlocked_in_category = UserAchievement.objects.filter(
+                user=user,
+                achievement__category=category.name,
+                achievement__is_active=True,
+                is_unlocked=True
+            ).count()
+            
+            category_data.append({
+                'name': category.name,
+                'display_name': category.display_name,
+                'description': category.description,
+                'icon_class': category.icon_class,
+                'color': category.color,
+                'order': category.order,
+                'achievement_count': total_in_category,
+                'unlocked_count': unlocked_in_category
+            })
+        
+        return Response(category_data)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao buscar categorias: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def student_achievement_notifications(request):
+    """
+    GET /api/v1/student/practice-courses/achievements/notifications/
+    
+    Get unread achievement notifications for user.
+    """
+    try:
+        user = request.user
+        
+        notifications = AchievementNotification.objects.filter(
+            user=user,
+            is_read=False
+        ).select_related('achievement').order_by('-created_at')[:10]
+        
+        serializer = AchievementNotificationSerializer(
+            notifications, 
+            many=True,
+            context={'request': request}
+        )
+        
+        return Response(serializer.data)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao buscar notificações: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )

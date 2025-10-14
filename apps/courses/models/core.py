@@ -259,6 +259,18 @@ class Chapter(BaseModel, OrderedModelMixin, MetadataModelMixin):
         help_text="Whether this chapter has an interactive quiz"
     )
     
+    # Quiz data storage for frontend compatibility (Quiz chapters)
+    quiz_data = models.JSONField(
+        null=True, blank=True,
+        help_text="Quiz questions and settings data (JSON format)"
+    )
+    
+    # Practice selection for exercise chapters (Exercise chapters)  
+    practice_selection = models.JSONField(
+        null=True, blank=True,
+        help_text="Practice course selection data for exercise chapters"
+    )
+    
     resources_data = models.JSONField(
         default=list,
         help_text="Array of chapter resources (PDFs, links, etc.)"
@@ -284,6 +296,25 @@ class Chapter(BaseModel, OrderedModelMixin, MetadataModelMixin):
     
     def __str__(self):
         return f"{self.section.course.title} - {self.section.sectionTitle} - {self.title}"
+    
+    def save(self, *args, **kwargs):
+        # Auto-enable quiz when chapter type is Quiz
+        if self.type == 'Quiz' and not self.quiz_enabled:
+            self.quiz_enabled = True
+        
+        # Auto-populate practice_selection for Exercise chapters if not set
+        if self.type == 'Exercise' and not self.practice_selection:
+            # Set default empty selection structure
+            self.practice_selection = {
+                "course_id": None,
+                "lesson_ids": [],
+                "settings": {
+                    "shuffle": True,
+                    "time_limit": None
+                }
+            }
+        
+        super().save(*args, **kwargs)
     
     @property
     def course(self):

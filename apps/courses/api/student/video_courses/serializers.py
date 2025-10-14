@@ -49,7 +49,13 @@ class ChapterSerializer(serializers.ModelSerializer):
         model = Chapter
         fields = [
             'chapterId', 'title', 'content', 'type', 'video', 
-            'order', 'comments', 'created_at'
+            'order', 'comments', 'created_at',
+            # ✅ QUIZ FIELDS - para chapters tipo Quiz
+            'quiz_enabled', 'quiz_data',
+            # ✅ EXERCISE FIELDS - para chapters tipo Exercise  
+            'practice_selection', 'practice_lesson',
+            # ✅ RESOURCE FIELDS - para todos os tipos (Text, Quiz, Exercise, Video)
+            'resources_data', 'transcript'
         ]
         read_only_fields = ['chapterId', 'created_at']
     
@@ -459,6 +465,14 @@ class CourseUpdateSerializer(serializers.ModelSerializer):
                     chapter.type = chapter_data.get('type', chapter.type)
                     chapter.video = chapter_data.get('video', chapter.video)
                     chapter.order = chapter_data.get('order', chapter.order)
+                    # ✅ QUIZ FIELDS - para chapters tipo Quiz
+                    chapter.quiz_enabled = chapter_data.get('quiz_enabled', chapter.quiz_enabled)
+                    chapter.quiz_data = chapter_data.get('quiz_data', chapter.quiz_data)
+                    # ✅ EXERCISE FIELDS - para chapters tipo Exercise
+                    chapter.practice_selection = chapter_data.get('practice_selection', chapter.practice_selection)
+                    # ✅ RESOURCE FIELDS - para todos os tipos
+                    chapter.resources_data = chapter_data.get('resources_data', chapter.resources_data)
+                    chapter.transcript = chapter_data.get('transcript', chapter.transcript)
                     chapter.save()
                     processed_chapter_ids.add(chapter.id)
                 except Chapter.DoesNotExist:
@@ -469,7 +483,15 @@ class CourseUpdateSerializer(serializers.ModelSerializer):
                         content=chapter_data.get('content', ''),
                         type=chapter_data.get('type', 'Text'),
                         video=chapter_data.get('video', ''),
-                        order=chapter_data.get('order', 0)
+                        order=chapter_data.get('order', 0),
+                        # ✅ QUIZ FIELDS - para chapters tipo Quiz
+                        quiz_enabled=chapter_data.get('quiz_enabled', False),
+                        quiz_data=chapter_data.get('quiz_data', None),
+                        # ✅ EXERCISE FIELDS - para chapters tipo Exercise
+                        practice_selection=chapter_data.get('practice_selection', None),
+                        # ✅ RESOURCE FIELDS - para todos os tipos
+                        resources_data=chapter_data.get('resources_data', []),
+                        transcript=chapter_data.get('transcript', '')
                     )
                     processed_chapter_ids.add(chapter.id)
             else:
@@ -480,7 +502,15 @@ class CourseUpdateSerializer(serializers.ModelSerializer):
                     content=chapter_data.get('content', ''),
                     type=chapter_data.get('type', 'Text'),
                     video=chapter_data.get('video', ''),
-                    order=chapter_data.get('order', 0)
+                    order=chapter_data.get('order', 0),
+                    # ✅ QUIZ FIELDS - para chapters tipo Quiz
+                    quiz_enabled=chapter_data.get('quiz_enabled', False),
+                    quiz_data=chapter_data.get('quiz_data', None),
+                    # ✅ EXERCISE FIELDS - para chapters tipo Exercise
+                    practice_selection=chapter_data.get('practice_selection', None),
+                    # ✅ RESOURCE FIELDS - para todos os tipos
+                    resources_data=chapter_data.get('resources_data', []),
+                    transcript=chapter_data.get('transcript', '')
                 )
                 processed_chapter_ids.add(chapter.id)
         
