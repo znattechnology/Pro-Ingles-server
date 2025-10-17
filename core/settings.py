@@ -95,10 +95,17 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # DATABASE
 # =============================================================================
 
-# Use SQLite for development, PostgreSQL for production
-USE_POSTGRESQL = config('USE_POSTGRESQL', default=False, cast=bool)
+# Database configuration with Neon support
+DATABASE_URL = config('DATABASE_URL', default='')
 
-if USE_POSTGRESQL:
+if DATABASE_URL:
+    # Parse Neon DATABASE_URL
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
+    }
+elif config('USE_POSTGRESQL', default=False, cast=bool):
+    # Manual PostgreSQL configuration
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',

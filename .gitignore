@@ -12,6 +12,9 @@ venv/
 .env
 .env.local
 .env.production
+# Arquivos de ambiente
+
+.env.*
 
 # IDEs e configs
 .vscode/
