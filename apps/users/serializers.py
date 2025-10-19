@@ -3,6 +3,7 @@ Serializers for user models and authentication.
 """
 
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
@@ -66,7 +67,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Check if email is verified
         user = self.user
         if not user.email_verified:
-            raise serializers.ValidationError(
+            raise AuthenticationFailed(
                 "Email não verificado. Verifique seu email antes de fazer login."
             )
         
