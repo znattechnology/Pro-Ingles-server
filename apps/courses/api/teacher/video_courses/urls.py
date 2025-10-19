@@ -26,17 +26,8 @@ urlpatterns = [
     # Chapter comments
     path('chapters/<uuid:chapterId>/comments/', views.ChapterCommentListCreateView.as_view(), name='chapter_comments'),
     
-    # Transactions
+    # Transactions (Teachers can view transaction lists for their courses)
     path('transactions/', views.TransactionListView.as_view(), name='transaction_list'),
-    path('transactions/create/', views.create_transaction, name='transaction_create'),
-    
-    # User course progress
-    path('users/<uuid:userId>/enrolled/', views.get_user_enrolled_courses, name='user_enrolled_courses'),
-    path('users/<uuid:userId>/progress/<uuid:courseId>/', views.get_user_course_progress, name='user_course_progress'),
-    path('users/<uuid:userId>/progress/<uuid:courseId>/update/', views.update_user_course_progress, name='update_user_course_progress'),
-    
-    # Stripe payments
-    path('payments/stripe/intent/', views.create_stripe_payment_intent, name='stripe_payment_intent'),
     
     # Chapter resources (for teachers)
     path('chapters/<uuid:chapterId>/resources/', 
@@ -50,9 +41,5 @@ urlpatterns = [
     path('chapters/<uuid:chapterId>/quiz/<uuid:quizId>/', 
          views.ChapterQuizDetailView.as_view(), name='chapter_quiz_detail'),
     
-    # Quiz attempts
-    path('chapters/<uuid:chapterId>/quiz/attempts/', 
-         views.StudentQuizAttemptListCreateView.as_view(), name='quiz_attempts'),
-    path('chapters/<uuid:chapterId>/quiz/summary/', 
-         views.get_student_quiz_summary, name='quiz_summary'),
+    # Quiz attempts and summaries moved to student API
 ]

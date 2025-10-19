@@ -23,6 +23,11 @@ class PracticeCourseManagementView(APIView):
     
     def get_object(self, course_id):
         """Get practice course and verify ownership"""
+        # Check if user has teacher role
+        if getattr(self.request.user, 'role', None) != 'teacher':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Apenas professores podem gerenciar cursos")
+        
         try:
             from apps.courses.models import Course
             course = Course.objects.get(id=course_id, course_type='practice')
@@ -30,7 +35,7 @@ class PracticeCourseManagementView(APIView):
             # Verify if user is the teacher
             if course.teacher != self.request.user:
                 from rest_framework.exceptions import PermissionDenied
-                raise PermissionDenied("Apenas o professor pode gerenciar este curso")
+                raise PermissionDenied("Apenas o professor proprietário pode gerenciar este curso")
                 
             return course
         except Course.DoesNotExist:
