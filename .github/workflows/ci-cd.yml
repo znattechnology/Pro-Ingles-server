@@ -65,23 +65,30 @@ jobs:
           EOF
 
       - name: Run system checks
-        run: python manage.py check --deploy --settings=core.test_settings
+        run: |
+          export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test_tuwi_backend"
+          python manage.py check --deploy --settings=core.test_settings
 
       - name: Run migrations
-        run: python manage.py migrate --settings=core.test_settings
+        run: |
+          export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test_tuwi_backend"
+          python manage.py migrate --settings=core.test_settings
 
       - name: Run Critical Tests (CMS, Users, Subscriptions)
         run: |
+          export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test_tuwi_backend"
           echo "🧪 Running critical tests..."
           python manage.py test apps.cms.tests apps.users.tests apps.subscriptions.tests --verbosity=1 --settings=core.test_settings --debug-mode
 
       - name: Run Courses Basic Tests
         run: |
+          export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test_tuwi_backend"
           echo "🧪 Running courses basic tests..."
           python manage.py test apps.courses.api.tests.test_student_practice_courses_basic --verbosity=1 --settings=core.test_settings --debug-mode
 
       - name: Run Practice Tests
         run: |
+          export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/test_tuwi_backend"
           echo "🧪 Running practice tests..."
           python manage.py test apps.practice.tests --verbosity=1 --settings=core.test_settings --debug-mode
 
