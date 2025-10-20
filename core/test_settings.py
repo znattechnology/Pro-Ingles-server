@@ -78,6 +78,19 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
+
+# Test-specific security settings
+DEBUG = False
+SECRET_KEY = 'test-secret-key-for-ci-cd-pipeline-with-sufficient-length-and-complexity-123456789'
+SECURE_HSTS_SECONDS = 0  # Disabled for tests
+SECURE_SSL_REDIRECT = False  # Disabled for tests  
+SESSION_COOKIE_SECURE = False  # Disabled for tests
+CSRF_COOKIE_SECURE = False  # Disabled for tests
+
+# Remove static directory that doesn't exist in CI
+STATICFILES_DIRS = []
