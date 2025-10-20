@@ -1,0 +1,51 @@
+# =============================================================================
+# Docker Compose para executar testes localmente
+# Uso: docker-compose -f docker-compose.test.yml up --build
+# =============================================================================
+version: '3.8'
+
+services:
+  # Banco de dados para testes
+  postgres-test:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: test_tuwi_backend
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Aplicação para testes
+  tuwi-backend-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    environment:
+      - DJANGO_SECRET_KEY=test-secret-key-for-local-testing
+      - DEBUG=False
+      - DATABASE_URL=postgresql://postgres:postgres@postgres-test:5432/test_tuwi_backend
+      - USE_POSTGRESQL=True
+      - RATELIMIT_ENABLE=False
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: |
+      sh -c "
+        echo '🔄 Executando migrações...' &&
+        python manage.py migrate &&
+        echo '🧪 Executando testes...' &&
+        python manage.py test --keepdb --parallel --verbosity=2
+      "
+
+volumes:
+  postgres_test_data:

@@ -53,7 +53,7 @@ LOCAL_APPS = [
     'apps.core',
     'apps.users',
     'apps.courses',
-    'apps.practice',
+    'apps.practice',  # Temporarily enabled for testing - functionality moved to courses/api structure
     'apps.subscriptions',
     'apps.cms',
 ]
@@ -180,6 +180,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.FileUploadParser',
     ],
     'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],

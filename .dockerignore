@@ -1,0 +1,130 @@
+# =============================================================================
+# .dockerignore para Tuwi Backend
+# =============================================================================
+
+# Git files
+.git
+.gitignore
+.github/
+
+# Documentation
+*.md
+docs/
+README*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Local environment files
+.env
+.env.local
+.env.test
+.env.production
+
+# Database
+db.sqlite3
+*.db
+
+# Media files (should be in S3 in production)
+media/
+
+# Static files (collected during build)
+staticfiles/
+
+# Test files
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# Development files
+debug_*.py
+temp_*.py
+test_*.py
+
+# Logs
+logs/
+*.log
+
+# Terraform
+terraform/
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# K8s
+k8s/
+
+# Migration backups
+migration_backup/
+migration_backups/
+
+# Backup files
+*.tar.gz
+*.backup
+
+# Analysis files
+*.json
+database_analysis.json
+filtered_data.json
+temp_*.json
+
+# PyCharm
+.idea/
+
+# Coverage
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Optimized versions (remove after decision)
+Dockerfile.optimized
+Dockerfile.multistage
