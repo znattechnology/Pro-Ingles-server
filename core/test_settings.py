@@ -40,6 +40,16 @@ PASSWORD_HASHERS = [
 # Use dummy storage for tests
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.InMemoryStorage'
 
+# Ensure test isolation with proper database configuration
+DATABASES['default'].update({
+    'OPTIONS': {
+        'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+    },
+    'TEST': {
+        'NAME': None,  # Use in-memory database for tests when possible
+    }
+})
+
 # Disable channels for tests to avoid Redis dependency
 INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'channels']
 
