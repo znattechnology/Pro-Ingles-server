@@ -274,6 +274,11 @@ class UserSubscription(models.Model):
             )
             self.last_heart_recharge = now
             self.save(update_fields=['current_hearts', 'last_heart_recharge'])
+    
+    def has_hearts(self):
+        """Verifica se o usuário tem vidas disponíveis"""
+        self.recharge_hearts_if_needed()
+        return self.current_hearts > 0
 
 
 class SubscriptionHistory(models.Model):

@@ -42,12 +42,20 @@ DEFAULT_FILE_STORAGE = 'django.core.files.storage.InMemoryStorage'
 
 # Force PostgreSQL database for CI/CD tests
 import os
-DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432/test_tuwi_backend')
+DATABASE_URL = os.getenv('DATABASE_URL', None)
 
 if DATABASE_URL:
     import dj_database_url
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
+    }
+else:
+    # Use SQLite for local testing
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
     }
 
 # Disable channels for tests to avoid Redis dependency

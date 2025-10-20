@@ -266,8 +266,7 @@ class SubscriptionRequiredDecoratorTest(APITestCase):
             })
         
         # Anexar temporariamente à URLconf
-        from django.urls import include
-        from django.conf.urls import url
+        from django.urls import include, re_path
         
         with self.settings(ROOT_URLCONF=__name__):
             response = self.client.get('/test/lesson/')
