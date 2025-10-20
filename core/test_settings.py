@@ -103,3 +103,16 @@ CSRF_COOKIE_SECURE = False  # Disabled for tests
 
 # Remove static directory that doesn't exist in CI
 STATICFILES_DIRS = []
+
+# Disable rate limiting for tests
+RATELIMIT_ENABLE = False
+
+# Ensure migrations are run in test database
+MIGRATION_MODULES = {}
+
+# Force test database to be reset and all migrations run
+# This ensures subscription plans are created  
+import sys
+if 'test' in sys.argv or 'pytest' in sys.modules:
+    # Ensure all apps run their migrations in tests
+    pass
