@@ -65,25 +65,25 @@ jobs:
           EOF
 
       - name: Run system checks
-        run: python manage.py check --deploy
+        run: python manage.py check --deploy --settings=core.test_settings
 
       - name: Run migrations
-        run: python manage.py migrate
+        run: python manage.py migrate --settings=core.test_settings
 
       - name: Run Critical Tests (CMS, Users, Subscriptions)
         run: |
           echo "🧪 Running critical tests..."
-          python manage.py test apps.cms.tests apps.users.tests apps.subscriptions.tests --keepdb --parallel --verbosity=1
+          python manage.py test apps.cms.tests apps.users.tests apps.subscriptions.tests --keepdb --parallel --verbosity=1 --settings=core.test_settings
 
       - name: Run Courses Basic Tests
         run: |
           echo "🧪 Running courses basic tests..."
-          python manage.py test apps.courses.api.tests.test_student_practice_courses_basic --keepdb --parallel --verbosity=1
+          python manage.py test apps.courses.api.tests.test_student_practice_courses_basic --keepdb --parallel --verbosity=1 --settings=core.test_settings
 
       - name: Run Practice Tests
         run: |
           echo "🧪 Running practice tests..."
-          python manage.py test apps.practice.tests --keepdb --parallel --verbosity=1
+          python manage.py test apps.practice.tests --keepdb --parallel --verbosity=1 --settings=core.test_settings
 
       - name: Generate test summary
         if: always()
