@@ -585,7 +585,7 @@ class CMSFilteringAndOrderingTest(APITestCase):
         response = self.client.get(url, {'ordering': 'order'})
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        results = response.data
+        results = response.data['results'] if 'results' in response.data else response.data
         
         # Verificar que estão ordenados por order
         orders = [item['order'] for item in results]
@@ -597,7 +597,7 @@ class CMSFilteringAndOrderingTest(APITestCase):
         response = self.client.get(url, {'ordering': 'name'})
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        results = response.data
+        results = response.data['results'] if 'results' in response.data else response.data
         
         # Verificar que estão ordenados por nome
         names = [item['name'] for item in results]

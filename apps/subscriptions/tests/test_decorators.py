@@ -122,16 +122,18 @@ class SubscriptionRequiredDecoratorTest(APITestCase):
             password='password123'
         )
         
-        self.free_plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.free_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00'),
-            daily_lessons_limit=3,
-            daily_speaking_minutes=10,
-            daily_listening_minutes=15,
-            hearts_limit=5,
-            hearts_recharge_hours=4
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00'),
+                "daily_lessons_limit": 3,
+                "daily_speaking_minutes": 10,
+                "daily_listening_minutes": 15,
+                "hearts_limit": 5,
+                "hearts_recharge_hours": 4
+            }
         )
         
         self.subscription = UserSubscription.objects.create(
@@ -292,25 +294,31 @@ class PremiumRequiredDecoratorTest(APITestCase):
             password='password123'
         )
         
-        self.free_plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.free_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00')
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00')
+            }
         )
         
-        self.premium_plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.premium_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00')
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00')
+            }
         )
         
-        self.premium_plus_plan = SubscriptionPlan.objects.create(
-            name="Premium Plus",
+        self.premium_plus_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM_PLUS",
-            description="Premium Plus plan",
-            monthly_price=Decimal('3000.00')
+            defaults={
+                "name": "Premium Plus",
+                "description": "Premium Plus plan",
+                "monthly_price": Decimal('3000.00')
+            }
         )
     
     def test_premium_access_with_premium_plan(self):
@@ -397,18 +405,22 @@ class PremiumPlusRequiredDecoratorTest(APITestCase):
             password='password123'
         )
         
-        self.premium_plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.premium_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00')
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00')
+            }
         )
         
-        self.premium_plus_plan = SubscriptionPlan.objects.create(
-            name="Premium Plus",
+        self.premium_plus_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM_PLUS",
-            description="Premium Plus plan",
-            monthly_price=Decimal('3000.00')
+            defaults={
+                "name": "Premium Plus",
+                "description": "Premium Plus plan",
+                "monthly_price": Decimal('3000.00')
+            }
         )
     
     def test_premium_plus_access_allowed(self):
@@ -463,12 +475,14 @@ class TrackUsageDecoratorTest(APITestCase):
             password='password123'
         )
         
-        self.plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00'),
-            daily_lessons_limit=3
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00'),
+                "daily_lessons_limit": 3
+            }
         )
         
         self.subscription = UserSubscription.objects.create(
@@ -536,13 +550,15 @@ class CombinedDecoratorsTest(APITestCase):
             password='password123'
         )
         
-        self.plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00'),
-            daily_lessons_limit=3,
-            daily_speaking_minutes=10
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00'),
+                "daily_lessons_limit": 3,
+                "daily_speaking_minutes": 10
+            }
         )
         
         self.subscription = UserSubscription.objects.create(

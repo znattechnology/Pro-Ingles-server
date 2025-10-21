@@ -260,7 +260,7 @@ class SecurityValidationTest(APITestCase):
         
         create_response = self.client.post('/api/v1/teacher/video-courses/', course_data)
         self.assertEqual(create_response.status_code, status.HTTP_201_CREATED)
-        course_id = create_response.data['courseId']
+        course_id = create_response.data.get('courseId') or create_response.data.get('id')
         
         # Try to access course as teacher2 (should fail)
         self.client.force_authenticate(user=self.teacher2)

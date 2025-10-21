@@ -50,6 +50,7 @@ class User(AbstractUser):
     phone = models.CharField(
         max_length=20,
         blank=True,
+        null=True,
         validators=[
             RegexValidator(
                 # Updated regex for better international phone validation
