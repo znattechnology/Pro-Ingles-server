@@ -49,8 +49,8 @@ class PublicSubscriptionPlansTest(APITestCase):
             defaults={
                 "name": "Plano Premium",
                 "description": "Plano premium",
-                "monthly_price": Decimal('2000.00'),
-                "yearly_price": Decimal('20000.00'),
+                "monthly_price": Decimal('14950.00'),
+                "yearly_price": Decimal('149500.00'),
                 "daily_lessons_limit": None,
                 "is_active": True,
                 "sort_order": 2
@@ -68,7 +68,7 @@ class PublicSubscriptionPlansTest(APITestCase):
             }
         )
         
-        self.public_plans_url = reverse('subscriptions:public_plans')
+        self.public_plans_url = reverse('subscriptions:public-plans-list')
     
     def test_public_plans_list_success(self):
         """Testa listagem pública de planos."""
@@ -124,7 +124,7 @@ class UserSubscriptionViewTest(APITestCase):
             }
         )
         
-        self.subscription_url = reverse('subscriptions:user_subscription')
+        self.subscription_url = reverse('subscriptions:user-subscription')
     
     def test_user_subscription_authenticated(self):
         """Testa acesso autenticado à assinatura."""
@@ -188,12 +188,12 @@ class UpgradeSubscriptionTest(APITestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('2000.00'),
+                "monthly_price": Decimal('14950.00'),
                 "yearly_price": Decimal('20000.00')
             }
         )
         
-        self.upgrade_url = reverse('subscriptions:upgrade_subscription')
+        self.upgrade_url = reverse('subscriptions:upgrade-subscription')
     
     def test_upgrade_monthly_success(self):
         """Testa upgrade mensal bem-sucedido."""
@@ -361,7 +361,7 @@ class PromoCodeTest(APITestCase):
             valid_until=timezone.now() + timedelta(days=30)
         )
         
-        self.apply_promo_url = reverse('subscriptions:apply_promo_code')
+        self.apply_promo_url = reverse('subscriptions:apply-promo-code')
     
     def test_apply_valid_promo_code(self):
         """Testa aplicação de código promocional válido."""
@@ -476,7 +476,7 @@ class CancelSubscriptionTest(APITestCase):
             status='ACTIVE'
         )
         
-        self.cancel_url = reverse('subscriptions:cancel_subscription')
+        self.cancel_url = reverse('subscriptions:cancel-subscription')
     
     def test_cancel_subscription_success(self):
         """Testa cancelamento bem-sucedido."""
@@ -551,7 +551,7 @@ class SubscriptionAnalyticsTest(APITestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('2000.00'),
+                "monthly_price": Decimal('14950.00'),
                 "daily_lessons_limit": None,  # Ilimitado
                 "hearts_limit": 0,  # Ilimitado
                 "offline_downloads": True,
@@ -566,7 +566,7 @@ class SubscriptionAnalyticsTest(APITestCase):
             status='ACTIVE'
         )
         
-        self.analytics_url = reverse('subscriptions:user_subscription_analytics')
+        self.analytics_url = reverse('subscriptions:user-subscription-analytics')
         self.limits_url = reverse('subscriptions:subscription_limits_status')
     
     def test_user_analytics_success(self):
@@ -656,7 +656,7 @@ class FeatureAccessTest(APITestCase):
             daily_lessons_used=2  # Já usou 2 de 3 lições
         )
         
-        self.check_access_url = reverse('subscriptions:check_feature_access')
+        self.check_access_url = reverse('subscriptions:check-feature-access')
         self.consume_usage_url = reverse('subscriptions:consume_feature_usage')
     
     def test_check_lesson_access_allowed(self):

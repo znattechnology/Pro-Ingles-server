@@ -85,12 +85,14 @@ def check_subscription_limits(user, feature_type='general', amount=1):
     # Verificar limitações específicas
     if feature_type == 'lesson':
         can_use = subscription.can_take_lesson()
+        result.update({
+            'current_usage': subscription.daily_lessons_used,
+            'limit': subscription.plan.daily_lessons_limit
+        })
         if not can_use:
             result.update({
                 'allowed': False,
                 'error_message': f'Limite diário de lições atingido ({subscription.plan.daily_lessons_limit})',
-                'current_usage': subscription.daily_lessons_used,
-                'limit': subscription.plan.daily_lessons_limit,
                 'upgrade_required': True
             })
     

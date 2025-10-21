@@ -266,8 +266,8 @@ class CalculateUpgradePriceTest(TestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('2000.00'),
-                "yearly_price": Decimal('20000.00'),
+                "monthly_price": Decimal('14950.00'),
+                "yearly_price": Decimal('149500.00'),
                 "is_active": True
             }
         )
@@ -298,8 +298,8 @@ class CalculateUpgradePriceTest(TestCase):
         """Testa cálculo de preço mensal."""
         result = calculate_upgrade_price(self.user, self.premium_plan.id, 'MONTHLY')
         
-        self.assertEqual(result['base_price'], Decimal('2000.00'))
-        self.assertEqual(result['final_price'], Decimal('2000.00'))
+        self.assertEqual(result['base_price'], Decimal('14950.00'))
+        self.assertEqual(result['final_price'], Decimal('14950.00'))
         self.assertEqual(result['discount_applied'], Decimal('0.00'))
         self.assertEqual(result['billing_cycle'], 'MONTHLY')
         self.assertFalse(result['promo_code_valid'])
@@ -308,7 +308,7 @@ class CalculateUpgradePriceTest(TestCase):
         """Testa cálculo de preço anual."""
         result = calculate_upgrade_price(self.user, self.premium_plan.id, 'YEARLY')
         
-        self.assertEqual(result['base_price'], Decimal('20000.00'))
+        self.assertEqual(result['base_price'], Decimal('149500.00'))
         self.assertEqual(result['final_price'], Decimal('20000.00'))
         self.assertEqual(result['billing_cycle'], 'YEARLY')
     
@@ -321,9 +321,9 @@ class CalculateUpgradePriceTest(TestCase):
             'SAVE20'
         )
         
-        self.assertEqual(result['base_price'], Decimal('2000.00'))
-        self.assertEqual(result['discount_applied'], Decimal('400.00'))  # 20% de 2000
-        self.assertEqual(result['final_price'], Decimal('1600.00'))
+        self.assertEqual(result['base_price'], Decimal('14950.00'))
+        self.assertEqual(result['discount_applied'], Decimal('2990.00'))  # 20% de 14950
+        self.assertEqual(result['final_price'], Decimal('11960.00'))
         self.assertTrue(result['promo_code_valid'])
         self.assertEqual(result['promo_code_name'], "Desconto 20%")
     
@@ -336,9 +336,9 @@ class CalculateUpgradePriceTest(TestCase):
             'SAVE500'
         )
         
-        self.assertEqual(result['base_price'], Decimal('2000.00'))
+        self.assertEqual(result['base_price'], Decimal('14950.00'))
         self.assertEqual(result['discount_applied'], Decimal('500.00'))
-        self.assertEqual(result['final_price'], Decimal('1500.00'))
+        self.assertEqual(result['final_price'], Decimal('14450.00'))
         self.assertTrue(result['promo_code_valid'])
     
     def test_calculate_with_invalid_promo(self):
@@ -350,7 +350,7 @@ class CalculateUpgradePriceTest(TestCase):
             'INVALID'
         )
         
-        self.assertEqual(result['final_price'], Decimal('2000.00'))  # Preço original
+        self.assertEqual(result['final_price'], Decimal('14950.00'))  # Preço original
         self.assertFalse(result['promo_code_valid'])
         self.assertIn('não encontrado', result['promo_code_error'])
     
@@ -374,7 +374,7 @@ class CalculateUpgradePriceTest(TestCase):
             'EXPIRED'
         )
         
-        self.assertEqual(result['final_price'], Decimal('2000.00'))
+        self.assertEqual(result['final_price'], Decimal('14950.00'))
         self.assertFalse(result['promo_code_valid'])
         self.assertIn('expirado', result['promo_code_error'])
     
@@ -391,7 +391,7 @@ class CalculateUpgradePriceTest(TestCase):
             user=self.user,
             promo_code=self.promo_percentage,
             subscription=subscription,
-            discount_applied=Decimal('400.00')
+            discount_applied=Decimal('2990.00')
         )
         
         result = calculate_upgrade_price(
@@ -401,7 +401,7 @@ class CalculateUpgradePriceTest(TestCase):
             'SAVE20'
         )
         
-        self.assertEqual(result['final_price'], Decimal('2000.00'))
+        self.assertEqual(result['final_price'], Decimal('14950.00'))
         self.assertFalse(result['promo_code_valid'])
         self.assertIn('já utilizado', result['promo_code_error'])
     
@@ -431,7 +431,7 @@ class GetSubscriptionAnalyticsTest(TestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('2000.00'),
+                "monthly_price": Decimal('14950.00'),
                 "daily_lessons_limit": None,  # Ilimitado
                 "daily_speaking_minutes": None,
                 "daily_listening_minutes": None,
@@ -531,7 +531,7 @@ class CheckPremiumFeatureTest(TestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('2000.00'),
+                "monthly_price": Decimal('14950.00'),
                 "offline_downloads": True,
                 "certificates": True,
                 "ai_tutor": False,
