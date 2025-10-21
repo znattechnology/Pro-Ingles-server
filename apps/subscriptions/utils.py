@@ -21,10 +21,21 @@ def get_user_subscription(user):
     Returns:
         UserSubscription: Assinatura do usuário
     """
+    # Garantir que o plano FREE existe
+    free_plan, _ = SubscriptionPlan.objects.get_or_create(
+        plan_type='FREE',
+        defaults={
+            'name': 'Free',
+            'description': 'Plano gratuito',
+            'monthly_price': Decimal('0.00'),
+            'is_active': True
+        }
+    )
+    
     subscription, created = UserSubscription.objects.get_or_create(
         user=user,
         defaults={
-            'plan': SubscriptionPlan.objects.get(plan_type='FREE'),
+            'plan': free_plan,
             'status': 'ACTIVE',
             'expires_at': timezone.now() + timedelta(days=365*10)  # 10 anos para free
         }

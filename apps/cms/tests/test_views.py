@@ -116,8 +116,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['site_title'], "ProEnglish Test")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['site_title'], "ProEnglish Test")
     
     def test_hero_sections_list_public(self):
         """Testa listagem pública das hero sections."""
@@ -125,8 +126,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['headline'], "Test Hero")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['headline'], "Test Hero")
     
     def test_companies_list_public(self):
         """Testa listagem pública das empresas."""
@@ -134,8 +136,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['name'], "Test Company")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], "Test Company")
     
     def test_services_list_public(self):
         """Testa listagem pública dos serviços."""
@@ -143,8 +146,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], "Test Service")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['title'], "Test Service")
     
     def test_pricing_list_public(self):
         """Testa listagem pública dos planos de preço."""
@@ -152,8 +156,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], "Test Plan")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['title'], "Test Plan")
     
     def test_features_list_public(self):
         """Testa listagem pública das funcionalidades."""
@@ -161,8 +166,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], "Test Feature")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['title'], "Test Feature")
     
     def test_testimonials_list_public(self):
         """Testa listagem pública dos depoimentos."""
@@ -170,8 +176,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['name'], "Test User")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['name'], "Test User")
     
     def test_faqs_list_public(self):
         """Testa listagem pública dos FAQs."""
@@ -179,8 +186,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['question'], "Test question?")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['question'], "Test question?")
     
     def test_ctas_list_public(self):
         """Testa listagem pública dos CTAs."""
@@ -188,8 +196,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['title'], "Test CTA")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['title'], "Test CTA")
     
     def test_seo_settings_list_public(self):
         """Testa listagem pública das configurações SEO."""
@@ -197,8 +206,9 @@ class PublicCMSEndpointsTest(APITestCase):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['page_type'], "home")
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['page_type'], "home")
 
 
 @override_settings(

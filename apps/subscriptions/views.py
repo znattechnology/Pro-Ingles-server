@@ -69,10 +69,21 @@ class UserSubscriptionView(generics.RetrieveAPIView):
     
     def get_object(self):
         """Retorna assinatura do usuário ou cria uma gratuita"""
+        # Garantir que o plano FREE existe
+        free_plan, _ = SubscriptionPlan.objects.get_or_create(
+            plan_type='FREE',
+            defaults={
+                'name': 'Free',
+                'description': 'Plano gratuito',
+                'monthly_price': Decimal('0.00'),
+                'is_active': True
+            }
+        )
+        
         subscription, created = UserSubscription.objects.get_or_create(
             user=self.request.user,
             defaults={
-                'plan': SubscriptionPlan.objects.get(plan_type='FREE'),
+                'plan': free_plan,
                 'expires_at': timezone.now() + timedelta(days=365*10),  # 10 anos para free
                 'status': 'ACTIVE'
             }
@@ -96,11 +107,22 @@ def upgrade_subscription(request):
         try:
             new_plan = SubscriptionPlan.objects.get(id=plan_id, is_active=True)
             
+            # Garantir que o plano FREE existe
+            free_plan, _ = SubscriptionPlan.objects.get_or_create(
+                plan_type='FREE',
+                defaults={
+                    'name': 'Free',
+                    'description': 'Plano gratuito',
+                    'monthly_price': Decimal('0.00'),
+                    'is_active': True
+                }
+            )
+            
             # Obter ou criar assinatura atual
             subscription, created = UserSubscription.objects.get_or_create(
                 user=request.user,
                 defaults={
-                    'plan': SubscriptionPlan.objects.get(plan_type='FREE'),
+                    'plan': free_plan,
                     'expires_at': timezone.now() + timedelta(days=365*10),
                     'status': 'ACTIVE'
                 }

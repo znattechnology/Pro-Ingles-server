@@ -182,12 +182,14 @@ class ConsumeSubscriptionResourceTest(TestCase):
             password='password123'
         )
         
-        self.plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00'),
-            daily_lessons_limit=3
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00'),
+                "daily_lessons_limit": 3
+            }
         )
         
         self.subscription = UserSubscription.objects.create(
@@ -259,13 +261,15 @@ class CalculateUpgradePriceTest(TestCase):
             password='password123'
         )
         
-        self.premium_plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.premium_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00'),
-            yearly_price=Decimal('20000.00'),
-            is_active=True
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00'),
+                "yearly_price": Decimal('20000.00'),
+                "is_active": True
+            }
         )
         
         self.promo_percentage = PromotionalCode.objects.create(
@@ -422,19 +426,21 @@ class GetSubscriptionAnalyticsTest(TestCase):
             password='password123'
         )
         
-        self.premium_plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.premium_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00'),
-            daily_lessons_limit=None,  # Ilimitado
-            daily_speaking_minutes=None,
-            daily_listening_minutes=None,
-            hearts_limit=0,  # Ilimitado
-            offline_downloads=True,
-            certificates=True,
-            ai_tutor=False,
-            advanced_analytics=True
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00'),
+                "daily_lessons_limit": None,  # Ilimitado
+                "daily_speaking_minutes": None,
+                "daily_listening_minutes": None,
+                "hearts_limit": 0,  # Ilimitado
+                "offline_downloads": True,
+                "certificates": True,
+                "ai_tutor": False,
+                "advanced_analytics": True
+            }
         )
         
         self.subscription = UserSubscription.objects.create(
@@ -507,27 +513,31 @@ class CheckPremiumFeatureTest(TestCase):
             password='password123'
         )
         
-        self.free_plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.free_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00'),
-            offline_downloads=False,
-            certificates=False,
-            ai_tutor=False,
-            native_teacher_sessions=0
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00'),
+                "offline_downloads": False,
+                "certificates": False,
+                "ai_tutor": False,
+                "native_teacher_sessions": 0
+            }
         )
         
-        self.premium_plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.premium_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00'),
-            offline_downloads=True,
-            certificates=True,
-            ai_tutor=False,
-            native_teacher_sessions=2,
-            multiple_devices=3
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00'),
+                "offline_downloads": True,
+                "certificates": True,
+                "ai_tutor": False,
+                "native_teacher_sessions": 2,
+                "multiple_devices": 3
+            }
         )
     
     def test_free_plan_features(self):

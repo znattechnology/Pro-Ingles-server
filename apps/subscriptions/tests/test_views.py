@@ -31,35 +31,41 @@ class PublicSubscriptionPlansTest(APITestCase):
     """Testes para endpoints públicos de planos."""
     
     def setUp(self):
-        self.free_plan = SubscriptionPlan.objects.create(
-            name="Plano Gratuito",
+        self.free_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Plano básico gratuito",
-            monthly_price=Decimal('0.00'),
-            yearly_price=Decimal('0.00'),
-            daily_lessons_limit=3,
-            is_active=True,
-            sort_order=1
+            defaults={
+                "name": "Plano Gratuito",
+                "description": "Plano básico gratuito",
+                "monthly_price": Decimal('0.00'),
+                "yearly_price": Decimal('0.00'),
+                "daily_lessons_limit": 3,
+                "is_active": True,
+                "sort_order": 1
+            }
         )
         
-        self.premium_plan = SubscriptionPlan.objects.create(
-            name="Plano Premium",
+        self.premium_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Plano premium",
-            monthly_price=Decimal('2000.00'),
-            yearly_price=Decimal('20000.00'),
-            daily_lessons_limit=None,
-            is_active=True,
-            sort_order=2
+            defaults={
+                "name": "Plano Premium",
+                "description": "Plano premium",
+                "monthly_price": Decimal('2000.00'),
+                "yearly_price": Decimal('20000.00'),
+                "daily_lessons_limit": None,
+                "is_active": True,
+                "sort_order": 2
+            }
         )
         
-        self.inactive_plan = SubscriptionPlan.objects.create(
-            name="Plano Inativo",
+        self.inactive_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM_PLUS",
-            description="Plano inativo",
-            monthly_price=Decimal('3000.00'),
-            is_active=False,
-            sort_order=3
+            defaults={
+                "name": "Plano Inativo",
+                "description": "Plano inativo",
+                "monthly_price": Decimal('3000.00'),
+                "is_active": False,
+                "sort_order": 3
+            }
         )
         
         self.public_plans_url = reverse('subscriptions:public_plans')
@@ -108,12 +114,14 @@ class UserSubscriptionViewTest(APITestCase):
             password='password123'
         )
         
-        self.free_plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.free_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00'),
-            daily_lessons_limit=3
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00'),
+                "daily_lessons_limit": 3
+            }
         )
         
         self.subscription_url = reverse('subscriptions:user_subscription')
@@ -166,19 +174,23 @@ class UpgradeSubscriptionTest(APITestCase):
             password='password123'
         )
         
-        self.free_plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.free_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00')
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00')
+            }
         )
         
-        self.premium_plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.premium_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00'),
-            yearly_price=Decimal('20000.00')
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00'),
+                "yearly_price": Decimal('20000.00')
+            }
         )
         
         self.upgrade_url = reverse('subscriptions:upgrade_subscription')
@@ -329,11 +341,13 @@ class PromoCodeTest(APITestCase):
             password='password123'
         )
         
-        self.plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00')
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00')
+            }
         )
         
         self.valid_promo = PromotionalCode.objects.create(
@@ -446,11 +460,13 @@ class CancelSubscriptionTest(APITestCase):
             password='password123'
         )
         
-        self.plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00')
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00')
+            }
         )
         
         self.subscription = UserSubscription.objects.create(
@@ -530,15 +546,17 @@ class SubscriptionAnalyticsTest(APITestCase):
             password='password123'
         )
         
-        self.plan = SubscriptionPlan.objects.create(
-            name="Premium",
+        self.plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="PREMIUM",
-            description="Premium plan",
-            monthly_price=Decimal('2000.00'),
-            daily_lessons_limit=None,  # Ilimitado
-            hearts_limit=0,  # Ilimitado
-            offline_downloads=True,
-            certificates=True
+            defaults={
+                "name": "Premium",
+                "description": "Premium plan",
+                "monthly_price": Decimal('2000.00'),
+                "daily_lessons_limit": None,  # Ilimitado
+                "hearts_limit": 0,  # Ilimitado
+                "offline_downloads": True,
+                "certificates": True
+            }
         )
         
         self.subscription = UserSubscription.objects.create(
@@ -618,14 +636,16 @@ class FeatureAccessTest(APITestCase):
             password='password123'
         )
         
-        self.free_plan = SubscriptionPlan.objects.create(
-            name="Free",
+        self.free_plan, _ = SubscriptionPlan.objects.get_or_create(
             plan_type="FREE",
-            description="Free plan",
-            monthly_price=Decimal('0.00'),
-            daily_lessons_limit=3,
-            daily_speaking_minutes=10,
-            hearts_limit=5
+            defaults={
+                "name": "Free",
+                "description": "Free plan",
+                "monthly_price": Decimal('0.00'),
+                "daily_lessons_limit": 3,
+                "daily_speaking_minutes": 10,
+                "hearts_limit": 5
+            }
         )
         
         self.subscription = UserSubscription.objects.create(
