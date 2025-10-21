@@ -78,6 +78,7 @@ class StatItemViewSet(viewsets.ModelViewSet):
     queryset = StatItem.objects.all()
     serializer_class = StatItemSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['section', 'is_active']
     ordering_fields = ['order', 'created_at']
     ordering = ['section', 'order']
@@ -95,6 +96,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['category', 'is_active', 'show_in_hero', 'show_in_ticker']
     ordering_fields = ['order', 'name', 'created_at']
     ordering = ['order', 'name']
@@ -163,6 +165,7 @@ class TestimonialViewSet(viewsets.ModelViewSet):
     queryset = Testimonial.objects.all()
     serializer_class = TestimonialSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['sector', 'is_featured', 'is_active', 'verified']
     ordering_fields = ['order', 'date_given', 'created_at']
     ordering = ['order', '-date_given']

@@ -75,10 +75,11 @@ class PublicSubscriptionPlansTest(APITestCase):
         response = self.client.get(self.public_plans_url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)  # Apenas planos ativos
+        results = response.data['results'] if 'results' in response.data else response.data
+        self.assertEqual(len(results), 2)  # Apenas planos ativos
         
         # Verificar dados do primeiro plano
-        first_plan = response.data[0]
+        first_plan = results[0]
         self.assertEqual(first_plan['name'], "Plano Gratuito")
         self.assertEqual(first_plan['plan_type'], "FREE")
         self.assertIn('features', first_plan)
@@ -88,7 +89,8 @@ class PublicSubscriptionPlansTest(APITestCase):
         """Testa que apenas planos ativos são retornados."""
         response = self.client.get(self.public_plans_url)
         
-        plan_names = [plan['name'] for plan in response.data]
+        results = response.data['results'] if 'results' in response.data else response.data
+        plan_names = [plan['name'] for plan in results]
         self.assertIn("Plano Gratuito", plan_names)
         self.assertIn("Plano Premium", plan_names)
         self.assertNotIn("Plano Inativo", plan_names)

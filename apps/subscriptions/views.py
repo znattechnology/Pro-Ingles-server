@@ -583,7 +583,7 @@ def subscription_limits_status(request):
             'type': subscription.plan.plan_type,
             'is_active': subscription.is_active(),
             'expires_at': subscription.expires_at,
-            'days_remaining': subscription.days_until_expiry
+            'days_remaining': subscription.days_until_expiry()
         }
     }
     

@@ -72,13 +72,11 @@ def check_subscription_limits(user, feature_type='general', amount=1):
         return {
             'allowed': False,
             'error_message': 'Sua assinatura expirou',
-            'subscription': subscription,
             'upgrade_required': True
         }
     
     result = {
         'allowed': True,
-        'subscription': subscription,
         'upgrade_required': False
     }
     
