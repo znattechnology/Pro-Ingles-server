@@ -8,6 +8,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
 from django.utils import timezone
+import django_filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import (
     LandingPageSettings,

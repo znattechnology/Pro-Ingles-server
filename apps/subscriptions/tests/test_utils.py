@@ -266,8 +266,8 @@ class CalculateUpgradePriceTest(TestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('14950.00'),
-                "yearly_price": Decimal('149500.00'),
+                "monthly_price": Decimal('2500.00'),
+                "yearly_price": Decimal('25000.00'),
                 "is_active": True
             }
         )
@@ -298,8 +298,8 @@ class CalculateUpgradePriceTest(TestCase):
         """Testa cálculo de preço mensal."""
         result = calculate_upgrade_price(self.user, self.premium_plan.id, 'MONTHLY')
         
-        self.assertEqual(result['base_price'], Decimal('14950.00'))
-        self.assertEqual(result['final_price'], Decimal('14950.00'))
+        self.assertEqual(result['base_price'], Decimal('2500.00'))
+        self.assertEqual(result['final_price'], Decimal('2500.00'))
         self.assertEqual(result['discount_applied'], Decimal('0.00'))
         self.assertEqual(result['billing_cycle'], 'MONTHLY')
         self.assertFalse(result['promo_code_valid'])
@@ -308,8 +308,8 @@ class CalculateUpgradePriceTest(TestCase):
         """Testa cálculo de preço anual."""
         result = calculate_upgrade_price(self.user, self.premium_plan.id, 'YEARLY')
         
-        self.assertEqual(result['base_price'], Decimal('149500.00'))
-        self.assertEqual(result['final_price'], Decimal('149500.00'))
+        self.assertEqual(result['base_price'], Decimal('25000.00'))
+        self.assertEqual(result['final_price'], Decimal('25000.00'))
         self.assertEqual(result['billing_cycle'], 'YEARLY')
     
     def test_calculate_with_percentage_promo(self):
@@ -321,9 +321,9 @@ class CalculateUpgradePriceTest(TestCase):
             'SAVE20'
         )
         
-        self.assertEqual(result['base_price'], Decimal('14950.00'))
-        self.assertEqual(result['discount_applied'], Decimal('2990.00'))  # 20% de 14950
-        self.assertEqual(result['final_price'], Decimal('11960.00'))
+        self.assertEqual(result['base_price'], Decimal('2500.00'))
+        self.assertEqual(result['discount_applied'], Decimal('500.00'))  # 20% de 2500
+        self.assertEqual(result['final_price'], Decimal('2000.00'))
         self.assertTrue(result['promo_code_valid'])
         self.assertEqual(result['promo_code_name'], "Desconto 20%")
     
@@ -336,9 +336,9 @@ class CalculateUpgradePriceTest(TestCase):
             'SAVE500'
         )
         
-        self.assertEqual(result['base_price'], Decimal('14950.00'))
+        self.assertEqual(result['base_price'], Decimal('2500.00'))
         self.assertEqual(result['discount_applied'], Decimal('500.00'))
-        self.assertEqual(result['final_price'], Decimal('14450.00'))
+        self.assertEqual(result['final_price'], Decimal('2000.00'))
         self.assertTrue(result['promo_code_valid'])
     
     def test_calculate_with_invalid_promo(self):
@@ -350,7 +350,7 @@ class CalculateUpgradePriceTest(TestCase):
             'INVALID'
         )
         
-        self.assertEqual(result['final_price'], Decimal('14950.00'))  # Preço original
+        self.assertEqual(result['final_price'], Decimal('2500.00'))  # Preço original
         self.assertFalse(result['promo_code_valid'])
         self.assertIn('não encontrado', result['promo_code_error'])
     
@@ -374,7 +374,7 @@ class CalculateUpgradePriceTest(TestCase):
             'EXPIRED'
         )
         
-        self.assertEqual(result['final_price'], Decimal('14950.00'))
+        self.assertEqual(result['final_price'], Decimal('2500.00'))
         self.assertFalse(result['promo_code_valid'])
         self.assertIn('expirado', result['promo_code_error'])
     
@@ -401,7 +401,7 @@ class CalculateUpgradePriceTest(TestCase):
             'SAVE20'
         )
         
-        self.assertEqual(result['final_price'], Decimal('14950.00'))
+        self.assertEqual(result['final_price'], Decimal('2500.00'))
         self.assertFalse(result['promo_code_valid'])
         self.assertIn('já utilizado', result['promo_code_error'])
     
@@ -431,14 +431,14 @@ class GetSubscriptionAnalyticsTest(TestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('14950.00'),
-                "daily_lessons_limit": None,  # Ilimitado
-                "daily_speaking_minutes": None,
-                "daily_listening_minutes": None,
+                "monthly_price": Decimal('2500.00'),
+                "daily_lessons_limit": 0,  # Ilimitado
+                "daily_speaking_minutes": 0,
+                "daily_listening_minutes": 0,
                 "hearts_limit": 0,  # Ilimitado
                 "offline_downloads": True,
                 "certificates": True,
-                "ai_tutor": False,
+                "ai_tutor": True,
                 "advanced_analytics": True
             }
         )
@@ -476,7 +476,7 @@ class GetSubscriptionAnalyticsTest(TestCase):
         features = analytics['features']
         self.assertTrue(features['offline_downloads'])
         self.assertTrue(features['certificates'])
-        self.assertFalse(features['ai_tutor'])
+        self.assertTrue(features['ai_tutor'])
         self.assertTrue(features['advanced_analytics'])
     
     def test_analytics_unlimited_features(self):
@@ -488,13 +488,13 @@ class GetSubscriptionAnalyticsTest(TestCase):
         # Lições ilimitadas
         lessons = usage['lessons']
         self.assertTrue(lessons['unlimited'])
-        self.assertIsNone(lessons['limit'])
+        self.assertEqual(lessons['limit'], 0)
         self.assertTrue(lessons['can_use'])
         
         # Speaking ilimitado
         speaking = usage['speaking']
         self.assertTrue(speaking['unlimited'])
-        self.assertIsNone(speaking['limit'])
+        self.assertEqual(speaking['limit'], 0)
         self.assertTrue(speaking['can_use'])
         
         # Vidas ilimitadas
@@ -531,10 +531,10 @@ class CheckPremiumFeatureTest(TestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('14950.00'),
+                "monthly_price": Decimal('2500.00'),
                 "offline_downloads": True,
                 "certificates": True,
-                "ai_tutor": False,
+                "ai_tutor": True,
                 "native_teacher_sessions": 2,
                 "multiple_devices": 3
             }
@@ -571,8 +571,8 @@ class CheckPremiumFeatureTest(TestCase):
         self.assertTrue(check_premium_feature(self.user, 'native_teacher_sessions'))
         self.assertTrue(check_premium_feature(self.user, 'multiple_devices'))
         
-        # Funcionalidades que ainda não tem
-        self.assertFalse(check_premium_feature(self.user, 'ai_tutor'))
+        # Funcionalidades que o premium tem
+        self.assertTrue(check_premium_feature(self.user, 'ai_tutor'))
     
     def test_expired_subscription_features(self):
         """Testa funcionalidades com assinatura expirada."""

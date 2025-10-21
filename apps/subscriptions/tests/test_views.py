@@ -49,7 +49,7 @@ class PublicSubscriptionPlansTest(APITestCase):
             defaults={
                 "name": "Plano Premium",
                 "description": "Plano premium",
-                "monthly_price": Decimal('14950.00'),
+                "monthly_price": Decimal('2500.00'),
                 "yearly_price": Decimal('149500.00'),
                 "daily_lessons_limit": None,
                 "is_active": True,
@@ -188,8 +188,8 @@ class UpgradeSubscriptionTest(APITestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('14950.00'),
-                "yearly_price": Decimal('20000.00')
+                "monthly_price": Decimal('2500.00'),
+                "yearly_price": Decimal('25000.00')
             }
         )
         
@@ -209,7 +209,7 @@ class UpgradeSubscriptionTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn('message', response.data)
         self.assertIn('subscription', response.data)
-        self.assertEqual(response.data['amount_paid'], Decimal('2000.00'))
+        self.assertEqual(response.data['amount_paid'], Decimal('2500.00'))
         
         # Verificar que assinatura foi atualizada
         subscription = UserSubscription.objects.get(user=self.user)
@@ -228,7 +228,7 @@ class UpgradeSubscriptionTest(APITestCase):
         response = self.client.post(self.upgrade_url, data)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['amount_paid'], Decimal('20000.00'))
+        self.assertEqual(response.data['amount_paid'], Decimal('25000.00'))
     
     def test_upgrade_with_valid_promo_code(self):
         """Testa upgrade com código promocional válido."""
@@ -255,10 +255,10 @@ class UpgradeSubscriptionTest(APITestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        # 20% de desconto em 2000 = 400 de desconto
-        expected_final_price = Decimal('1600.00')
+        # 20% de desconto em 2500 = 500 de desconto
+        expected_final_price = Decimal('2000.00')
         self.assertEqual(response.data['amount_paid'], expected_final_price)
-        self.assertEqual(response.data['discount_applied'], Decimal('400.00'))
+        self.assertEqual(response.data['discount_applied'], Decimal('500.00'))
         
         # Verificar que código foi marcado como usado
         self.assertTrue(PromoCodeUsage.objects.filter(
@@ -346,7 +346,7 @@ class PromoCodeTest(APITestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('2000.00')
+                "monthly_price": Decimal('2500.00')
             }
         )
         
@@ -377,8 +377,8 @@ class PromoCodeTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data['valid'])
         self.assertEqual(response.data['promo_code'], 'SAVE20')
-        self.assertEqual(response.data['discount_amount'], Decimal('400.00'))
-        self.assertEqual(response.data['final_price'], Decimal('1600.00'))
+        self.assertEqual(response.data['discount_amount'], Decimal('500.00'))
+        self.assertEqual(response.data['final_price'], Decimal('2000.00'))
     
     def test_apply_invalid_promo_code(self):
         """Testa aplicação de código inválido."""
@@ -430,7 +430,7 @@ class PromoCodeTest(APITestCase):
             user=self.user,
             promo_code=self.valid_promo,
             subscription=subscription,
-            discount_applied=Decimal('400.00')
+            discount_applied=Decimal('500.00')
         )
         
         self.client.force_authenticate(user=self.user)
@@ -465,7 +465,7 @@ class CancelSubscriptionTest(APITestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('2000.00')
+                "monthly_price": Decimal('2500.00')
             }
         )
         
@@ -551,7 +551,7 @@ class SubscriptionAnalyticsTest(APITestCase):
             defaults={
                 "name": "Premium",
                 "description": "Premium plan",
-                "monthly_price": Decimal('14950.00'),
+                "monthly_price": Decimal('2500.00'),
                 "daily_lessons_limit": None,  # Ilimitado
                 "hearts_limit": 0,  # Ilimitado
                 "offline_downloads": True,

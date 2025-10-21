@@ -125,13 +125,13 @@ urlpatterns = [
     path(
         'consume-usage/', 
         views.consume_feature_usage, 
-        name='consume-feature-usage'
+        name='consume_feature_usage'
     ),
     
     # Status de limitações e uso atual
     path(
         'limits/', 
         views.subscription_limits_status, 
-        name='subscription-limits-status'
+        name='subscription_limits_status'
     ),
 ]
