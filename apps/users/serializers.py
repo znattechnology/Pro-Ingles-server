@@ -233,15 +233,9 @@ class NotificationSettingsSerializer(serializers.ModelSerializer):
 class PasswordResetRequestSerializer(serializers.Serializer):
     """
     Serializer for password reset request.
+    Note: Email validation is handled in the view to not reveal if email exists.
     """
     email = serializers.EmailField()
-    
-    def validate_email(self, value):
-        try:
-            User.objects.get(email=value, is_active=True)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("No active user with this email address.")
-        return value
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
