@@ -5,6 +5,7 @@ Custom exception handlers for the API.
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
+from rest_framework.exceptions import AuthenticationFailed, ValidationError
 from django.http import Http404
 from django.core.exceptions import PermissionDenied
 import logging
@@ -28,8 +29,28 @@ def custom_exception_handler(exc, context):
             'status_code': response.status_code
         }
         
+        # Check if this is a login endpoint error first
+        request = context.get('request') if context else None
+        is_login_endpoint = request and request.path.endswith('/login/')
+        
         # Handle specific exception types
-        if isinstance(exc, Http404):
+        if isinstance(exc, AuthenticationFailed):
+            # Ensure AuthenticationFailed returns 401 status
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            custom_response_data['status_code'] = status.HTTP_401_UNAUTHORIZED
+            custom_response_data['message'] = str(exc.detail)
+        elif is_login_endpoint and response.status_code == 400:
+            # Convert only validation errors from login endpoint to 401
+            # Don't convert other types of errors
+            if hasattr(exc, 'detail') and isinstance(exc.detail, dict):
+                # This is likely a field validation error - convert to 401
+                response.status_code = status.HTTP_401_UNAUTHORIZED
+                custom_response_data['status_code'] = status.HTTP_401_UNAUTHORIZED
+                custom_response_data['message'] = 'Credenciais inválidas. Verifique seu email e senha.'
+            else:
+                # Keep original error for other types
+                custom_response_data['message'] = 'Validation error'
+        elif isinstance(exc, Http404):
             custom_response_data['message'] = 'Resource not found'
         elif isinstance(exc, PermissionDenied):
             custom_response_data['message'] = 'Permission denied'
