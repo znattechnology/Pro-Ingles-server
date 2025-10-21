@@ -40,16 +40,11 @@ def custom_exception_handler(exc, context):
             custom_response_data['status_code'] = status.HTTP_401_UNAUTHORIZED
             custom_response_data['message'] = str(exc.detail)
         elif is_login_endpoint and response.status_code == 400:
-            # Convert only validation errors from login endpoint to 401
-            # Don't convert other types of errors
-            if hasattr(exc, 'detail') and isinstance(exc.detail, dict):
-                # This is likely a field validation error - convert to 401
-                response.status_code = status.HTTP_401_UNAUTHORIZED
-                custom_response_data['status_code'] = status.HTTP_401_UNAUTHORIZED
-                custom_response_data['message'] = 'Credenciais inválidas. Verifique seu email e senha.'
-            else:
-                # Keep original error for other types
-                custom_response_data['message'] = 'Validation error'
+            # Convert all validation errors from login endpoint to 401 for security
+            # This includes empty fields, invalid formats, etc.
+            response.status_code = status.HTTP_401_UNAUTHORIZED
+            custom_response_data['status_code'] = status.HTTP_401_UNAUTHORIZED
+            custom_response_data['message'] = 'Credenciais inválidas. Verifique seu email e senha.'
         elif isinstance(exc, Http404):
             custom_response_data['message'] = 'Resource not found'
         elif isinstance(exc, PermissionDenied):
