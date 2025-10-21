@@ -1,14 +1,29 @@
+# =============================================================================
+# DETAILED TESTING PIPELINE
+# =============================================================================
+# This pipeline provides comprehensive testing with coverage reports
+# Runs only on PRs or manual dispatch to avoid conflicts with ci-cd.yml
+# Use this for detailed test analysis and debugging
+# =============================================================================
+
 name: Run Tests
 
 on:
-  push:
-    branches:
-      - main
-      - develop
+  # Only run on pull requests or manual dispatch to avoid conflicts with ci-cd.yml
   pull_request:
     branches:
       - main
       - develop
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Enable debug mode'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
 
 permissions:
   contents: read

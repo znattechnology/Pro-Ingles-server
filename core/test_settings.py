@@ -111,6 +111,38 @@ RATELIMIT_ENABLE = False
 # Ensure migrations are run in test database
 MIGRATION_MODULES = {}
 
+# JWT configuration for tests - ensure token blacklisting works properly
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Shorter for tests
+    'REFRESH_TOKEN_LIFETIME': timedelta(minutes=30),  # Shorter for tests
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': None,
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
+    'JTI_CLAIM': 'jti',
+}
+
+# Add rest_framework_simplejwt.token_blacklist to INSTALLED_APPS for tests
+if 'rest_framework_simplejwt.token_blacklist' not in INSTALLED_APPS:
+    INSTALLED_APPS = INSTALLED_APPS + ['rest_framework_simplejwt.token_blacklist']
+
 # Force test database to be reset and all migrations run
 # This ensures subscription plans are created  
 import sys
