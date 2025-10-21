@@ -44,7 +44,31 @@ from .serializers import (
 CACHE_TIMEOUT = 60 * 15
 
 
-class LandingPageSettingsViewSet(viewsets.ModelViewSet):
+class AdminWritePermissionMixin:
+    """
+    Mixin to ensure admin-only write operations return 403 instead of 405
+    when accessed by non-admin users.
+    """
+    
+    def check_permissions(self, request):
+        """
+        Check if user has permission to perform the action.
+        For write operations, ensure non-admin users get 403 instead of 405.
+        """
+        super().check_permissions(request)
+        
+        # For write operations (create, update, partial_update, destroy)
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            if not request.user.is_authenticated:
+                from rest_framework.exceptions import NotAuthenticated
+                raise NotAuthenticated()
+            
+            if request.user.role != 'admin':
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied("Acesso negado. Privilégios de administrador necessários.")
+
+
+class LandingPageSettingsViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for landing page settings"""
     queryset = LandingPageSettings.objects.all()
     serializer_class = LandingPageSettingsSerializer
@@ -59,7 +83,7 @@ class LandingPageSettingsViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class HeroSectionViewSet(viewsets.ModelViewSet):
+class HeroSectionViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for hero sections"""
     queryset = HeroSection.objects.all()
     serializer_class = HeroSectionSerializer
@@ -73,7 +97,7 @@ class HeroSectionViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class StatItemViewSet(viewsets.ModelViewSet):
+class StatItemViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for statistics items"""
     queryset = StatItem.objects.all()
     serializer_class = StatItemSerializer
@@ -91,7 +115,7 @@ class StatItemViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class CompanyViewSet(viewsets.ModelViewSet):
+class CompanyViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for companies"""
     queryset = Company.objects.all()
     serializer_class = CompanySerializer
@@ -109,7 +133,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class ServiceItemViewSet(viewsets.ModelViewSet):
+class ServiceItemViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for service items"""
     queryset = ServiceItem.objects.all()
     serializer_class = ServiceItemSerializer
@@ -127,7 +151,7 @@ class ServiceItemViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class PricingTierViewSet(viewsets.ModelViewSet):
+class PricingTierViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for pricing tiers"""
     queryset = PricingTier.objects.all()
     serializer_class = PricingTierSerializer
@@ -145,7 +169,7 @@ class PricingTierViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class FeatureViewSet(viewsets.ModelViewSet):
+class FeatureViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for features"""
     queryset = Feature.objects.all()
     serializer_class = FeatureSerializer
@@ -163,7 +187,7 @@ class FeatureViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class TestimonialViewSet(viewsets.ModelViewSet):
+class TestimonialViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for testimonials"""
     queryset = Testimonial.objects.all()
     serializer_class = TestimonialSerializer
@@ -181,7 +205,7 @@ class TestimonialViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class FAQItemViewSet(viewsets.ModelViewSet):
+class FAQItemViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for FAQ items"""
     queryset = FAQItem.objects.all()
     serializer_class = FAQItemSerializer
@@ -199,7 +223,7 @@ class FAQItemViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class CallToActionViewSet(viewsets.ModelViewSet):
+class CallToActionViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for call to actions"""
     queryset = CallToAction.objects.all()
     serializer_class = CallToActionSerializer
@@ -217,7 +241,7 @@ class CallToActionViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
 
-class SeoSettingsViewSet(viewsets.ModelViewSet):
+class SeoSettingsViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for SEO settings"""
     queryset = SeoSettings.objects.all()
     serializer_class = SeoSettingsSerializer
