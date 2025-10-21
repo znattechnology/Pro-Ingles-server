@@ -61,8 +61,23 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
     
     def validate(self, attrs):
-        # First validate credentials
-        data = super().validate(attrs)
+        # Check for empty credentials first and raise AuthenticationFailed
+        email = attrs.get('email', '').strip()
+        password = attrs.get('password', '')
+        
+        if not email or not password:
+            raise AuthenticationFailed(
+                "Email e senha são obrigatórios."
+            )
+        
+        try:
+            # Use parent validate() which handles authentication
+            data = super().validate(attrs)
+        except Exception:
+            # Convert any validation error to AuthenticationFailed for 401 status
+            raise AuthenticationFailed(
+                "Credenciais inválidas. Verifique seu email e senha."
+            )
         
         # Check if email is verified
         user = self.user
