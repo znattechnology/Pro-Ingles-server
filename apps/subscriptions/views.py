@@ -382,8 +382,13 @@ def admin_subscription_stats(request):
         elif item['plan__plan_type'] == 'PREMIUM_PLUS':
             premium_plus_users = item['count']
     
-    # Taxa de conversão (estimativa simples)
+    # Account for users without subscription records (they should be considered FREE users)
     total_users = User.objects.count()
+    users_with_subscriptions = UserSubscription.objects.filter(status='ACTIVE').values('user').distinct().count()
+    users_without_subscriptions = total_users - users_with_subscriptions
+    free_users += users_without_subscriptions  # Add users without subscriptions to FREE count
+    
+    # Taxa de conversão (estimativa simples)
     paying_users = premium_users + premium_plus_users
     conversion_rate = (paying_users / total_users * 100) if total_users > 0 else 0
     
