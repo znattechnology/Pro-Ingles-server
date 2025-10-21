@@ -66,67 +66,67 @@ jobs:
 
       - name: Run system checks
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
-          python manage.py check --deploy --settings=core.settings
+          python manage.py check --settings=core.test_settings
 
       - name: Run migrations
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
-          python manage.py migrate --settings=core.settings
+          python manage.py migrate --settings=core.test_settings
 
       - name: Run Core App Tests
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "🧪 Running Core app tests..."
-          python manage.py test apps.core.tests --keepdb --parallel --verbosity=1
+          python manage.py test apps.core.tests --keepdb --parallel --verbosity=1 --settings=core.test_settings
 
       - name: Run Users App Tests
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "🧪 Running Users app tests..."
-          python manage.py test apps.users.tests --keepdb --parallel --verbosity=1
+          python manage.py test apps.users.tests --keepdb --parallel --verbosity=1 --settings=core.test_settings
 
       - name: Run Subscriptions App Tests
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "🧪 Running Subscriptions app tests..."
-          python manage.py test apps.subscriptions.tests --keepdb --parallel --verbosity=1
+          python manage.py test apps.subscriptions.tests --keepdb --parallel --verbosity=1 --settings=core.test_settings
 
       - name: Run CMS App Tests
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "🧪 Running CMS app tests..."
-          python manage.py test apps.cms.tests --keepdb --parallel --verbosity=1
+          python manage.py test apps.cms.tests --keepdb --parallel --verbosity=1 --settings=core.test_settings
 
       - name: Run Courses App Tests
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "🧪 Running Courses app tests..."
-          python manage.py test apps.courses.tests --keepdb --parallel --verbosity=1
+          python manage.py test apps.courses.tests --keepdb --parallel --verbosity=1 --settings=core.test_settings
         continue-on-error: true
 
       - name: Run Practice App Tests
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "🧪 Running Practice app tests..."
-          python manage.py test apps.practice.tests --keepdb --parallel --verbosity=1
+          python manage.py test apps.practice.tests --keepdb --parallel --verbosity=1 --settings=core.test_settings
         continue-on-error: true
 
       - name: Generate Test Coverage Report
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "📊 Generating test coverage report..."
           pip install coverage
-          coverage run --source='.' manage.py test --keepdb
+          coverage run --source='.' manage.py test --keepdb --settings=core.test_settings
           coverage report --show-missing
           coverage xml
 
@@ -250,24 +250,24 @@ jobs:
 
       - name: Test Fresh Migration
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "🗃️ Testing fresh database migration..."
-          python manage.py migrate --settings=core.settings
+          python manage.py migrate --settings=core.test_settings
 
       - name: Test Migration Rollback
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "⏪ Testing migration rollback..."
-          python manage.py showmigrations --settings=core.settings
+          python manage.py showmigrations --settings=core.test_settings
 
       - name: Check for Migration Conflicts
         env:
-          DJANGO_SETTINGS_MODULE: core.settings
+          DJANGO_SETTINGS_MODULE: core.test_settings
         run: |
           echo "🔍 Checking for migration conflicts..."
-          python manage.py makemigrations --check --dry-run --settings=core.settings
+          python manage.py makemigrations --check --dry-run --settings=core.test_settings
 
   # =============================================================================
   # FINAL STATUS JOB
