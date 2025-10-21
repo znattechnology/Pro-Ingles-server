@@ -114,6 +114,7 @@ class ServiceItemViewSet(viewsets.ModelViewSet):
     queryset = ServiceItem.objects.all()
     serializer_class = ServiceItemSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_featured', 'is_active']
     ordering_fields = ['order', 'title', 'created_at']
     ordering = ['order', 'title']
@@ -131,6 +132,7 @@ class PricingTierViewSet(viewsets.ModelViewSet):
     queryset = PricingTier.objects.all()
     serializer_class = PricingTierSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_popular', 'is_active']
     ordering_fields = ['order', 'monthly_price', 'created_at']
     ordering = ['order']
@@ -148,6 +150,7 @@ class FeatureViewSet(viewsets.ModelViewSet):
     queryset = Feature.objects.all()
     serializer_class = FeatureSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['is_highlighted', 'is_active']
     ordering_fields = ['order', 'title', 'created_at']
     ordering = ['order']
@@ -183,6 +186,7 @@ class FAQItemViewSet(viewsets.ModelViewSet):
     queryset = FAQItem.objects.all()
     serializer_class = FAQItemSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['category', 'is_featured', 'is_active']
     ordering_fields = ['order', 'category', 'created_at']
     ordering = ['category', 'order']
@@ -200,6 +204,7 @@ class CallToActionViewSet(viewsets.ModelViewSet):
     queryset = CallToAction.objects.all()
     serializer_class = CallToActionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['section', 'is_active']
     ordering_fields = ['order', 'section', 'created_at']
     ordering = ['section', 'order']
@@ -217,6 +222,7 @@ class SeoSettingsViewSet(viewsets.ModelViewSet):
     queryset = SeoSettings.objects.all()
     serializer_class = SeoSettingsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
     filterset_fields = ['page_type']
     
     def get_permissions(self):
