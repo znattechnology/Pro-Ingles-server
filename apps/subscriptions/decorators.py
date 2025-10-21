@@ -14,12 +14,13 @@ from django.contrib.auth.decorators import login_required
 from .models import UserSubscription, SubscriptionPlan
 
 
-def subscription_required(feature_type='general'):
+def subscription_required(feature_type='general', amount=1):
     """
     Decorator para verificar se o usuário tem permissão para usar uma funcionalidade
     
     Args:
         feature_type: Tipo de funcionalidade ('lesson', 'speaking', 'listening', 'hearts')
+        amount: Quantidade necessária (para speaking/listening = minutos, hearts = vidas)
     """
     def decorator(view_func):
         @wraps(view_func)
@@ -63,7 +64,7 @@ def subscription_required(feature_type='general'):
                     }, status=status.HTTP_429_TOO_MANY_REQUESTS)
             
             elif feature_type == 'speaking':
-                if not subscription.can_use_speaking():
+                if not subscription.can_use_speaking(amount):
                     return Response({
                         'error': f'Limite diário de Speaking atingido ({subscription.plan.daily_speaking_minutes} min)',
                         'upgrade_required': True,
@@ -73,7 +74,7 @@ def subscription_required(feature_type='general'):
                     }, status=status.HTTP_429_TOO_MANY_REQUESTS)
             
             elif feature_type == 'listening':
-                if not subscription.can_use_listening():
+                if not subscription.can_use_listening(amount):
                     return Response({
                         'error': f'Limite diário de Listening atingido ({subscription.plan.daily_listening_minutes} min)',
                         'upgrade_required': True,
@@ -86,7 +87,7 @@ def subscription_required(feature_type='general'):
                 # Recarregar vidas se necessário
                 subscription.recharge_hearts_if_needed()
                 
-                if not subscription.has_hearts():
+                if subscription.current_hearts < amount:
                     return Response({
                         'error': 'Você não tem vidas suficientes',
                         'upgrade_required': True,
@@ -217,9 +218,22 @@ def track_usage(feature_type, amount=1):
             
             # Se a view foi bem sucedida, rastrear o uso
             if hasattr(response, 'status_code') and 200 <= response.status_code < 300:
+                # Obter subscription do request se anexada, senão buscar no DB
                 if hasattr(request, 'user_subscription'):
                     subscription = request.user_subscription
-                    
+                elif request.user.is_authenticated:
+                    # Obter ou criar assinatura se não anexada ao request
+                    subscription, created = UserSubscription.objects.get_or_create(
+                        user=request.user,
+                        defaults={
+                            'plan': SubscriptionPlan.objects.get(plan_type='FREE'),
+                            'status': 'ACTIVE'
+                        }
+                    )
+                else:
+                    subscription = None
+                
+                if subscription:
                     if feature_type == 'lesson':
                         subscription.daily_lessons_used += amount
                     elif feature_type == 'speaking_minutes':
@@ -253,7 +267,7 @@ def lesson_required():
 def speaking_required(minutes=1):
     """Combina verificação + rastreamento para Speaking Practice"""
     def decorator(view_func):
-        @subscription_required('speaking')
+        @subscription_required('speaking', minutes)
         @track_usage('speaking_minutes', minutes)
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
@@ -265,7 +279,7 @@ def speaking_required(minutes=1):
 def listening_required(minutes=1):
     """Combina verificação + rastreamento para Listening Practice"""
     def decorator(view_func):
-        @subscription_required('listening')
+        @subscription_required('listening', minutes)
         @track_usage('listening_minutes', minutes)
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
@@ -277,7 +291,7 @@ def listening_required(minutes=1):
 def hearts_required(hearts=1):
     """Combina verificação + rastreamento para sistema de vidas"""
     def decorator(view_func):
-        @subscription_required('hearts')
+        @subscription_required('hearts', hearts)
         @track_usage('hearts', hearts)
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
