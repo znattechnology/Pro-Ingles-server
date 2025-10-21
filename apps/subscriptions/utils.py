@@ -97,7 +97,13 @@ def check_subscription_limits(user, feature_type='general', amount=1):
             })
     
     elif feature_type == 'speaking':
-        if subscription.daily_speaking_minutes_used + amount > subscription.plan.daily_speaking_minutes:
+        if subscription.plan.daily_speaking_minutes is None or subscription.plan.daily_speaking_minutes == 0:
+            # Unlimited speaking
+            result.update({
+                'current_usage': subscription.daily_speaking_minutes_used,
+                'limit': subscription.plan.daily_speaking_minutes
+            })
+        elif subscription.daily_speaking_minutes_used + amount > subscription.plan.daily_speaking_minutes:
             result.update({
                 'allowed': False,
                 'error_message': f'Limite diário de Speaking atingido ({subscription.plan.daily_speaking_minutes} min)',
@@ -112,7 +118,13 @@ def check_subscription_limits(user, feature_type='general', amount=1):
             })
     
     elif feature_type == 'listening':
-        if subscription.daily_listening_minutes_used + amount > subscription.plan.daily_listening_minutes:
+        if subscription.plan.daily_listening_minutes is None or subscription.plan.daily_listening_minutes == 0:
+            # Unlimited listening
+            result.update({
+                'current_usage': subscription.daily_listening_minutes_used,
+                'limit': subscription.plan.daily_listening_minutes
+            })
+        elif subscription.daily_listening_minutes_used + amount > subscription.plan.daily_listening_minutes:
             result.update({
                 'allowed': False,
                 'error_message': f'Limite diário de Listening atingido ({subscription.plan.daily_listening_minutes} min)',
@@ -267,15 +279,15 @@ def get_subscription_analytics(user):
     
     # Cálculos de uso
     lesson_usage_pct = 0
-    if plan.daily_lessons_limit > 0:
+    if plan.daily_lessons_limit and plan.daily_lessons_limit > 0:
         lesson_usage_pct = (subscription.daily_lessons_used / plan.daily_lessons_limit) * 100
     
     speaking_usage_pct = 0
-    if plan.daily_speaking_minutes > 0:
+    if plan.daily_speaking_minutes and plan.daily_speaking_minutes > 0:
         speaking_usage_pct = (subscription.daily_speaking_minutes_used / plan.daily_speaking_minutes) * 100
     
     listening_usage_pct = 0
-    if plan.daily_listening_minutes > 0:
+    if plan.daily_listening_minutes and plan.daily_listening_minutes > 0:
         listening_usage_pct = (subscription.daily_listening_minutes_used / plan.daily_listening_minutes) * 100
     
     hearts_pct = 0
@@ -296,21 +308,21 @@ def get_subscription_analytics(user):
             'lessons': {
                 'used': subscription.daily_lessons_used,
                 'limit': plan.daily_lessons_limit,
-                'unlimited': plan.daily_lessons_limit == 0,
+                'unlimited': plan.daily_lessons_limit == 0 or plan.daily_lessons_limit is None,
                 'percentage': min(100, lesson_usage_pct),
                 'can_use': subscription.can_take_lesson()
             },
             'speaking': {
                 'used': subscription.daily_speaking_minutes_used,
                 'limit': plan.daily_speaking_minutes,
-                'unlimited': plan.daily_speaking_minutes == 0,
+                'unlimited': plan.daily_speaking_minutes == 0 or plan.daily_speaking_minutes is None,
                 'percentage': min(100, speaking_usage_pct),
                 'can_use': subscription.can_use_speaking()
             },
             'listening': {
                 'used': subscription.daily_listening_minutes_used,
                 'limit': plan.daily_listening_minutes,
-                'unlimited': plan.daily_listening_minutes == 0,
+                'unlimited': plan.daily_listening_minutes == 0 or plan.daily_listening_minutes is None,
                 'percentage': min(100, listening_usage_pct),
                 'can_use': subscription.can_use_listening()
             },

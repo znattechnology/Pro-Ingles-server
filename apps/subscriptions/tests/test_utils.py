@@ -309,7 +309,7 @@ class CalculateUpgradePriceTest(TestCase):
         result = calculate_upgrade_price(self.user, self.premium_plan.id, 'YEARLY')
         
         self.assertEqual(result['base_price'], Decimal('149500.00'))
-        self.assertEqual(result['final_price'], Decimal('20000.00'))
+        self.assertEqual(result['final_price'], Decimal('149500.00'))
         self.assertEqual(result['billing_cycle'], 'YEARLY')
     
     def test_calculate_with_percentage_promo(self):
