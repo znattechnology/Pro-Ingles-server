@@ -31,23 +31,23 @@ class PublicSubscriptionPlansTest(APITestCase):
     """Testes para endpoints públicos de planos."""
     
     def setUp(self):
-        self.free_plan, _ = SubscriptionPlan.objects.get_or_create(
+        # Limpar planos existentes para garantir testes isolados
+        SubscriptionPlan.objects.all().delete()
+        
+        self.free_plan = SubscriptionPlan.objects.create(
             plan_type="FREE",
-            defaults={
-                "name": "Plano Gratuito",
-                "description": "Plano básico gratuito",
-                "monthly_price": Decimal('0.00'),
-                "yearly_price": Decimal('0.00'),
-                "daily_lessons_limit": 3,
-                "is_active": True,
-                "sort_order": 1
-            }
+            name="Plano Gratuito",
+            description="Plano básico gratuito",
+            monthly_price=Decimal('0.00'),
+            yearly_price=Decimal('0.00'),
+            daily_lessons_limit=3,
+            is_active=True,
+            sort_order=1
         )
         
-        self.premium_plan, _ = SubscriptionPlan.objects.get_or_create(
+        self.premium_plan = SubscriptionPlan.objects.create(
             plan_type="PREMIUM",
-            defaults={
-                "name": "Plano Premium",
+            name="Tuwi Premium",
                 "description": "Plano premium",
                 "monthly_price": Decimal('2500.00'),
                 "yearly_price": Decimal('149500.00'),
@@ -76,7 +76,7 @@ class PublicSubscriptionPlansTest(APITestCase):
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         results = response.data['results'] if 'results' in response.data else response.data
-        self.assertEqual(len(results), 2)  # Apenas planos ativos
+        self.assertEqual(len(results), 2)  # Planos ativos: Free, Premium
         
         # Verificar dados do primeiro plano
         first_plan = results[0]
@@ -92,7 +92,7 @@ class PublicSubscriptionPlansTest(APITestCase):
         results = response.data['results'] if 'results' in response.data else response.data
         plan_names = [plan['name'] for plan in results]
         self.assertIn("Plano Gratuito", plan_names)
-        self.assertIn("Plano Premium", plan_names)
+        self.assertIn("Tuwi Premium", plan_names)
         self.assertNotIn("Plano Inativo", plan_names)
     
     def test_public_plans_no_authentication_required(self):
@@ -108,6 +108,10 @@ class PublicSubscriptionPlansTest(APITestCase):
 )
 class UserSubscriptionViewTest(APITestCase):
     """Testes para endpoint de assinatura do usuário."""
+    
+    def authenticate_as_user(self):
+        """Helper para autenticar como usuário."""
+        self.client.force_authenticate(user=self.user)
     
     def setUp(self):
         self.user = User.objects.create_user(

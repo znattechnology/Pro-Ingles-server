@@ -41,6 +41,16 @@ class PublicCMSEndpointsTest(APITestCase):
     """Testes para endpoints públicos do CMS."""
     
     def setUp(self):
+        # Limpar dados existentes para garantir testes isolados
+        HeroSection.objects.all().delete()
+        StatItem.objects.all().delete()
+        Company.objects.all().delete()
+        ServiceItem.objects.all().delete()
+        Testimonial.objects.all().delete()
+        FAQItem.objects.all().delete()
+        PricingTier.objects.all().delete()
+        Feature.objects.all().delete()
+        LandingPageSettings.objects.all().delete()
         # Criar dados de teste
         self.settings = LandingPageSettings.objects.create(
             site_title="ProEnglish Test",
@@ -277,15 +287,38 @@ class LandingPageDataEndpointTest(APITestCase):
     RATELIMIT_ENABLE=False,
     CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
 )
+@override_settings(
+    RATELIMIT_ENABLE=False,
+    CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
+)
 class AdminCMSEndpointsTest(APITestCase):
     """Testes para endpoints administrativos do CMS."""
     
+    def authenticate_as_admin(self):
+        """Helper para autenticar como admin."""
+        self.client.force_authenticate(user=self.admin_user)
+        
+    def authenticate_as_regular_user(self):
+        """Helper para autenticar como usuário regular."""
+        self.client.force_authenticate(user=self.regular_user)
+    
     def setUp(self):
+        # Limpar dados existentes para garantir testes isolados
+        HeroSection.objects.all().delete()
+        StatItem.objects.all().delete()
+        Company.objects.all().delete()
+        ServiceItem.objects.all().delete()
+        Testimonial.objects.all().delete()
+        FAQItem.objects.all().delete()
+        PricingTier.objects.all().delete()
+        Feature.objects.all().delete()
+        User.objects.all().delete()
         # Criar usuário admin
         self.admin_user = User.objects.create_user(
             email='admin@test.com',
             name='Admin User',
             password='adminpass123',
+            role='admin',
             is_staff=True,
             is_superuser=True
         )
@@ -304,7 +337,7 @@ class AdminCMSEndpointsTest(APITestCase):
     
     def test_create_hero_section_admin(self):
         """Testa criação de hero section por admin."""
-        self.client.force_authenticate(user=self.admin_user)
+        self.authenticate_as_admin()
         
         url = reverse('cms:herosection-list')
         data = {
@@ -321,7 +354,7 @@ class AdminCMSEndpointsTest(APITestCase):
     
     def test_create_hero_section_denied_regular_user(self):
         """Testa que usuário regular não pode criar hero section."""
-        self.client.force_authenticate(user=self.regular_user)
+        self.authenticate_as_regular_user()
         
         url = reverse('cms:herosection-list')
         data = {
@@ -363,17 +396,33 @@ class AdminCMSEndpointsTest(APITestCase):
     RATELIMIT_ENABLE=False,
     CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
 )
+@override_settings(
+    RATELIMIT_ENABLE=False,
+    CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
+)
 class CustomCMSEndpointsTest(APITestCase):
     """Testes para endpoints customizados do CMS."""
+    
+    def authenticate_as_admin(self):
+        """Helper para autenticar como admin."""
+        self.client.force_authenticate(user=self.admin_user)
     
     def setUp(self):
         self.admin_user = User.objects.create_user(
             email='admin@test.com',
             name='Admin User',
             password='adminpass123',
+            role='admin',
             is_staff=True,
             is_superuser=True
         )
+        
+        # Limpar dados existentes para testes isolados
+        Company.objects.all().delete()
+        ServiceItem.objects.all().delete()
+        Testimonial.objects.all().delete()
+        FAQItem.objects.all().delete()
+        PricingTier.objects.all().delete()
         
         # Criar alguns dados para estatísticas
         Company.objects.create(name="Sonangol", category="oil_gas", is_active=True)
@@ -501,10 +550,19 @@ class CustomCMSEndpointsTest(APITestCase):
     RATELIMIT_ENABLE=False,
     CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
 )
+@override_settings(
+    RATELIMIT_ENABLE=False,
+    CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}}
+)
 class CMSFilteringAndOrderingTest(APITestCase):
     """Testes para filtragem e ordenação nos endpoints do CMS."""
     
     def setUp(self):
+        # Limpar dados existentes para garantir testes isolados
+        StatItem.objects.all().delete()
+        Company.objects.all().delete()
+        Testimonial.objects.all().delete()
+        
         # Criar múltiplos itens para testar filtragem
         StatItem.objects.create(value="100%", label="Hero Stat", section="hero", order=1, is_active=True)
         StatItem.objects.create(value="50+", label="About Stat", section="about", order=2, is_active=True)

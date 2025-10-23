@@ -19,6 +19,7 @@ from django.db import models
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
 
+from apps.cms.views import AdminWritePermissionMixin
 from .models import User, UserAddress, NotificationSettings, EmailVerification
 from .serializers import (
     UserRegistrationSerializer, CustomTokenObtainPairSerializer,
@@ -513,7 +514,7 @@ class AdminUserDetailView(generics.RetrieveAPIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminUserUpdateView(generics.UpdateAPIView):
+class AdminUserUpdateView(AdminWritePermissionMixin, generics.UpdateAPIView):
     """
     Admin view to update user basic information.
     """
@@ -523,11 +524,6 @@ class AdminUserUpdateView(generics.UpdateAPIView):
     lookup_field = 'id'
     
     def patch(self, request, *args, **kwargs):
-        # Check if user is admin
-        if request.user.role != 'admin':
-            return Response({
-                'error': 'Access denied. Admin privileges required.'
-            }, status=status.HTTP_403_FORBIDDEN)
         
         try:
             user = self.get_object()
@@ -586,7 +582,7 @@ class AdminUserUpdateView(generics.UpdateAPIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminUserRoleUpdateView(generics.UpdateAPIView):
+class AdminUserRoleUpdateView(AdminWritePermissionMixin, generics.UpdateAPIView):
     """
     Admin view to update user role.
     """
@@ -595,11 +591,6 @@ class AdminUserRoleUpdateView(generics.UpdateAPIView):
     lookup_field = 'id'
     
     def patch(self, request, *args, **kwargs):
-        # Check if user is admin
-        if request.user.role != 'admin':
-            return Response({
-                'error': 'Access denied. Admin privileges required.'
-            }, status=status.HTTP_403_FORBIDDEN)
         
         try:
             user = self.get_object()
@@ -640,7 +631,7 @@ class AdminUserRoleUpdateView(generics.UpdateAPIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminUserToggleStatusView(generics.UpdateAPIView):
+class AdminUserToggleStatusView(AdminWritePermissionMixin, generics.UpdateAPIView):
     """
     Admin view to toggle user active status.
     """
@@ -649,11 +640,6 @@ class AdminUserToggleStatusView(generics.UpdateAPIView):
     lookup_field = 'id'
     
     def patch(self, request, *args, **kwargs):
-        # Check if user is admin
-        if request.user.role != 'admin':
-            return Response({
-                'error': 'Access denied. Admin privileges required.'
-            }, status=status.HTTP_403_FORBIDDEN)
         
         try:
             user = self.get_object()
@@ -688,7 +674,7 @@ class AdminUserToggleStatusView(generics.UpdateAPIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminUserDeleteView(generics.DestroyAPIView):
+class AdminUserDeleteView(AdminWritePermissionMixin, generics.DestroyAPIView):
     """
     Admin view to delete user with cascade handling.
     """
@@ -697,11 +683,6 @@ class AdminUserDeleteView(generics.DestroyAPIView):
     lookup_field = 'id'
     
     def delete(self, request, *args, **kwargs):
-        # Check if user is admin
-        if request.user.role != 'admin':
-            return Response({
-                'error': 'Access denied. Admin privileges required.'
-            }, status=status.HTTP_403_FORBIDDEN)
         
         try:
             user = self.get_object()

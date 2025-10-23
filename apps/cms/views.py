@@ -70,9 +70,10 @@ class AdminWritePermissionMixin:
 
 class LandingPageSettingsViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for landing page settings"""
-    queryset = LandingPageSettings.objects.all()
+    queryset = LandingPageSettings.objects.all().order_by('id')
     serializer_class = LandingPageSettingsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    ordering = ['id']
     
     def get_permissions(self):
         """Allow read access to everyone, write access to staff only"""
@@ -85,9 +86,10 @@ class LandingPageSettingsViewSet(AdminWritePermissionMixin, viewsets.ModelViewSe
 
 class HeroSectionViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for hero sections"""
-    queryset = HeroSection.objects.all()
+    queryset = HeroSection.objects.all().order_by('id')
     serializer_class = HeroSectionSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    ordering = ['id']
     
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -243,9 +245,10 @@ class CallToActionViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
 
 class SeoSettingsViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     """ViewSet for SEO settings"""
-    queryset = SeoSettings.objects.all()
+    queryset = SeoSettings.objects.all().order_by('id')
     serializer_class = SeoSettingsSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    ordering = ['id']
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['page_type']
     
