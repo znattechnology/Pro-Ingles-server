@@ -40,6 +40,10 @@ class EndToEndAuthenticationFlowTest(APITestCase):
         self.student_courses_url = '/api/v1/student/video-courses/'
         self.practice_courses_url = '/api/v1/student/practice-courses/courses/'
     
+    def tearDown(self):
+        """Clean up after each test to ensure isolation."""
+        User.objects.all().delete()
+    
     def test_complete_teacher_registration_to_course_creation_flow(self):
         """Test complete flow from teacher registration to course creation."""
         # Step 1: Register as teacher
@@ -208,6 +212,10 @@ class SecurityValidationTest(APITestCase):
             role='teacher'
         )
     
+    def tearDown(self):
+        """Clean up after each test to ensure isolation."""
+        User.objects.all().delete()
+    
     def test_jwt_token_role_consistency(self):
         """Test that JWT tokens consistently enforce role permissions."""
         login_url = reverse('users:login')
@@ -357,6 +365,10 @@ class AdminSecurityTest(APITestCase):
             password='password123',
             role='teacher'
         )
+    
+    def tearDown(self):
+        """Clean up after each test to ensure isolation."""
+        User.objects.all().delete()
     
     def test_admin_self_modification_prevention(self):
         """Test that admin cannot modify critical aspects of their own account."""
