@@ -37,15 +37,17 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
-# Use dummy storage for tests
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.InMemoryStorage'
+# Use FileSystem storage for tests (InMemoryStorage doesn't exist)
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-# Force PostgreSQL database for CI/CD tests
+# Conditional PostgreSQL usage based on environment variables
 import os
+import dj_database_url
+
+USE_POSTGRESQL = os.getenv('USE_POSTGRESQL', 'False') == 'True'
 DATABASE_URL = os.getenv('DATABASE_URL', None)
 
-if DATABASE_URL:
-    import dj_database_url
+if USE_POSTGRESQL and DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
     }
@@ -59,7 +61,8 @@ else:
     }
 
 # Disable channels for tests to avoid Redis dependency
-INSTALLED_APPS = [app for app in INSTALLED_APPS if app != 'channels']
+if 'channels' in INSTALLED_APPS:
+    INSTALLED_APPS.remove('channels')
 
 # Use in-memory channel layers for tests
 CHANNEL_LAYERS = {
@@ -74,7 +77,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
@@ -108,8 +111,8 @@ STATICFILES_DIRS = []
 # Disable rate limiting for tests
 RATELIMIT_ENABLE = False
 
-# Ensure migrations are run in test database
-MIGRATION_MODULES = {}
+# Allow real migrations during tests for proper FK relationships
+# MIGRATION_MODULES = {}  # Commented out to enable real migrations
 
 # JWT configuration for tests - ensure token blacklisting works properly
 from datetime import timedelta

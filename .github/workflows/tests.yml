@@ -79,6 +79,13 @@ jobs:
           RATELIMIT_ENABLE=False
           EOF
 
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
       - name: Run system checks
         env:
           DJANGO_SETTINGS_MODULE: core.test_settings
@@ -262,6 +269,13 @@ jobs:
           DATABASE_URL=postgresql://postgres:postgres@localhost:5432/test_migration_db
           USE_POSTGRESQL=True
           EOF
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
 
       - name: Test Fresh Migration
         env:
