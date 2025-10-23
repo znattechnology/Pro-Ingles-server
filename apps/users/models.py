@@ -240,6 +240,7 @@ class UserAddress(BaseModel):
             models.Index(fields=['user', 'address_type']),
             models.Index(fields=['is_default']),
         ]
+        ordering = ['user', 'address_type', '-is_default', 'created_at']
     
     def __str__(self):
         return f"{self.user.name} - {self.get_address_type_display()}"

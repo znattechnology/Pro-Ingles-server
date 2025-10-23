@@ -129,7 +129,7 @@ class UserAddressListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        return UserAddress.objects.filter(user=self.request.user)
+        return UserAddress.objects.filter(user=self.request.user).order_by('address_type', '-is_default', 'created_at')
 
 
 class UserAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -140,7 +140,7 @@ class UserAddressDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        return UserAddress.objects.filter(user=self.request.user)
+        return UserAddress.objects.filter(user=self.request.user).order_by('address_type', '-is_default', 'created_at')
 
 
 class NotificationSettingsView(generics.RetrieveUpdateAPIView):
@@ -514,7 +514,7 @@ class AdminUserDetailView(generics.RetrieveAPIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminUserUpdateView(AdminWritePermissionMixin, generics.UpdateAPIView):
+class AdminUserUpdateView(generics.UpdateAPIView):
     """
     Admin view to update user basic information.
     """
@@ -522,6 +522,25 @@ class AdminUserUpdateView(AdminWritePermissionMixin, generics.UpdateAPIView):
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user is admin for all HTTP methods
+        if request.user.is_authenticated and request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        # Return 403 for non-admin users instead of 405
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        # This endpoint doesn't support GET, but we want 403 not 405 for non-admins
+        return Response({
+            'error': 'Method not allowed.'
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     def patch(self, request, *args, **kwargs):
         
@@ -582,13 +601,32 @@ class AdminUserUpdateView(AdminWritePermissionMixin, generics.UpdateAPIView):
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminUserRoleUpdateView(AdminWritePermissionMixin, generics.UpdateAPIView):
+class AdminUserRoleUpdateView(generics.UpdateAPIView):
     """
     Admin view to update user role.
     """
     queryset = User.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user is admin for all HTTP methods
+        if request.user.is_authenticated and request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        # Return 403 for non-admin users instead of 405
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        # This endpoint doesn't support GET, but we want 403 not 405 for non-admins
+        return Response({
+            'error': 'Method not allowed.'
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     def patch(self, request, *args, **kwargs):
         
@@ -631,13 +669,32 @@ class AdminUserRoleUpdateView(AdminWritePermissionMixin, generics.UpdateAPIView)
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminUserToggleStatusView(AdminWritePermissionMixin, generics.UpdateAPIView):
+class AdminUserToggleStatusView(generics.UpdateAPIView):
     """
     Admin view to toggle user active status.
     """
     queryset = User.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user is admin for all HTTP methods
+        if request.user.is_authenticated and request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        # Return 403 for non-admin users instead of 405
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        # This endpoint doesn't support GET, but we want 403 not 405 for non-admins
+        return Response({
+            'error': 'Method not allowed.'
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     def patch(self, request, *args, **kwargs):
         
@@ -674,13 +731,32 @@ class AdminUserToggleStatusView(AdminWritePermissionMixin, generics.UpdateAPIVie
             }, status=status.HTTP_404_NOT_FOUND)
 
 
-class AdminUserDeleteView(AdminWritePermissionMixin, generics.DestroyAPIView):
+class AdminUserDeleteView(generics.DestroyAPIView):
     """
     Admin view to delete user with cascade handling.
     """
     queryset = User.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     lookup_field = 'id'
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Check if user is admin for all HTTP methods
+        if request.user.is_authenticated and request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get(self, request, *args, **kwargs):
+        # Return 403 for non-admin users instead of 405
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+        # This endpoint doesn't support GET, but we want 403 not 405 for non-admins
+        return Response({
+            'error': 'Method not allowed.'
+        }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     def delete(self, request, *args, **kwargs):
         

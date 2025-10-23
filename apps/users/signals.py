@@ -47,7 +47,6 @@ def create_user_default_subscription(sender, instance, created, **kwargs):
                     user=instance,
                     plan=free_plan,
                     status='ACTIVE',
-                    billing_cycle='MONTHLY',
                     expires_at=expires_at,
                     current_hearts=free_plan.hearts_limit
                 )

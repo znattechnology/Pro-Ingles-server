@@ -48,13 +48,12 @@ class PublicSubscriptionPlansTest(APITestCase):
         self.premium_plan = SubscriptionPlan.objects.create(
             plan_type="PREMIUM",
             name="Tuwi Premium",
-                "description": "Plano premium",
-                "monthly_price": Decimal('2500.00'),
-                "yearly_price": Decimal('149500.00'),
-                "daily_lessons_limit": None,
-                "is_active": True,
-                "sort_order": 2
-            }
+            description="Plano premium",
+            monthly_price=Decimal('2500.00'),
+            yearly_price=Decimal('149500.00'),
+            daily_lessons_limit=None,
+            is_active=True,
+            sort_order=2
         )
         
         self.inactive_plan, _ = SubscriptionPlan.objects.get_or_create(
