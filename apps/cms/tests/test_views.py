@@ -51,6 +51,8 @@ class PublicCMSEndpointsTest(APITestCase):
         PricingTier.objects.all().delete()
         Feature.objects.all().delete()
         LandingPageSettings.objects.all().delete()
+        CallToAction.objects.all().delete()
+        SeoSettings.objects.all().delete()
         # Criar dados de teste
         self.settings = LandingPageSettings.objects.create(
             site_title="ProEnglish Test",
@@ -119,6 +121,23 @@ class PublicCMSEndpointsTest(APITestCase):
             meta_title="Test SEO",
             meta_description="Test description"
         )
+    
+    def tearDown(self):
+        """Limpar dados após cada teste para garantir isolamento."""
+        # Limpar cache
+        cache.clear()
+        # Limpar dados
+        HeroSection.objects.all().delete()
+        StatItem.objects.all().delete()
+        Company.objects.all().delete()
+        ServiceItem.objects.all().delete()
+        Testimonial.objects.all().delete()
+        FAQItem.objects.all().delete()
+        PricingTier.objects.all().delete()
+        Feature.objects.all().delete()
+        LandingPageSettings.objects.all().delete()
+        CallToAction.objects.all().delete()
+        SeoSettings.objects.all().delete()
     
     def test_landing_page_settings_list_public(self):
         """Testa listagem pública das configurações."""
@@ -250,6 +269,12 @@ class LandingPageDataEndpointTest(APITestCase):
             is_active=False
         )
     
+    def tearDown(self):
+        """Limpar dados após cada teste para garantir isolamento."""
+        cache.clear()
+        HeroSection.objects.all().delete()
+        LandingPageSettings.objects.all().delete()
+    
     def test_landing_page_data_success(self):
         """Testa sucesso do endpoint de dados da landing page."""
         url = reverse('cms:landing-page-data')
@@ -334,6 +359,18 @@ class AdminCMSEndpointsTest(APITestCase):
             headline="Test Hero",
             description="Test description"
         )
+    
+    def tearDown(self):
+        """Limpar dados após cada teste para garantir isolamento."""
+        HeroSection.objects.all().delete()
+        StatItem.objects.all().delete()
+        Company.objects.all().delete()
+        ServiceItem.objects.all().delete()
+        Testimonial.objects.all().delete()
+        FAQItem.objects.all().delete()
+        PricingTier.objects.all().delete()
+        Feature.objects.all().delete()
+        User.objects.all().delete()
     
     def test_create_hero_section_admin(self):
         """Testa criação de hero section por admin."""
@@ -435,6 +472,15 @@ class CustomCMSEndpointsTest(APITestCase):
         )
         FAQItem.objects.create(question="Q1?", answer="A1", is_active=True)
         PricingTier.objects.create(title="Free", subtitle="Basic", icon="💰", is_active=True)
+    
+    def tearDown(self):
+        """Limpar dados após cada teste para garantir isolamento."""
+        Company.objects.all().delete()
+        ServiceItem.objects.all().delete()
+        Testimonial.objects.all().delete()
+        FAQItem.objects.all().delete()
+        PricingTier.objects.all().delete()
+        User.objects.all().delete()
     
     def test_landing_page_stats_success(self):
         """Testa endpoint de estatísticas da landing page."""
@@ -582,6 +628,12 @@ class CMSFilteringAndOrderingTest(APITestCase):
             result_achieved="Promotion", rating=4, 
             sector="banking", is_featured=False, verified=True
         )
+    
+    def tearDown(self):
+        """Limpar dados após cada teste para garantir isolamento."""
+        StatItem.objects.all().delete()
+        Company.objects.all().delete()
+        Testimonial.objects.all().delete()
     
     def test_stat_items_filter_by_section(self):
         """Testa filtragem de estatísticas por seção."""

@@ -58,7 +58,8 @@ class AdminWritePermissionMixin:
         super().check_permissions(request)
         
         # For write operations (create, update, partial_update, destroy)
-        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+        action = getattr(self, "action", None)
+        if action in ['create', 'update', 'partial_update', 'destroy']:
             if not request.user.is_authenticated:
                 from rest_framework.exceptions import NotAuthenticated
                 raise NotAuthenticated()
@@ -77,7 +78,8 @@ class LandingPageSettingsViewSet(AdminWritePermissionMixin, viewsets.ModelViewSe
     
     def get_permissions(self):
         """Allow read access to everyone, write access to staff only"""
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -92,7 +94,8 @@ class HeroSectionViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['id']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -110,7 +113,8 @@ class StatItemViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['section', 'order']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -128,7 +132,8 @@ class CompanyViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['order', 'name']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -146,7 +151,8 @@ class ServiceItemViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['order', 'title']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -164,7 +170,8 @@ class PricingTierViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['order']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -182,7 +189,8 @@ class FeatureViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['order']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -200,7 +208,8 @@ class TestimonialViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['order', '-date_given']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -218,7 +227,8 @@ class FAQItemViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['category', 'order']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -236,7 +246,8 @@ class CallToActionViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     ordering = ['section', 'order']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
@@ -253,7 +264,8 @@ class SeoSettingsViewSet(AdminWritePermissionMixin, viewsets.ModelViewSet):
     filterset_fields = ['page_type']
     
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
+        action = getattr(self, "action", None)
+        if action in ['list', 'retrieve']:
             permission_classes = [AllowAny]
         else:
             permission_classes = [permissions.IsAdminUser]
