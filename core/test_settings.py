@@ -37,8 +37,15 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
-# Use FileSystem storage for tests (InMemoryStorage doesn't exist)
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+# Use FileSystem storage for tests
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # Conditional PostgreSQL usage based on environment variables
 import os

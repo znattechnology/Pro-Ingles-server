@@ -114,7 +114,7 @@ class CoursesListView(generics.ListAPIView):
     
     List all published practice courses for students.
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
     
     def get_queryset(self):
         """
@@ -212,7 +212,7 @@ class CourseUnitsView(generics.ListAPIView):
     Maps to getCourse query from client project.
     """
     serializer_class = PracticeUnitSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
     
     def get_queryset(self):
         course_id = self.kwargs['course_id']

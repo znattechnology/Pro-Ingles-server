@@ -5,6 +5,15 @@ Testa endpoints públicos e administrativos,
 incluindo CRUD operations e endpoints customizados.
 """
 
+import os
+import django
+from django.conf import settings
+
+# Configure Django settings before any imports
+if not settings.configured:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.test_settings')
+    django.setup()
+
 import json
 from decimal import Decimal
 from django.test import TestCase, override_settings

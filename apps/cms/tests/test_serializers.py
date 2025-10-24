@@ -5,6 +5,15 @@ Testa serialização e validação de dados dos modelos CMS,
 incluindo campos computados e validações customizadas.
 """
 
+import os
+import django
+from django.conf import settings
+
+# Configure Django settings before any imports
+if not settings.configured:
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.test_settings')
+    django.setup()
+
 from decimal import Decimal
 from django.test import TestCase, RequestFactory
 from django.contrib.auth import get_user_model

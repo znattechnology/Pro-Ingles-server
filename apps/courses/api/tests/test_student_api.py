@@ -118,7 +118,8 @@ class TestStudentVideoCourseAPI(BaseStudentAPITest):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        response_data = response.json()
+        data = response_data['data']
         
         self.assertEqual(data['courseId'], str(self.published_video_course.id))
         self.assertEqual(data['course_type'], 'video')
@@ -137,7 +138,8 @@ class TestStudentVideoCourseAPI(BaseStudentAPITest):
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        response_data = response.json()
+        data = response_data['data']
         
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]['sectionId'], str(self.video_section.id))
@@ -145,11 +147,12 @@ class TestStudentVideoCourseAPI(BaseStudentAPITest):
     
     def test_student_list_video_course_chapters(self):
         """Test student can list chapters in video course section."""
-        url = f'/api/courses/student/video-courses/sections/{self.video_section.id}/chapters/'
+        url = f'/api/v1/student/video-courses/sections/{self.video_section.id}/chapters/'
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        response_data = response.json()
+        data = response_data['data']
         
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]['chapterId'], str(self.video_chapter.id))
@@ -164,11 +167,12 @@ class TestStudentVideoCourseAPI(BaseStudentAPITest):
             category='Grammar'
         )
         
-        url = '/api/courses/student/video-courses/?category=Grammar'
+        url = '/api/v1/student/video-courses/?category=Grammar'
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        response_data = response.json()
+        data = response_data['data']
         
         # Should find the grammar course
         course_found = False
@@ -220,7 +224,7 @@ class TestStudentPracticeCourseAPI(BaseStudentAPITest):
     
     def test_practice_course_has_exercise_chapters(self):
         """Test that practice courses can have exercise chapters."""
-        url = f'/api/courses/student/practice-courses/sections/{self.practice_section.id}/chapters/'
+        url = f'/api/v1/student/practice-courses/sections/{self.practice_section.id}/chapters/'
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -383,7 +387,7 @@ class TestStudentAPIResponseFormat(BaseStudentAPITest):
     def test_chapter_response_includes_type_specific_fields(self):
         """Test chapter responses include type-specific fields."""
         # Video chapter should include video field
-        url = f'/api/courses/student/video-courses/chapters/{self.video_chapter.id}/'
+        url = f'/api/v1/student/video-courses/chapters/{self.video_chapter.id}/'
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -394,7 +398,7 @@ class TestStudentAPIResponseFormat(BaseStudentAPITest):
         self.assertEqual(data['video'], 'https://example.com/video.mp4')
         
         # Exercise chapter should include practice_selection
-        url = f'/api/courses/student/practice-courses/chapters/{self.practice_chapter.id}/'
+        url = f'/api/v1/student/practice-courses/chapters/{self.practice_chapter.id}/'
         response = self.client.get(url)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
