@@ -152,6 +152,9 @@ class UserSubscriptionViewTest(APITestCase):
         """Testa criação automática de assinatura gratuita."""
         self.client.force_authenticate(user=self.user)
         
+        # Limpar qualquer assinatura existente para garantir teste isolado
+        UserSubscription.objects.filter(user=self.user).delete()
+        
         # Verificar que não existe assinatura
         self.assertFalse(UserSubscription.objects.filter(user=self.user).exists())
         

@@ -55,6 +55,9 @@ class GetUserSubscriptionTest(TestCase):
     
     def test_create_new_subscription(self):
         """Testa criação de nova assinatura."""
+        # Limpar qualquer assinatura existente para garantir teste isolado
+        UserSubscription.objects.filter(user=self.user).delete()
+        
         # Verificar que não existe
         self.assertFalse(UserSubscription.objects.filter(user=self.user).exists())
         
