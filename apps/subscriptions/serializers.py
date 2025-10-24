@@ -266,13 +266,7 @@ class SubscriptionUpgradeSerializer(serializers.Serializer):
     billing_cycle = serializers.ChoiceField(choices=['MONTHLY', 'YEARLY'], default='MONTHLY')
     promo_code = serializers.CharField(required=False, allow_blank=True)
     
-    def validate_plan_id(self, value):
-        """Valida se o plano existe e está ativo"""
-        try:
-            plan = SubscriptionPlan.objects.get(id=value, is_active=True)
-            return value
-        except SubscriptionPlan.DoesNotExist:
-            raise serializers.ValidationError("Plano não encontrado ou inativo.")
+    # Validation moved to view to return proper 404 status code
 
 
 class ApplyPromoCodeSerializer(serializers.Serializer):
