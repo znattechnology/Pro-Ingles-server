@@ -6,12 +6,14 @@ Focused on core endpoints without complex model setup.
 
 import pytest
 from django.test import TestCase
+from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.courses.models import Course
-from tests.factories import TeacherFactory, StudentFactory
+
+User = get_user_model()
 
 
 class BasicStudentPracticeCoursesAPITest(APITestCase):
@@ -20,8 +22,21 @@ class BasicStudentPracticeCoursesAPITest(APITestCase):
     def setUp(self):
         """Set up test data."""
         self.client = APIClient()
-        self.teacher = TeacherFactory()
-        self.student = StudentFactory()
+        
+        # Create teacher and student directly
+        self.teacher = User.objects.create_user(
+            email='teacher@example.com',
+            name='Test Teacher',
+            password='password123',
+            role='teacher'
+        )
+        
+        self.student = User.objects.create_user(
+            email='student@example.com',
+            name='Test Student',
+            password='password123',
+            role='student'
+        )
         
         # Create a simple practice course
         self.published_practice_course = Course.objects.create(
