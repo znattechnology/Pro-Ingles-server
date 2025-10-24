@@ -213,7 +213,14 @@ class PracticeCoursesEndpointsExistenceTest(APITestCase):
     def setUp(self):
         """Set up test data."""
         self.client = APIClient()
-        self.student = StudentFactory()
+        
+        # Create student directly
+        self.student = User.objects.create_user(
+            email='student2@example.com',
+            name='Test Student 2',
+            password='password123',
+            role='student'
+        )
     
     def get_jwt_token(self, user):
         """Get JWT token for user authentication."""
