@@ -15,9 +15,9 @@ django_secret_key = "sua-django-secret-key-aqui"                  # Substitua po
 allowed_hosts = "localhost,127.0.0.1,pro-english-alb-343566329.eu-west-1.elb.amazonaws.com"
 app_replicas = 2
 
-# Frontend Configuration - Domínios Vercel
-cors_allowed_origins = "http://localhost:3000,https://pro-english-client.vercel.app,https://pro-english-client-git-main.vercel.app,https://proenglish.com,https://www.proenglish.com"
-csrf_trusted_origins = "http://localhost:3000,https://pro-english-client.vercel.app,https://pro-english-client-git-main.vercel.app,https://proenglish.com,https://www.proenglish.com"
+# Frontend Configuration - Domínios Vercel (URLs estáveis)
+cors_allowed_origins = "http://localhost:3000,https://pro-ingles-client-nine.vercel.app,https://pro-ingles-client-git-main-znattechnology95-1655s-projects.vercel.app,https://proenglish.com,https://www.proenglish.com"
+csrf_trusted_origins = "http://localhost:3000,https://pro-ingles-client-nine.vercel.app,https://pro-ingles-client-git-main-znattechnology95-1655s-projects.vercel.app,https://proenglish.com,https://www.proenglish.com"
 
 # Tags
 common_tags = {
