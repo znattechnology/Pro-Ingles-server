@@ -67,13 +67,13 @@ class BasicStudentPracticeCoursesAPITest(APITestCase):
         token = self.get_jwt_token(self.student)
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
     
-    def test_practice_courses_list_requires_authentication(self):
-        """Test that practice courses listing requires authentication."""
+    def test_practice_courses_list_is_public(self):
+        """Test that practice courses listing is publicly accessible."""
         url = '/api/v1/student/practice-courses/courses/'
         response = self.client.get(url)
         
-        # Should require authentication
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        # Should be publicly accessible for course discovery
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_authenticated_student_can_list_practice_courses(self):
         """Test authenticated student can list published practice courses."""
