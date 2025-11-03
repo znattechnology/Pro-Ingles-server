@@ -1,0 +1,7565 @@
+{
+  "tables": {
+    "auth_group": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "auth_group_permissions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "group_id",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "permission_id",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "auth_permission": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "content_type_id",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "codename",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 220
+    },
+    "chapter_comments": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "timestamp",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "chapter_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_resolved",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "parent_comment_id",
+          "type": "uuid",
+          "nullable": "YES",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "chapter_progress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "completed",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "chapter_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_progress_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "best_score",
+          "type": "double precision",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "time_spent",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "chapter_quizzes": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points_reward",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "hearts_cost",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "passing_score",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "time_limit",
+          "type": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "max_attempts",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "total_attempts",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "total_completions",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "average_score",
+          "type": "double precision",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "chapter_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_by_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "practice_lesson_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "allow_review",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "available_from",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "available_until",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "difficulty",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "randomize_questions",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "show_correct_answers",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "chapter_resource_tags": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "resource_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "tag_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "chapter_resources": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "resource_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "file",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "external_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "file_size",
+          "type": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "download_count",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_featured",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "chapter_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_by_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "access_level",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "available_from",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "available_until",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "file_format",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_downloadable",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "view_count",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "chapters": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "content",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "video",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "section_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "practice_lesson_id",
+          "type": "uuid",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "quiz_enabled",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "resources_data",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "transcript",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "quiz_data",
+          "type": "jsonb",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "practice_selection",
+          "type": "jsonb",
+          "nullable": "YES",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_calltoaction": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "subtitle",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "primary_button_text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "primary_button_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "secondary_button_text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "secondary_button_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "background_image",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "gradient_from",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "gradient_to",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "section",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_company": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "logo",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "website_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "category",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "show_in_hero",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "show_in_ticker",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_faqitem": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "question",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "answer",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "category",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "keywords",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_featured",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_feature": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "gradient_from",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "gradient_to",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "background_image",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "benefits",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "use_cases",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "grid_column_span",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_highlighted",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_herosection": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "badge_text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "badge_is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "headline",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "headline_highlight",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "primary_cta_text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "primary_cta_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "secondary_cta_text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "secondary_cta_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "social_proof_text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "rating_value",
+          "type": "numeric",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "rating_count",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "hero_image",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "background_video",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_landingpagesettings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "site_title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "site_description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "meta_keywords",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "contact_email",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "contact_phone",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "whatsapp_number",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "facebook_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "instagram_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "linkedin_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "youtube_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "google_analytics_id",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "facebook_pixel_id",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "maintenance_mode",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "maintenance_message",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_pricingtier": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "subtitle",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "monthly_price",
+          "type": "numeric",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "yearly_price",
+          "type": "numeric",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "currency",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "yearly_discount_text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "promotional_badge",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "angola_benefit",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "features",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "button_text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "button_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_popular",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_inverse_design",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "gradient_from",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "gradient_to",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_seosettings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "page_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "meta_title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "meta_description",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "meta_keywords",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "canonical_url",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "og_title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "og_description",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "og_image",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "og_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "twitter_card",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "twitter_title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "twitter_description",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "twitter_image",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "schema_markup",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "index_page",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "follow_links",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_serviceitem": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "subtitle",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "student_count",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "level",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "duration",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "certification",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "service_image",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "gradient_from",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "gradient_to",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "features",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "curriculum_topics",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_featured",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "service_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_serviceitem_target_companies": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "serviceitem_id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "company_id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_statitem": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "value",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "label",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "section",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_testimonial": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "location",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "avatar",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "result_achieved",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "rating",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "sector",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "date_given",
+          "type": "date",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "verified",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_featured",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "company_id",
+          "type": "bigint",
+          "nullable": "YES",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "core_address": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "street",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "city",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "postal_code",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "district",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "country",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "building_number",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "apartment",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "floor",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "additional_info",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "course_enrollments": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "enrollment_date",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "enrollment_source",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "course_sections": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "sectionTitle",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "sectionDescription",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "courses": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "teacherName",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "category",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "image",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "level",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "teacher_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "template",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "course_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "email_verifications": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "code",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_used",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "attempts",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "max_attempts",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "enrollment_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "action",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "details",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "enrollment_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "performed_by_id",
+          "type": "uuid",
+          "nullable": "YES",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "notification_settings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email_bookings",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email_messages",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email_ratings",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email_orders",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email_marketing",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "push_bookings",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "push_messages",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "push_ratings",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "push_orders",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "digest_frequency",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "quiet_hours_start",
+          "type": "time without time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "quiet_hours_end",
+          "type": "time without time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "timezone",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "payment_methods": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "last_four",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "card_brand",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "exp_month",
+          "type": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "exp_year",
+          "type": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "provider_id",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "provider",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_default",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_achievement": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "category",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "rarity",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "requirement_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "requirement_target",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "requirement_unit",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_secret",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_achievementcategory": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "display_name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "icon_class",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "color",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_achievementnotification": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_read",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_celebrated",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "read_at",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "achievement_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_challengeoption": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "text",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_correct",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "image_url",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "audio_url",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "challenge_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_challengeprogress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "completed",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "challenge_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_competition": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "start_date",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "end_date",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "min_points_to_participate",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "max_participants",
+          "type": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "first_place_prize",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "second_place_prize",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "third_place_prize",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_competitionparticipant": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points_earned",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "challenges_completed",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "lessons_completed",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "streak_days",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "current_rank",
+          "type": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "best_rank",
+          "type": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "joined_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "competition_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_leaderboardsnapshot": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "snapshot_date",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "snapshot_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "rank",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "league",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "rank_change",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points_change",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_leaguepromotion": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "from_league",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "to_league",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points_at_promotion",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "promoted_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_practicechallenge": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "question",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "lesson_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_practicelesson": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "unit_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_practiceunit": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "title",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_userachievement": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_unlocked",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "current_progress",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "unlocked_at",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "achievement_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_userleague": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "current_league",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points_when_promoted",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "promoted_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_userprogress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "hearts",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_image_src",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "active_course_id",
+          "type": "uuid",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_userstreak": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "current_streak",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "longest_streak",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "last_practice_date",
+          "type": "date",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "quiz_questions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "question_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "question_text",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "image",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "audio",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "options",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "explanation",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "quiz_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "resource_access_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "access_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "ip_address",
+          "type": "inet",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "user_agent",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "referrer",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "session_id",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "resource_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "YES",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "resource_categories": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "color",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "icon",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "order",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "resource_tags": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "color",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "student_quiz_attempts": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "score",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "max_score",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "time_taken",
+          "type": "integer",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "hearts_lost",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "points_earned",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_completed",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_passed",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "attempt_number",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "chapter_quiz_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "practice_progress_id",
+          "type": "uuid",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "student_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "answers_data",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "started_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "transaction_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "action",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "amount",
+          "type": "numeric",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "details",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "provider_reference",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "performed_by_id",
+          "type": "uuid",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "transaction_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "transactionId",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "dateTime",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "amount",
+          "type": "numeric",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "paymentProvider",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "currency",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "ip_address",
+          "type": "inet",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "payment_fee",
+          "type": "numeric",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "payment_intent_id",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "platform_fee",
+          "type": "numeric",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "refund_reason",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "refunded_amount",
+          "type": "numeric",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "refunded_at",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_agent",
+          "type": "text",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "user_addresses": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "address_type",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_default",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "address_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "user_course_progress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "enrollmentDate",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "overallProgress",
+          "type": "double precision",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "lastAccessedTimestamp",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "course_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "completion_date",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "current_chapter_id",
+          "type": "uuid",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "total_time_spent",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "avg_listening_score",
+          "type": "double precision",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "avg_speaking_score",
+          "type": "double precision",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "listening_practice_progress",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "speaking_practice_progress",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "total_listening_sessions",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "total_speaking_sessions",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "users": {
+      "columns": [
+        {
+          "name": "password",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "last_login",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "is_superuser",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "username",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "first_name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "last_name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_staff",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "date_joined",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "phone",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "avatar",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "role",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email_verified",
+          "type": "boolean",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "email_verification_token",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "reset_password_token",
+          "type": "character varying",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "reset_password_expires",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "last_login_at",
+          "type": "timestamp with time zone",
+          "nullable": "YES",
+          "default": null
+        },
+        {
+          "name": "preferences",
+          "type": "jsonb",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "google_id",
+          "type": "character varying",
+          "nullable": "YES",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "users_groups": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "group_id",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    },
+    "users_user_permissions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "nullable": "NO",
+          "default": null
+        },
+        {
+          "name": "permission_id",
+          "type": "integer",
+          "nullable": "NO",
+          "default": null
+        }
+      ],
+      "row_count": 0
+    }
+  },
+  "constraints": {
+    "auth_group": [
+      [
+        "auth_group_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "auth_group_name_key",
+        "UNIQUE"
+      ],
+      [
+        "2200_27094_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27094_2_not_null",
+        "CHECK"
+      ]
+    ],
+    "auth_group_permissions": [
+      [
+        "auth_group_permissions_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "auth_group_permissions_group_id_permission_id_0cd325b0_uniq",
+        "UNIQUE"
+      ],
+      [
+        "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27102_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27102_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27102_3_not_null",
+        "CHECK"
+      ]
+    ],
+    "auth_permission": [
+      [
+        "auth_permission_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "auth_permission_content_type_id_codename_01ab375a_uniq",
+        "UNIQUE"
+      ],
+      [
+        "auth_permission_content_type_id_2f476e4b_fk_django_co",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27088_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27088_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27088_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27088_4_not_null",
+        "CHECK"
+      ]
+    ],
+    "chapter_comments": [
+      [
+        "chapter_comments_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "chapter_comments_chapter_id_dd4c69ab_fk_chapters_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_comments_user_id_58da103f_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_comments_parent_comment_id_24a555f1_fk_chapter_c",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27417_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27417_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27417_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27417_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27417_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27417_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27417_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27417_8_not_null",
+        "CHECK"
+      ]
+    ],
+    "chapter_progress": [
+      [
+        "chapter_progress_user_progress_id_chapter_id_d8432e0f_uniq",
+        "UNIQUE"
+      ],
+      [
+        "chapter_progress_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "chapter_progress_chapter_id_2ded0456_fk_chapters_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_progress_user_progress_id_3b7da804_fk_user_cour",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_progress_attempts_check",
+        "CHECK"
+      ],
+      [
+        "chapter_progress_time_spent_check",
+        "CHECK"
+      ],
+      [
+        "2200_27412_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27412_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27412_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27412_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27412_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27412_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27412_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27412_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27412_11_not_null",
+        "CHECK"
+      ]
+    ],
+    "chapter_quizzes": [
+      [
+        "chapter_quizzes_points_reward_check",
+        "CHECK"
+      ],
+      [
+        "chapter_quizzes_hearts_cost_check",
+        "CHECK"
+      ],
+      [
+        "chapter_quizzes_passing_score_check",
+        "CHECK"
+      ],
+      [
+        "chapter_quizzes_time_limit_check",
+        "CHECK"
+      ],
+      [
+        "chapter_quizzes_max_attempts_check",
+        "CHECK"
+      ],
+      [
+        "chapter_quizzes_total_attempts_check",
+        "CHECK"
+      ],
+      [
+        "chapter_quizzes_total_completions_check",
+        "CHECK"
+      ],
+      [
+        "chapter_quizzes_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "chapter_quizzes_chapter_id_key",
+        "UNIQUE"
+      ],
+      [
+        "chapter_quizzes_chapter_id_99e5498d_fk_chapters_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_quizzes_created_by_id_51eb73f5_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_quizzes_practice_lesson_id_e0f381d8_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27796_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_18_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_21_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_22_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_23_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27796_24_not_null",
+        "CHECK"
+      ]
+    ],
+    "chapter_resource_tags": [
+      [
+        "chapter_resource_tags_tag_id_c85d93b7_fk_resource_tags_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_resource_tags_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "chapter_resource_tag_resource_id_df074ee5_fk_chapter_r",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_resource_tags_resource_id_tag_id_d2249034_uniq",
+        "UNIQUE"
+      ],
+      [
+        "2200_27897_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27897_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27897_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27897_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27897_5_not_null",
+        "CHECK"
+      ]
+    ],
+    "chapter_resources": [
+      [
+        "chapter_resources_file_size_check",
+        "CHECK"
+      ],
+      [
+        "chapter_resources_download_count_check",
+        "CHECK"
+      ],
+      [
+        "chapter_resources_order_check",
+        "CHECK"
+      ],
+      [
+        "chapter_resources_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "chapter_resources_chapter_id_9b6a96e8_fk_chapters_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_resources_created_by_id_40217871_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapter_resources_view_count_check",
+        "CHECK"
+      ],
+      [
+        "2200_27823_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_18_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_19_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_20_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_21_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27823_22_not_null",
+        "CHECK"
+      ]
+    ],
+    "chapters": [
+      [
+        "chapters_order_check",
+        "CHECK"
+      ],
+      [
+        "chapters_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "chapters_section_id_92dfba28_fk_course_sections_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "chapters_practice_lesson_id_7c95d8b6_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27372_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27372_14_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_calltoaction": [
+      [
+        "cms_calltoaction_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_calltoaction_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27246_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27246_17_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_company": [
+      [
+        "cms_company_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_company_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27255_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27255_12_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_faqitem": [
+      [
+        "cms_faqitem_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_faqitem_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27264_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27264_10_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_feature": [
+      [
+        "cms_feature_grid_column_span_check",
+        "CHECK"
+      ],
+      [
+        "cms_feature_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_feature_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27273_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27273_15_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_herosection": [
+      [
+        "cms_herosection_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_herosection_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27283_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_18_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27283_19_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_landingpagesettings": [
+      [
+        "cms_landingpagesettings_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27292_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27292_18_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_pricingtier": [
+      [
+        "cms_pricingtier_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_pricingtier_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27300_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_18_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_19_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_20_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_21_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27300_22_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_seosettings": [
+      [
+        "cms_seosettings_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "cms_seosettings_page_type_key",
+        "UNIQUE"
+      ],
+      [
+        "2200_27309_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_18_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27309_19_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_serviceitem": [
+      [
+        "cms_serviceitem_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_serviceitem_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27336_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_18_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_19_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27336_20_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_serviceitem_target_companies": [
+      [
+        "cms_serviceitem_target_companies_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "cms_serviceitem_target_c_serviceitem_id_company_i_737ac130_uniq",
+        "UNIQUE"
+      ],
+      [
+        "cms_serviceitem_targ_serviceitem_id_7776e907_fk_cms_servi",
+        "FOREIGN KEY"
+      ],
+      [
+        "cms_serviceitem_targ_company_id_2101b8a7_fk_cms_compa",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27345_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27345_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27345_3_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_statitem": [
+      [
+        "cms_statitem_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_statitem_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27319_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27319_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27319_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27319_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27319_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27319_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27319_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27319_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27319_9_not_null",
+        "CHECK"
+      ]
+    ],
+    "cms_testimonial": [
+      [
+        "cms_testimonial_rating_check",
+        "CHECK"
+      ],
+      [
+        "cms_testimonial_order_check",
+        "CHECK"
+      ],
+      [
+        "cms_testimonial_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "cms_testimonial_company_id_c6646556_fk_cms_company_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27326_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27326_16_not_null",
+        "CHECK"
+      ]
+    ],
+    "core_address": [
+      [
+        "core_address_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27072_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27072_12_not_null",
+        "CHECK"
+      ]
+    ],
+    "course_enrollments": [
+      [
+        "course_enrollments_user_id_course_id_4517d44a_uniq",
+        "UNIQUE"
+      ],
+      [
+        "course_enrollments_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "course_enrollments_course_id_e80b84cd_fk_courses_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "course_enrollments_user_id_7c6e9041_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27407_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27407_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27407_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27407_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27407_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27407_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27407_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27407_9_not_null",
+        "CHECK"
+      ]
+    ],
+    "course_sections": [
+      [
+        "course_sections_order_check",
+        "CHECK"
+      ],
+      [
+        "course_sections_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "course_sections_course_id_ff682291_fk_courses_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27399_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27399_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27399_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27399_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27399_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27399_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27399_7_not_null",
+        "CHECK"
+      ]
+    ],
+    "courses": [
+      [
+        "courses_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "courses_teacher_id_79a070ce_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27380_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27380_14_not_null",
+        "CHECK"
+      ]
+    ],
+    "email_verifications": [
+      [
+        "email_verifications_attempts_check",
+        "CHECK"
+      ],
+      [
+        "email_verifications_max_attempts_check",
+        "CHECK"
+      ],
+      [
+        "email_verifications_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "email_verifications_user_id_a6e578be_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_28151_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_28151_10_not_null",
+        "CHECK"
+      ]
+    ],
+    "enrollment_logs": [
+      [
+        "enrollment_logs_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "enrollment_logs_enrollment_id_899a563f_fk_course_enrollments_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "enrollment_logs_performed_by_id_f8f13e57_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27902_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27902_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27902_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27902_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27902_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27902_6_not_null",
+        "CHECK"
+      ]
+    ],
+    "notification_settings": [
+      [
+        "notification_settings_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "notification_settings_user_id_key",
+        "UNIQUE"
+      ],
+      [
+        "notification_settings_user_id_ce43fde1_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27156_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27156_17_not_null",
+        "CHECK"
+      ]
+    ],
+    "payment_methods": [
+      [
+        "payment_methods_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "payment_methods_exp_month_check",
+        "CHECK"
+      ],
+      [
+        "payment_methods_exp_year_check",
+        "CHECK"
+      ],
+      [
+        "payment_methods_user_id_d4fe6d88_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27909_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27909_13_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_achievement": [
+      [
+        "practice_achievement_points_check",
+        "CHECK"
+      ],
+      [
+        "practice_achievement_requirement_target_check",
+        "CHECK"
+      ],
+      [
+        "practice_achievement_order_check",
+        "CHECK"
+      ],
+      [
+        "practice_achievement_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27726_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27726_15_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_achievementcategory": [
+      [
+        "practice_achievementcategory_name_key",
+        "UNIQUE"
+      ],
+      [
+        "practice_achievementcategory_order_check",
+        "CHECK"
+      ],
+      [
+        "practice_achievementcategory_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27737_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27737_10_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_achievementnotification": [
+      [
+        "practice_achievementnotification_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_achievementnoti_user_id_achievement_id_a9cb226e_uniq",
+        "UNIQUE"
+      ],
+      [
+        "practice_achievement_achievement_id_b6f8dfff_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "practice_achievementnotification_user_id_eb263452_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27753_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27753_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27753_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27753_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27753_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27753_7_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_challengeoption": [
+      [
+        "practice_challengeoption_order_check",
+        "CHECK"
+      ],
+      [
+        "practice_challengeoption_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_challengeop_challenge_id_4be23696_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27565_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27565_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27565_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27565_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27565_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27565_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27565_9_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_challengeprogress": [
+      [
+        "practice_challengeprogress_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_challengeprogress_user_id_challenge_id_f6a24e5d_uniq",
+        "UNIQUE"
+      ],
+      [
+        "practice_challengepr_challenge_id_34efaa9c_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "practice_challengeprogress_user_id_8404125a_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27573_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27573_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27573_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27573_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27573_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27573_6_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_competition": [
+      [
+        "practice_competition_min_points_to_participate_check",
+        "CHECK"
+      ],
+      [
+        "practice_competition_max_participants_check",
+        "CHECK"
+      ],
+      [
+        "practice_competition_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "2200_27635_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27635_14_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_competitionparticipant": [
+      [
+        "practice_competitionparticipant_points_earned_check",
+        "CHECK"
+      ],
+      [
+        "practice_competitionparticipant_challenges_completed_check",
+        "CHECK"
+      ],
+      [
+        "practice_competitionparticipant_lessons_completed_check",
+        "CHECK"
+      ],
+      [
+        "practice_competitionparticipant_streak_days_check",
+        "CHECK"
+      ],
+      [
+        "practice_competitionparticipant_current_rank_check",
+        "CHECK"
+      ],
+      [
+        "practice_competitionparticipant_best_rank_check",
+        "CHECK"
+      ],
+      [
+        "practice_competitionparticipant_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_competitionpart_competition_id_user_id_e8745745_uniq",
+        "UNIQUE"
+      ],
+      [
+        "practice_competition_competition_id_323c493a_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "practice_competitionparticipant_user_id_be5784ac_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27677_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27677_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27677_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27677_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27677_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27677_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27677_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27677_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27677_11_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_leaderboardsnapshot": [
+      [
+        "practice_leaderboardsnapshot_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_leaderboardsnapshot_rank_check",
+        "CHECK"
+      ],
+      [
+        "practice_leaderboardsnapshot_points_check",
+        "CHECK"
+      ],
+      [
+        "practice_leaderboardsnap_user_id_snapshot_date_sn_fce4685f_uniq",
+        "UNIQUE"
+      ],
+      [
+        "practice_leaderboardsnapshot_user_id_2317cf27_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27670_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27670_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27670_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27670_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27670_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27670_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27670_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27670_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27670_9_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_leaguepromotion": [
+      [
+        "practice_leaguepromotion_points_at_promotion_check",
+        "CHECK"
+      ],
+      [
+        "practice_leaguepromotion_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_leaguepromotion_user_id_273571fc_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27664_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27664_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27664_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27664_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27664_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27664_6_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_practicechallenge": [
+      [
+        "practice_practicechallenge_order_check",
+        "CHECK"
+      ],
+      [
+        "practice_practicechallenge_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_practicechallenge_lesson_id_order_f0be0893_uniq",
+        "UNIQUE"
+      ],
+      [
+        "practice_practicecha_lesson_id_597d2385_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27557_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27557_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27557_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27557_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27557_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27557_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27557_7_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_practicelesson": [
+      [
+        "practice_practicelesson_order_check",
+        "CHECK"
+      ],
+      [
+        "practice_practicelesson_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_practicelesson_unit_id_order_ad912c89_uniq",
+        "UNIQUE"
+      ],
+      [
+        "practice_practiceles_unit_id_3b3326e0_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27551_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27551_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27551_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27551_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27551_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27551_6_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_practiceunit": [
+      [
+        "practice_practiceunit_order_check",
+        "CHECK"
+      ],
+      [
+        "practice_practiceunit_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_practiceunit_course_id_order_28d336d9_uniq",
+        "UNIQUE"
+      ],
+      [
+        "practice_practiceunit_course_id_904f1ce3_fk_courses_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27543_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27543_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27543_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27543_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27543_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27543_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27543_7_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_userachievement": [
+      [
+        "practice_userachievement_current_progress_check",
+        "CHECK"
+      ],
+      [
+        "practice_userachievement_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_userachievement_user_id_achievement_id_8443d1a2_uniq",
+        "UNIQUE"
+      ],
+      [
+        "practice_userachieve_achievement_id_f89fa62a_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "practice_userachievement_user_id_7747de13_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27747_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27747_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27747_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27747_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27747_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27747_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27747_8_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_userleague": [
+      [
+        "practice_userleague_points_when_promoted_check",
+        "CHECK"
+      ],
+      [
+        "practice_userleague_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_userleague_user_id_key",
+        "UNIQUE"
+      ],
+      [
+        "practice_userleague_user_id_074fa7ec_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27655_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27655_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27655_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27655_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27655_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27655_6_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_userprogress": [
+      [
+        "practice_userprogress_hearts_check",
+        "CHECK"
+      ],
+      [
+        "practice_userprogress_points_check",
+        "CHECK"
+      ],
+      [
+        "practice_userprogress_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_userprogress_user_id_key",
+        "UNIQUE"
+      ],
+      [
+        "practice_userprogress_active_course_id_445e60e9_fk_courses_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "practice_userprogress_user_id_8d0698aa_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27534_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27534_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27534_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27534_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27534_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27534_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27534_8_not_null",
+        "CHECK"
+      ]
+    ],
+    "practice_userstreak": [
+      [
+        "practice_userstreak_current_streak_check",
+        "CHECK"
+      ],
+      [
+        "practice_userstreak_longest_streak_check",
+        "CHECK"
+      ],
+      [
+        "practice_userstreak_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "practice_userstreak_user_id_key",
+        "UNIQUE"
+      ],
+      [
+        "practice_userstreak_user_id_d3f8efaa_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27645_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27645_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27645_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27645_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27645_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27645_7_not_null",
+        "CHECK"
+      ]
+    ],
+    "quiz_questions": [
+      [
+        "quiz_questions_points_check",
+        "CHECK"
+      ],
+      [
+        "quiz_questions_order_check",
+        "CHECK"
+      ],
+      [
+        "quiz_questions_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "quiz_questions_quiz_id_908ef63c_fk_chapter_quizzes_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27916_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27916_14_not_null",
+        "CHECK"
+      ]
+    ],
+    "resource_access_logs": [
+      [
+        "resource_access_logs_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "resource_access_logs_resource_id_e0ec5b99_fk_chapter_r",
+        "FOREIGN KEY"
+      ],
+      [
+        "resource_access_logs_user_id_bace40d8_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27925_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27925_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27925_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27925_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27925_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27925_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27925_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27925_9_not_null",
+        "CHECK"
+      ]
+    ],
+    "resource_categories": [
+      [
+        "resource_categories_course_id_name_39875ec6_uniq",
+        "UNIQUE"
+      ],
+      [
+        "resource_categories_order_check",
+        "CHECK"
+      ],
+      [
+        "resource_categories_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "resource_categories_course_id_7fa0738e_fk_courses_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27932_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27932_10_not_null",
+        "CHECK"
+      ]
+    ],
+    "resource_tags": [
+      [
+        "resource_tags_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "resource_tags_name_key",
+        "UNIQUE"
+      ],
+      [
+        "2200_27940_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27940_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27940_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27940_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27940_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27940_6_not_null",
+        "CHECK"
+      ]
+    ],
+    "student_quiz_attempts": [
+      [
+        "student_quiz_attempts_score_check",
+        "CHECK"
+      ],
+      [
+        "student_quiz_attempts_max_score_check",
+        "CHECK"
+      ],
+      [
+        "student_quiz_attempts_time_taken_check",
+        "CHECK"
+      ],
+      [
+        "student_quiz_attempts_hearts_lost_check",
+        "CHECK"
+      ],
+      [
+        "student_quiz_attempts_points_earned_check",
+        "CHECK"
+      ],
+      [
+        "student_quiz_attempts_attempt_number_check",
+        "CHECK"
+      ],
+      [
+        "student_quiz_attempts_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "student_quiz_attempts_student_id_chapter_quiz__baa66331_uniq",
+        "UNIQUE"
+      ],
+      [
+        "student_quiz_attempt_chapter_quiz_id_ddb3de1b_fk_chapter_q",
+        "FOREIGN KEY"
+      ],
+      [
+        "student_quiz_attempt_practice_progress_id_22ae5a70_fk_practice_",
+        "FOREIGN KEY"
+      ],
+      [
+        "student_quiz_attempts_student_id_354a6e0a_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27812_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27812_18_not_null",
+        "CHECK"
+      ]
+    ],
+    "transaction_logs": [
+      [
+        "transaction_logs_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "transaction_logs_performed_by_id_065a11cf_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "transaction_logs_transaction_id_8fd35968_fk_transactions_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27949_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27949_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27949_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27949_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27949_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27949_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27949_9_not_null",
+        "CHECK"
+      ]
+    ],
+    "transactions": [
+      [
+        "transactions_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "transactions_transactionId_key",
+        "UNIQUE"
+      ],
+      [
+        "transactions_course_id_ebb330de_fk_courses_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "transactions_user_id_766cc893_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27392_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_19_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27392_20_not_null",
+        "CHECK"
+      ]
+    ],
+    "user_addresses": [
+      [
+        "user_addresses_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "user_addresses_user_id_address_type_is_default_ec1a0d94_uniq",
+        "UNIQUE"
+      ],
+      [
+        "user_addresses_address_id_d0d203a6_fk_core_address_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "user_addresses_user_id_c7113441_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27163_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27163_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27163_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27163_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27163_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27163_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27163_7_not_null",
+        "CHECK"
+      ]
+    ],
+    "user_course_progress": [
+      [
+        "user_course_progress_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "user_course_progress_user_id_course_id_66fd996b_uniq",
+        "UNIQUE"
+      ],
+      [
+        "user_course_progress_course_id_1ef9b1b3_fk_courses_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "user_course_progress_user_id_2fadfe47_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "user_course_progress_current_chapter_id_6b5bc632_fk_chapters_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "user_course_progress_total_time_spent_check",
+        "CHECK"
+      ],
+      [
+        "user_course_progress_total_listening_sessions_check",
+        "CHECK"
+      ],
+      [
+        "user_course_progress_total_speaking_sessions_check",
+        "CHECK"
+      ],
+      [
+        "2200_27387_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_13_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27387_17_not_null",
+        "CHECK"
+      ]
+    ],
+    "users": [
+      [
+        "users_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "users_username_key",
+        "UNIQUE"
+      ],
+      [
+        "users_email_key",
+        "UNIQUE"
+      ],
+      [
+        "users_google_id_key",
+        "UNIQUE"
+      ],
+      [
+        "2200_27133_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_3_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_4_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_5_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_6_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_7_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_8_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_9_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_10_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_11_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_12_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_14_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_15_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_16_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_17_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_18_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_20_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_21_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27133_23_not_null",
+        "CHECK"
+      ]
+    ],
+    "users_groups": [
+      [
+        "users_groups_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "users_groups_user_id_group_id_fc7788e8_uniq",
+        "UNIQUE"
+      ],
+      [
+        "users_groups_user_id_f500bee5_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "users_groups_group_id_2f3517aa_fk_auth_group_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27145_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27145_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27145_3_not_null",
+        "CHECK"
+      ]
+    ],
+    "users_user_permissions": [
+      [
+        "users_user_permissions_pkey",
+        "PRIMARY KEY"
+      ],
+      [
+        "users_user_permissions_user_id_permission_id_3b86cbdf_uniq",
+        "UNIQUE"
+      ],
+      [
+        "users_user_permissions_user_id_92473840_fk_users_id",
+        "FOREIGN KEY"
+      ],
+      [
+        "users_user_permissio_permission_id_6d08dcd2_fk_auth_perm",
+        "FOREIGN KEY"
+      ],
+      [
+        "2200_27151_1_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27151_2_not_null",
+        "CHECK"
+      ],
+      [
+        "2200_27151_3_not_null",
+        "CHECK"
+      ]
+    ]
+  },
+  "indexes": {},
+  "data_counts": {
+    "auth_group": 0,
+    "auth_group_permissions": 0,
+    "auth_permission": 220,
+    "chapter_comments": 0,
+    "chapter_progress": 0,
+    "chapter_quizzes": 0,
+    "chapter_resource_tags": 0,
+    "chapter_resources": 0,
+    "chapters": 0,
+    "cms_calltoaction": 0,
+    "cms_company": 0,
+    "cms_faqitem": 0,
+    "cms_feature": 0,
+    "cms_herosection": 0,
+    "cms_landingpagesettings": 0,
+    "cms_pricingtier": 0,
+    "cms_seosettings": 0,
+    "cms_serviceitem": 0,
+    "cms_serviceitem_target_companies": 0,
+    "cms_statitem": 0,
+    "cms_testimonial": 0,
+    "core_address": 0,
+    "course_enrollments": 0,
+    "course_sections": 0,
+    "courses": 0,
+    "email_verifications": 0,
+    "enrollment_logs": 0,
+    "notification_settings": 0,
+    "payment_methods": 0,
+    "practice_achievement": 0,
+    "practice_achievementcategory": 0,
+    "practice_achievementnotification": 0,
+    "practice_challengeoption": 0,
+    "practice_challengeprogress": 0,
+    "practice_competition": 0,
+    "practice_competitionparticipant": 0,
+    "practice_leaderboardsnapshot": 0,
+    "practice_leaguepromotion": 0,
+    "practice_practicechallenge": 0,
+    "practice_practicelesson": 0,
+    "practice_practiceunit": 0,
+    "practice_userachievement": 0,
+    "practice_userleague": 0,
+    "practice_userprogress": 0,
+    "practice_userstreak": 0,
+    "quiz_questions": 0,
+    "resource_access_logs": 0,
+    "resource_categories": 0,
+    "resource_tags": 0,
+    "student_quiz_attempts": 0,
+    "transaction_logs": 0,
+    "transactions": 0,
+    "user_addresses": 0,
+    "user_course_progress": 0,
+    "users": 0,
+    "users_groups": 0,
+    "users_user_permissions": 0
+  }
+}
