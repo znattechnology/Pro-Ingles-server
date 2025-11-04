@@ -33,10 +33,10 @@ jobs:
     
     env:
       AWS_REGION: eu-west-1
-      EC2_HOST: 3.249.175.72
+      EC2_HOST: 34.245.99.169
       EC2_USER: ec2-user
-      APP_DIR: /opt/pro-english/app
-      SERVICE_NAME: pro-english
+      APP_DIR: /opt/proenglish
+      SERVICE_NAME: proenglish
 
     steps:
       - name: Checkout code
