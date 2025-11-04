@@ -1,0 +1,145 @@
+# =============================================================================
+# DIGITALOCEAN TERRAFORM VARIABLES - PROENGLISH PLATFORM
+# Rename this file to terraform.tfvars and fill in your actual values
+# =============================================================================
+
+# =============================================================================
+# PROVIDER CONFIGURATION
+# =============================================================================
+
+# DigitalOcean API Token
+# Obtenha em: https://cloud.digitalocean.com/account/api/tokens
+do_token = "dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# =============================================================================
+# PROJECT CONFIGURATION
+# =============================================================================
+
+project_name = "proenglish"
+environment  = "production"
+region       = "fra1"  # Frankfurt - Próximo à Europa/África
+spaces_region = "fra1"
+
+# =============================================================================
+# DOMAIN CONFIGURATION
+# =============================================================================
+
+domain_name = "proenglish.ao"
+create_www_record = true
+
+# =============================================================================
+# DROPLET CONFIGURATION
+# =============================================================================
+
+droplet_image = "ubuntu-22-04-x64"
+droplet_size  = "s-2vcpu-4gb"  # $32/mês - 2 vCPUs, 4GB RAM, 120GB SSD
+
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+
+# SSH Public Key Path (gerar com: ssh-keygen -t rsa -b 4096)
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+
+# IPs permitidos para SSH (ALTERAR para seus IPs específicos)
+allowed_ssh_ips = [
+  "0.0.0.0/0"  # ALTERAR: Substitua por seus IPs específicos
+  # Exemplos:
+  # "203.0.113.10/32",  # Seu IP de casa
+  # "198.51.100.0/24",  # Sua rede do escritório
+]
+
+# =============================================================================
+# DATABASE CONFIGURATION (NEON)
+# =============================================================================
+
+# URL de conexão do Neon PostgreSQL
+# Formato: postgresql://username:password@hostname:5432/database?sslmode=require
+neon_database_url = "postgresql://username:password@ep-hostname.us-east-1.aws.neon.tech/neondb?sslmode=require"
+
+# =============================================================================
+# APPLICATION CONFIGURATION
+# =============================================================================
+
+app_environment_vars = {
+  DJANGO_SECRET_KEY = "your-super-secret-django-key-here-change-this"
+  DJANGO_DEBUG      = "False"
+  DATABASE_URL      = "postgresql://username:password@ep-hostname.us-east-1.aws.neon.tech/neondb?sslmode=require"
+  REDIS_URL         = "redis://localhost:6379/0"
+  CACHE_URL         = "redis://localhost:6379/1"
+}
+
+# =============================================================================
+# STORAGE CONFIGURATION
+# =============================================================================
+
+enable_spaces_cdn = true
+
+spaces_cors_origins = [
+  "https://proenglish.ao",
+  "https://www.proenglish.ao",
+  "https://admin.proenglish.ao"
+]
+
+# =============================================================================
+# BACKUP CONFIGURATION
+# =============================================================================
+
+# Habilitar backups automáticos (+$6.40/mês)
+enable_backups = false  # Mudar para true se desejar backups automáticos
+
+backup_retention_days = 30
+
+# =============================================================================
+# MONITORING CONFIGURATION
+# =============================================================================
+
+alert_email = "admin@proenglish.ao"
+enable_monitoring_alerts = true
+
+# Thresholds de alerta (percentual)
+cpu_alert_threshold    = 80
+memory_alert_threshold = 85
+disk_alert_threshold   = 90
+
+# =============================================================================
+# COST CONFIGURATION
+# =============================================================================
+
+# Alerta de custo mensal (USD)
+cost_alert_threshold = 45  # $5 acima do orçamento de $40
+enable_cost_alerts   = true
+
+# =============================================================================
+# SCALING CONFIGURATION (FUTURO)
+# =============================================================================
+
+# Load Balancer para múltiplos droplets (+$10/mês)
+enable_load_balancer = false
+
+# Auto scaling (futuro)
+enable_auto_scaling = false
+
+# =============================================================================
+# TAGS CONFIGURATION
+# =============================================================================
+
+common_tags = [
+  "project:proenglish",
+  "environment:production",
+  "managed-by:terraform",
+  "cost-center:infrastructure",
+  "owner:devops-team"
+]
+
+# =============================================================================
+# EXAMPLE VALUES FOR DEVELOPMENT
+# =============================================================================
+
+# Para ambiente de desenvolvimento, você pode usar valores como:
+# 
+# project_name = "proenglish-dev"
+# environment  = "development"
+# droplet_size = "s-1vcpu-2gb"  # $16/mês para development
+# enable_backups = false
+# domain_name = "dev.proenglish.ao"

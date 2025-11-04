@@ -20,16 +20,41 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "cluster_name" {
-  description = "Nome do cluster EKS"
+# =============================================================================
+# SSH & SECURITY CONFIGURATION
+# =============================================================================
+
+variable "ssh_public_key_path" {
+  description = "Caminho para a chave SSH pública"
   type        = string
-  default     = "pro-english-eks"
+  default     = "~/.ssh/id_rsa.pub"
 }
 
-variable "cluster_version" {
-  description = "Versão do Kubernetes"
-  type        = string
-  default     = "1.31"
+# =============================================================================
+# COST OPTIMIZATION VARIABLES
+# =============================================================================
+
+variable "root_volume_size" {
+  description = "Tamanho do volume raiz em GB"
+  type        = number
+  default     = 20  # 20GB suficiente para aplicação básica
+  
+  validation {
+    condition     = var.root_volume_size >= 8 && var.root_volume_size <= 50
+    error_message = "Root volume size must be between 8 and 50 GB for budget."
+  }
+}
+
+variable "use_elastic_ip" {
+  description = "Usar Elastic IP (+$3.65/mês) - Para produção"
+  type        = bool
+  default     = false  # Para economizar, usar IP dinâmico
+}
+
+variable "enable_detailed_monitoring" {
+  description = "Habilitar monitoramento detalhado (+$2.10/mês)"
+  type        = bool
+  default     = false  # Usar monitoramento básico gratuito
 }
 
 # =============================================================================
@@ -67,26 +92,19 @@ variable "private_subnets" {
 variable "instance_type" {
   description = "Tipo de instância EC2"
   type        = string
-  default     = "t3.small"
+  default     = "t3.small"  # ~$15/mês - 2 vCPUs, 2GB RAM
+  
+  validation {
+    condition = contains([
+      "t3.micro",   # Free tier ou $8/mês
+      "t3.small",   # $15/mês - ESCOLHIDO
+      "t3.medium"   # $30/mês
+    ], var.instance_type)
+    error_message = "Instance type must be t3.micro, t3.small, or t3.medium for budget."
+  }
 }
 
-variable "min_size" {
-  description = "Capacidade mínima do Auto Scaling Group"
-  type        = number
-  default     = 1
-}
-
-variable "max_size" {
-  description = "Capacidade máxima do Auto Scaling Group"
-  type        = number
-  default     = 3
-}
-
-variable "desired_capacity" {
-  description = "Capacidade desejada do Auto Scaling Group"
-  type        = number
-  default     = 1
-}
+# Removido: Auto Scaling não necessário para configuração básica
 
 # =============================================================================
 # DATABASE CONFIGURATION (NEON)
@@ -132,57 +150,13 @@ variable "csrf_trusted_origins" {
 # APPLICATION CONFIGURATION
 # =============================================================================
 
-variable "app_image_tag" {
-  description = "Tag da imagem Docker"
-  type        = string
-  default     = "latest"
-}
-
-variable "app_replicas" {
-  description = "Número de réplicas da aplicação"
-  type        = number
-  default     = 2
-}
-
-variable "app_cpu_request" {
-  description = "CPU request para containers"
-  type        = string
-  default     = "100m"
-}
-
-variable "app_cpu_limit" {
-  description = "CPU limit para containers"
-  type        = string
-  default     = "500m"
-}
-
-variable "app_memory_request" {
-  description = "Memory request para containers"
-  type        = string
-  default     = "256Mi"
-}
-
-variable "app_memory_limit" {
-  description = "Memory limit para containers"
-  type        = string
-  default     = "1Gi"
-}
+# Removido: Configurações de containers não necessárias para configuração básica
 
 # =============================================================================
 # MONITORING & LOGGING
 # =============================================================================
 
-variable "enable_logging" {
-  description = "Habilitar CloudWatch logging"
-  type        = bool
-  default     = true
-}
-
-variable "log_retention_days" {
-  description = "Dias de retenção dos logs"
-  type        = number
-  default     = 30
-}
+# Removido: CloudWatch logging pode gerar custos extras
 
 # =============================================================================
 # TAGS
