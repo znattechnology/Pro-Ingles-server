@@ -6,6 +6,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
+from apps.subscriptions.views import user_transactions
 
 app_name = 'users'
 
@@ -34,6 +35,9 @@ urlpatterns = [
     # Email verification
     path('verify-email/', views.EmailVerificationView.as_view(), name='verify_email'),
     path('resend-verification/', views.resend_verification_email, name='resend_verification'),
+    
+    # Transactions
+    path('transactions/', user_transactions, name='user_transactions'),
     
     # Google OAuth - temporarily disabled
     # path('oauth/google/url/', views.GoogleOAuthURLView.as_view(), name='google_oauth_url'),

@@ -822,3 +822,48 @@ def get_student_quiz_summary(request, chapterId):
         'message': 'Resumo do quiz recuperado com sucesso',
         'data': summary_data
     })
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def check_course_enrollment_status(request, courseId):
+    """
+    Check if user is enrolled in a specific course.
+    
+    GET /api/v1/student/video-courses/{courseId}/enrollment-status/
+    """
+    try:
+        course = Course.objects.get(id=courseId, status='Published', course_type='video')
+    except Course.DoesNotExist:
+        return Response({
+            'error': 'Curso não encontrado ou não está publicado'
+        }, status=404)
+    
+    # Check if user is enrolled
+    is_enrolled = CourseEnrollment.objects.filter(
+        user=request.user,
+        course=course,
+        is_active=True
+    ).exists()
+    
+    # Get enrollment details if enrolled
+    enrollment_data = None
+    if is_enrolled:
+        try:
+            enrollment = CourseEnrollment.objects.get(user=request.user, course=course)
+            enrollment_data = {
+                'enrolled_at': enrollment.enrollment_date,
+                'enrollment_source': getattr(enrollment, 'enrollment_source', 'direct'),
+                'is_active': enrollment.is_active
+            }
+        except CourseEnrollment.DoesNotExist:
+            pass
+    
+    return Response({
+        'message': 'Status de inscrição verificado com sucesso',
+        'data': {
+            'course_id': str(courseId),
+            'is_enrolled': is_enrolled,
+            'enrollment_details': enrollment_data
+        }
+    })

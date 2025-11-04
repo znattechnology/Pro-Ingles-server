@@ -21,6 +21,7 @@ from .models import (
     PromotionalCode,
     PromoCodeUsage
 )
+from apps.courses.models.transactions import Transaction
 from .serializers import (
     SubscriptionPlanSerializer,
     UserSubscriptionSerializer,
@@ -593,3 +594,155 @@ def subscription_limits_status(request):
     }
     
     return Response(limits_status)
+
+
+# ========================================================================
+# BILLING AND PAYMENT HISTORY ENDPOINTS
+# ========================================================================
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_payment_history(request):
+    """
+    GET /api/v1/subscriptions/payment-history/
+    
+    Get user's subscription payment history from SubscriptionHistory model.
+    """
+    user = request.user
+    
+    # Get payment-related subscription history
+    payment_history = SubscriptionHistory.objects.filter(
+        subscription__user=user,
+        event_type__in=['CREATED', 'UPGRADED', 'DOWNGRADED', 'RENEWED', 'PAYMENT_SUCCESS'],
+        amount_paid__isnull=False
+    ).select_related('subscription', 'previous_plan', 'new_plan').order_by('-created_at')
+    
+    # Format the payment history data
+    formatted_history = []
+    for history_item in payment_history:
+        formatted_history.append({
+            'id': str(history_item.id),
+            'date': history_item.created_at.isoformat(),
+            'event_type': history_item.event_type,
+            'event_description': dict(SubscriptionHistory.EVENT_TYPES).get(history_item.event_type, history_item.event_type),
+            'amount': float(history_item.amount_paid) if history_item.amount_paid else 0,
+            'currency': 'AOA',
+            'previous_plan': {
+                'name': history_item.previous_plan.name,
+                'type': history_item.previous_plan.plan_type
+            } if history_item.previous_plan else None,
+            'new_plan': {
+                'name': history_item.new_plan.name,
+                'type': history_item.new_plan.plan_type
+            } if history_item.new_plan else None,
+            'notes': history_item.notes,
+            'subscription_id': str(history_item.subscription.id)
+        })
+    
+    # Get summary statistics
+    total_payments = payment_history.aggregate(
+        total_amount=Sum('amount_paid'),
+        payment_count=Count('id')
+    )
+    
+    # Get current subscription info
+    try:
+        current_subscription = UserSubscription.objects.get(user=user)
+        current_plan = {
+            'name': current_subscription.plan.name,
+            'type': current_subscription.plan.plan_type,
+            'status': current_subscription.status,
+            'expires_at': current_subscription.expires_at.isoformat() if current_subscription.expires_at else None,
+            'next_billing_date': current_subscription.next_billing_date.isoformat() if current_subscription.next_billing_date else None
+        }
+    except UserSubscription.DoesNotExist:
+        current_plan = None
+    
+    return Response({
+        'payment_history': formatted_history,
+        'summary': {
+            'total_amount_paid': float(total_payments['total_amount'] or 0),
+            'total_payments': total_payments['payment_count'] or 0,
+            'currency': 'AOA'
+        },
+        'current_subscription': current_plan
+    })
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_transactions(request):
+    """
+    GET /api/v1/users/transactions/
+    
+    Get user's course purchase transactions from Transaction model.
+    """
+    user = request.user
+    
+    # Get user's transactions
+    transactions = Transaction.objects.filter(
+        user=user
+    ).select_related('course').order_by('-dateTime')
+    
+    # Format the transactions data
+    formatted_transactions = []
+    for transaction in transactions:
+        formatted_transactions.append({
+            'id': str(transaction.id),
+            'transaction_id': transaction.transactionId,
+            'date': transaction.dateTime.isoformat(),
+            'amount': float(transaction.amount),
+            'currency': transaction.currency,
+            'status': transaction.status,
+            'status_display': dict(Transaction.STATUS_CHOICES).get(transaction.status, transaction.status),
+            'payment_provider': transaction.paymentProvider,
+            'course': {
+                'id': str(transaction.course.id),
+                'title': transaction.course.title,
+                'description': transaction.course.description
+            } if transaction.course else None,
+            'payment_intent_id': transaction.payment_intent_id,
+            'platform_fee': float(transaction.platform_fee),
+            'payment_fee': float(transaction.payment_fee),
+            'net_amount': float(transaction.get_net_amount()),
+            'refunded_amount': float(transaction.refunded_amount),
+            'refunded_at': transaction.refunded_at.isoformat() if transaction.refunded_at else None,
+            'refund_reason': transaction.refund_reason,
+            'is_successful': transaction.is_successful(),
+            'is_refundable': transaction.is_refundable(),
+            'refundable_amount': float(transaction.get_refundable_amount())
+        })
+    
+    # Get summary statistics
+    total_stats = transactions.aggregate(
+        total_amount=Sum('amount'),
+        successful_count=Count('id', filter=Q(status='completed')),
+        total_count=Count('id'),
+        total_refunded=Sum('refunded_amount')
+    )
+    
+    # Get spending by status
+    status_breakdown = transactions.values('status').annotate(
+        count=Count('id'),
+        total_amount=Sum('amount')
+    ).order_by('status')
+    
+    return Response({
+        'transactions': formatted_transactions,
+        'summary': {
+            'total_amount': float(total_stats['total_amount'] or 0),
+            'total_transactions': total_stats['total_count'] or 0,
+            'successful_transactions': total_stats['successful_count'] or 0,
+            'total_refunded': float(total_stats['total_refunded'] or 0),
+            'currency': 'EUR'  # Default currency from Transaction model
+        },
+        'status_breakdown': [
+            {
+                'status': item['status'],
+                'status_display': dict(Transaction.STATUS_CHOICES).get(item['status'], item['status']),
+                'count': item['count'],
+                'total_amount': float(item['total_amount'] or 0)
+            }
+            for item in status_breakdown
+        ]
+    })

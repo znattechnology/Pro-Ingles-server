@@ -15,6 +15,9 @@ urlpatterns = [
     path('', views.CourseListView.as_view(), name='course_list'),
     path('<uuid:courseId>/', views.CourseDetailView.as_view(), name='course_detail'),
     
+    # Course enrollment status
+    path('<uuid:courseId>/enrollment-status/', views.check_course_enrollment_status, name='enrollment_status'),
+    
     # Course sections (read-only for students)
     path('<uuid:courseId>/sections/', views.CourseSectionListView.as_view(), name='section_list'),
     path('sections/<uuid:sectionId>/', views.CourseSectionDetailView.as_view(), name='section_detail'),

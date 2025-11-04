@@ -148,4 +148,15 @@ urlpatterns = [
         views.subscription_limits_status, 
         name='subscription_limits_status'
     ),
+    
+    # ========================================================================
+    # BILLING ENDPOINTS - Histórico de pagamentos e transações
+    # ========================================================================
+    
+    # Histórico de pagamentos de assinatura
+    path(
+        'payment-history/', 
+        views.user_payment_history, 
+        name='user-payment-history'
+    ),
 ]
