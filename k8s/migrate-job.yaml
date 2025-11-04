@@ -1,0 +1,179 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-migrate
+  namespace: default
+  labels:
+    app: django
+    component: migration
+    job-type: database-migration
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app: django
+        component: migration
+        job-type: database-migration
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: django-service-account
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: migrate
+        image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/tuwi-backend:{{IMAGE_TAG}}
+        imagePullPolicy: Always
+        command: 
+          - "/bin/sh"
+          - "-c"
+          - |
+            echo "🚀 Iniciando migração do banco de dados..."
+            echo "📊 Verificando conexão com PostgreSQL Neon..."
+            
+            # Test database connection
+            python manage.py check --database default
+            
+            if [ $? -eq 0 ]; then
+              echo "✅ Conexão com banco estabelecida"
+              
+              echo "📝 Executando migrações..."
+              python manage.py migrate --noinput
+              
+              if [ $? -eq 0 ]; then
+                echo "✅ Migrações executadas com sucesso"
+                
+                echo "🔍 Verificando estado das migrações..."
+                python manage.py showmigrations
+                
+                echo "📊 Coletando arquivos estáticos..."
+                python manage.py collectstatic --noinput --clear
+                
+                echo "🎉 Migração concluída com sucesso!"
+              else
+                echo "❌ Erro nas migrações"
+                exit 1
+              fi
+            else
+              echo "❌ Falha na conexão com banco de dados"
+              exit 1
+            fi
+        
+        env:
+          # Database Configuration (Neon PostgreSQL)
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: django-secrets
+                key: DATABASE_URL
+          - name: DATABASE_SSL_REQUIRE
+            value: "true"
+          
+          # Django Configuration
+          - name: DJANGO_SETTINGS_MODULE
+            value: "core.settings"
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: django-secrets
+                key: SECRET_KEY
+          - name: DEBUG
+            value: "False"
+          - name: ALLOWED_HOSTS
+            valueFrom:
+              secretKeyRef:
+                name: django-secrets
+                key: ALLOWED_HOSTS
+        
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+              - ALL
+        
+        volumeMounts:
+          - name: temp-storage
+            mountPath: /tmp
+      
+      volumes:
+        - name: temp-storage
+          emptyDir: {}
+
+---
+# =============================================================================
+# COLLECTSTATIC JOB - ARQUIVOS ESTÁTICOS
+# =============================================================================
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: django-collectstatic
+  namespace: default
+  labels:
+    app: django
+    component: static-files
+    job-type: collectstatic
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    metadata:
+      labels:
+        app: django
+        component: static-files
+        job-type: collectstatic
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: django-service-account
+      containers:
+      - name: collectstatic
+        image: <AWS_ACCOUNT_ID>.dkr.ecr.<AWS_REGION>.amazonaws.com/tuwi-backend:{{IMAGE_TAG}}
+        imagePullPolicy: Always
+        command: 
+          - "/bin/sh"
+          - "-c"
+          - |
+            echo "📊 Coletando arquivos estáticos..."
+            python manage.py collectstatic --noinput --clear
+            echo "✅ Arquivos estáticos coletados com sucesso!"
+        
+        env:
+          - name: DJANGO_SETTINGS_MODULE
+            value: "core.settings"
+          - name: SECRET_KEY
+            valueFrom:
+              secretKeyRef:
+                name: django-secrets
+                key: SECRET_KEY
+          - name: DEBUG
+            value: "False"
+        
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+        
+        volumeMounts:
+          - name: static-files
+            mountPath: /app/staticfiles
+      
+      volumes:
+        - name: static-files
+          emptyDir: {}

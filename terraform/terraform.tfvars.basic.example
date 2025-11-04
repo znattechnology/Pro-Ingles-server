@@ -1,0 +1,165 @@
+# =============================================================================
+# AWS BASIC TERRAFORM VARIABLES - PROENGLISH PLATFORM
+# Budget: $40/month | Rename this file to terraform.tfvars
+# =============================================================================
+
+# =============================================================================
+# PROJECT CONFIGURATION
+# =============================================================================
+
+project     = "proenglish"
+environment = "production"
+aws_region  = "us-east-1"  # Região mais barata
+
+# =============================================================================
+# EC2 CONFIGURATION
+# =============================================================================
+
+instance_type = "t3.small"  # $15.18/mês - 2 vCPUs, 2GB RAM (RECOMENDADO)
+# instance_type = "t3.micro"   # $8.76/mês - 1 vCPU, 1GB RAM (mais econômico)
+
+root_volume_size = 20  # 20GB suficiente para aplicação básica
+
+# =============================================================================
+# SSH CONFIGURATION
+# =============================================================================
+
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+
+# IMPORTANTE: Altere para seu IP específico por segurança
+# Descubra seu IP em: https://whatismyipaddress.com/
+# allowed_ssh_ips = ["SEU.IP.AQUI/32"]
+
+# =============================================================================
+# DATABASE CONFIGURATION (NEON POSTGRESQL)
+# =============================================================================
+
+# URL de conexão do Neon PostgreSQL (OBRIGATÓRIO)
+# Formato: postgresql://username:password@hostname:5432/database?sslmode=require
+neon_database_url = "postgresql://username:password@ep-hostname.region.aws.neon.tech/database?sslmode=require"
+
+# =============================================================================
+# DJANGO CONFIGURATION
+# =============================================================================
+
+# Gere uma chave secreta forte: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+django_secret_key = "sua-chave-secreta-django-muito-longa-e-aleatoria-aqui"
+
+django_debug     = "False"
+allowed_hosts    = "*"
+
+cors_allowed_origins = [
+  "https://proenglish.ao",
+  "https://www.proenglish.ao",
+  "http://localhost:3000"
+]
+
+csrf_trusted_origins = [
+  "https://proenglish.ao",
+  "https://www.proenglish.ao"
+]
+
+# =============================================================================
+# COST OPTIMIZATION SETTINGS
+# =============================================================================
+
+# Elastic IP (+$3.65/mês) - Desabilitado para economizar
+use_elastic_ip = false
+
+# Monitoramento detalhado (+$2.10/mês) - Desabilitado para economizar
+enable_detailed_monitoring = false
+
+# =============================================================================
+# TAGS CONFIGURATION
+# =============================================================================
+
+common_tags = {
+  Project     = "ProEnglish-Backend"
+  Environment = "production"
+  ManagedBy   = "Terraform"
+  Owner       = "DevOps-Team"
+  CostCenter  = "Infrastructure"
+  Budget      = "40USD-Monthly"
+}
+
+# =============================================================================
+# EXAMPLE VALUES FOR DIFFERENT ENVIRONMENTS
+# =============================================================================
+
+# Para ambiente de desenvolvimento (mais barato):
+# instance_type = "t3.micro"      # $8.76/mês
+# root_volume_size = 10           # 10GB mínimo
+# environment = "development"
+
+# Para ambiente de staging:
+# instance_type = "t3.small"      # $15.18/mês
+# root_volume_size = 20           # 20GB
+# environment = "staging"
+
+# Para produção com mais recursos:
+# instance_type = "t3.medium"     # $30.36/mês
+# root_volume_size = 30           # 30GB
+# use_elastic_ip = true           # IP fixo
+# environment = "production"
+
+# =============================================================================
+# PASSOS PARA CONFIGURAR
+# =============================================================================
+
+# 1. Copie este arquivo como terraform.tfvars:
+#    cp terraform.tfvars.basic.example terraform.tfvars
+
+# 2. Edite terraform.tfvars com seus valores reais:
+#    - neon_database_url: URL do seu banco Neon
+#    - django_secret_key: Chave secreta do Django
+#    - ssh_public_key_path: Caminho para sua chave SSH pública
+
+# 3. Execute Terraform:
+#    terraform init
+#    terraform plan
+#    terraform apply
+
+# 4. Acesse a aplicação:
+#    - SSH: ssh -i ~/.ssh/id_rsa ec2-user@<IP_DA_INSTANCIA>
+#    - App: http://<IP_DA_INSTANCIA>:8000
+
+# =============================================================================
+# CUSTOS ESTIMADOS
+# =============================================================================
+
+# 💰 BREAKDOWN DE CUSTOS MENSAIS:
+# 
+# 🖥️  EC2 t3.small (2 vCPUs, 2GB):  $15.18
+# 💾 EBS 20GB (gp3):                 $2.00
+# ☁️  S3 storage básico:              $1.00
+# 🌐 Data transfer:                  $3.00
+# ──────────────────────────────────────────
+# 📊 TOTAL ESTIMADO:                 ~$22/mês
+# 🎯 ORÇAMENTO DISPONÍVEL:            $40/mês
+# ✅ MARGEM DE SEGURANÇA:             $18/mês
+
+# =============================================================================
+# PRÓXIMOS PASSOS APÓS DEPLOY
+# =============================================================================
+
+# 1. Conectar ao servidor:
+#    ssh -i ~/.ssh/id_rsa ec2-user@<IP>
+
+# 2. Verificar status da instalação:
+#    sudo tail -f /var/log/cloud-init-output.log
+
+# 3. Upload do código Django:
+#    scp -r -i ~/.ssh/id_rsa ./seu_projeto/ ec2-user@<IP>:/opt/proenglish/app/
+
+# 4. Configurar .env:
+#    sudo nano /opt/proenglish/.env
+
+# 5. Iniciar aplicação:
+#    sudo systemctl start proenglish
+#    sudo systemctl enable proenglish
+
+# 6. Verificar status:
+#    /opt/proenglish/scripts/status.sh
+
+# 7. Acessar aplicação:
+#    http://<IP>:8000

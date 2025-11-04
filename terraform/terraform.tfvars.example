@@ -1,0 +1,54 @@
+# =============================================================================
+# TERRAFORM VARIABLES - EXEMPLO DE CONFIGURAÇÃO
+# =============================================================================
+# Copie este arquivo para terraform.tfvars e configure os valores
+
+# Projeto e Ambiente
+project     = "tuwi"
+environment = "production"
+aws_region  = "eu-west-1"
+
+# EKS Configuration
+cluster_name    = "tuwi-eks"
+cluster_version = "1.31"
+
+# Network Configuration
+vpc_cidr            = "10.0.0.0/16"
+availability_zones  = ["eu-west-1a", "eu-west-1b", "eu-west-1c"]
+public_subnets      = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+private_subnets     = ["10.0.10.0/24", "10.0.11.0/24", "10.0.12.0/24"]
+
+# Node Group Configuration
+node_group_desired_capacity = 2
+node_group_max_capacity     = 5
+node_group_min_capacity     = 1
+node_instance_types         = ["t3.medium"]
+
+# Database Configuration (Neon PostgreSQL)
+neon_database_url = "postgresql://neondb_owner:your_password@ep-divine-dew-agc1ldk8-pooler.c-2.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+
+# Django Configuration
+django_secret_key = "your-super-secret-django-key-here"
+django_debug      = "False"
+allowed_hosts     = "api.tuwi.com,www.tuwi.com"
+
+# Application Configuration
+app_image_tag      = "latest"
+app_replicas       = 2
+app_cpu_request    = "100m"
+app_cpu_limit      = "500m"
+app_memory_request = "256Mi"
+app_memory_limit   = "1Gi"
+
+# Monitoring
+enable_logging       = true
+log_retention_days   = 30
+
+# Tags
+common_tags = {
+  Project     = "Tuwi-Backend"
+  Environment = "production"
+  ManagedBy   = "Terraform"
+  Owner       = "DevOps-Team"
+  CostCenter  = "Engineering"
+}

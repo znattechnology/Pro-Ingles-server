@@ -1,0 +1,144 @@
+# =============================================================================
+# STAGING NAMESPACE - AMBIENTE DE DESENVOLVIMENTO
+# =============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+  labels:
+    name: staging
+    environment: staging
+    project: tuwi-backend
+  annotations:
+    description: "Ambiente de staging para Tuwi-Backend"
+
+---
+# =============================================================================
+# RESOURCE QUOTA - LIMITES DO STAGING
+# =============================================================================
+
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: staging-quota
+  namespace: staging
+  labels:
+    environment: staging
+    project: tuwi-backend
+spec:
+  hard:
+    # Compute Resources
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
+    
+    # Storage
+    requests.storage: 10Gi
+    
+    # Object Count
+    count/pods: "10"
+    count/services: "5"
+    count/secrets: "10"
+    count/configmaps: "10"
+    count/persistentvolumeclaims: "2"
+    
+    # Load Balancers
+    count/services.loadbalancers: "1"
+
+---
+# =============================================================================
+# LIMIT RANGE - LIMITES POR POD
+# =============================================================================
+
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: staging-limits
+  namespace: staging
+  labels:
+    environment: staging
+    project: tuwi-backend
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "200m"
+        memory: "256Mi"
+      defaultRequest:
+        cpu: "50m"
+        memory: "128Mi"
+      max:
+        cpu: "1"
+        memory: "1Gi"
+      min:
+        cpu: "10m"
+        memory: "64Mi"
+    
+    - type: Pod
+      max:
+        cpu: "2"
+        memory: "2Gi"
+    
+    - type: PersistentVolumeClaim
+      min:
+        storage: "1Gi"
+      max:
+        storage: "5Gi"
+
+---
+# =============================================================================
+# NETWORK POLICY - ISOLAMENTO DE REDE
+# =============================================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: staging-network-policy
+  namespace: staging
+  labels:
+    environment: staging
+    project: tuwi-backend
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  
+  ingress:
+    # Permitir tráfego do namespace staging
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: staging
+    
+    # Permitir tráfego do ALB/Ingress
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+      ports:
+      - protocol: TCP
+        port: 8000
+  
+  egress:
+    # Permitir DNS
+    - to: []
+      ports:
+      - protocol: UDP
+        port: 53
+      - protocol: TCP
+        port: 53
+    
+    # Permitir HTTPS para APIs externas
+    - to: []
+      ports:
+      - protocol: TCP
+        port: 443
+    
+    # Permitir PostgreSQL Neon
+    - to: []
+      ports:
+      - protocol: TCP
+        port: 5432

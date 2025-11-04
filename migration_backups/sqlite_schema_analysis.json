@@ -1,0 +1,9009 @@
+{
+  "tables": {
+    "auth_group": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "varchar(150)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "auth_group_permissions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "group_id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "permission_id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "auth_permission": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "content_type_id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "codename",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 280
+    },
+    "chapter_comments": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "chapter_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_resolved",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "parent_comment_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "chapter_progress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "completed",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "chapter_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_progress_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "attempts",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "best_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "time_spent",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 39
+    },
+    "chapter_quizzes": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points_reward",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "hearts_cost",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "passing_score",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "time_limit",
+          "type": "integer unsigned",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "max_attempts",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_attempts",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_completions",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "average_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "chapter_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_by_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "practice_lesson_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "allow_review",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "available_from",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "available_until",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "difficulty",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "metadata",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "randomize_questions",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "show_correct_answers",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "chapter_resource_tags": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "resource_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "tag_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "chapter_resources": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "resource_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "file",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "external_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "file_size",
+          "type": "integer unsigned",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "download_count",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_featured",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "chapter_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_by_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "access_level",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "available_from",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "available_until",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "file_format",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_downloadable",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "metadata",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "view_count",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 28
+    },
+    "chapters": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "title",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "content",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "video",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "section_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "practice_lesson_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "quiz_enabled",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "resources_data",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "transcript",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "metadata",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "quiz_data",
+          "type": "TEXT",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "practice_selection",
+          "type": "TEXT",
+          "not_null": 0,
+          "pk": 0
+        }
+      ],
+      "row_count": 77
+    },
+    "cms_calltoaction": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "subtitle",
+          "type": "varchar(300)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "primary_button_text",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "primary_button_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "secondary_button_text",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "secondary_button_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "icon",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "background_image",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "gradient_from",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "gradient_to",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "section",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_company": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "logo",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "website_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "category",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "show_in_hero",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "show_in_ticker",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 9
+    },
+    "cms_faqitem": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "question",
+          "type": "varchar(300)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "answer",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "category",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "keywords",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_featured",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_feature": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "icon",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "gradient_from",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "gradient_to",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "background_image",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "benefits",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "use_cases",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "grid_column_span",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_highlighted",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_herosection": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "badge_text",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "badge_is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "headline",
+          "type": "varchar(300)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "headline_highlight",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "primary_cta_text",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "primary_cta_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "secondary_cta_text",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "secondary_cta_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "social_proof_text",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "rating_value",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "rating_count",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "hero_image",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "background_video",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 1
+    },
+    "cms_landingpagesettings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "site_title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "site_description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "meta_keywords",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "contact_email",
+          "type": "varchar(254)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "contact_phone",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "whatsapp_number",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "facebook_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "instagram_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "linkedin_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "youtube_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "google_analytics_id",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "facebook_pixel_id",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "maintenance_mode",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "maintenance_message",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 1
+    },
+    "cms_pricingtier": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "subtitle",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "icon",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "monthly_price",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "yearly_price",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "yearly_discount_text",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "promotional_badge",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "angola_benefit",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "features",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "button_text",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "button_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_popular",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_inverse_design",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "gradient_from",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "gradient_to",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 3
+    },
+    "cms_seosettings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "page_type",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "meta_title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "meta_description",
+          "type": "varchar(300)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "meta_keywords",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "canonical_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "og_title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "og_description",
+          "type": "varchar(300)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "og_image",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "og_type",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "twitter_card",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "twitter_title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "twitter_description",
+          "type": "varchar(300)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "twitter_image",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "schema_markup",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "index_page",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "follow_links",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 1
+    },
+    "cms_serviceitem": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "subtitle",
+          "type": "varchar(300)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "icon",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "student_count",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "level",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "duration",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "certification",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "service_image",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "gradient_from",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "gradient_to",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "features",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "curriculum_topics",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_featured",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "service_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 7
+    },
+    "cms_serviceitem_target_companies": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "serviceitem_id",
+          "type": "bigint",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "company_id",
+          "type": "bigint",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "cms_statitem": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "value",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "label",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "icon",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "section",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 3
+    },
+    "cms_testimonial": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "location",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "avatar",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "result_achieved",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "rating",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "sector",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "date_given",
+          "type": "date",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "verified",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_featured",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "company_id",
+          "type": "bigint",
+          "not_null": 0,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "core_address": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "street",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "city",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "postal_code",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "district",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "country",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "building_number",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "apartment",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "floor",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "additional_info",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "course_enrollments": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "enrollment_date",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "enrollment_source",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 10
+    },
+    "course_sections": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "sectionTitle",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "sectionDescription",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 27
+    },
+    "courses": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "teacherName",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "title",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "category",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "image",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "level",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "teacher_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "template",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 72
+    },
+    "email_verifications": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "code",
+          "type": "varchar(6)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "email",
+          "type": "varchar(254)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_used",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "attempts",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "max_attempts",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 8
+    },
+    "enrollment_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "action",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "details",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "enrollment_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "performed_by_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "notification_settings": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "email_bookings",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "email_messages",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "email_ratings",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "email_orders",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "email_marketing",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "push_bookings",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "push_messages",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "push_ratings",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "push_orders",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "digest_frequency",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "quiet_hours_start",
+          "type": "time",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "quiet_hours_end",
+          "type": "time",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "timezone",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 26
+    },
+    "payment_methods": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_four",
+          "type": "varchar(4)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "card_brand",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "exp_month",
+          "type": "integer unsigned",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "exp_year",
+          "type": "integer unsigned",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "provider_id",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "provider",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_default",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_achievement": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "icon",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "category",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "rarity",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "requirement_type",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "requirement_target",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "requirement_unit",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_secret",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 20
+    },
+    "practice_achievementcategory": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "display_name",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "icon_class",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "color",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 5
+    },
+    "practice_achievementnotification": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "is_read",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_celebrated",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "read_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "achievement_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 27
+    },
+    "practice_audiosegment": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "start_time",
+          "type": "bigint",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "end_time",
+          "type": "bigint",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "segment_transcript",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "difficulty_rating",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "speech_rate",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "vocabulary_complexity",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "focused_grammar_points",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "key_phrases",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "cultural_context",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "listening_exercise_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_challengeoption": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "text",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_correct",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "image_url",
+          "type": "varchar(200)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "audio_url",
+          "type": "varchar(200)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "challenge_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 37
+    },
+    "practice_challengeprogress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "completed",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "challenge_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 11
+    },
+    "practice_competition": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "start_date",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "end_date",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "min_points_to_participate",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "max_participants",
+          "type": "integer unsigned",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "first_place_prize",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "second_place_prize",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "third_place_prize",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 2
+    },
+    "practice_competitionparticipant": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "points_earned",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "challenges_completed",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "lessons_completed",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "streak_days",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "current_rank",
+          "type": "integer unsigned",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "best_rank",
+          "type": "integer unsigned",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "joined_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "competition_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 24
+    },
+    "practice_leaderboardsnapshot": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "snapshot_date",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "snapshot_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "rank",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "league",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "rank_change",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points_change",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_leaguepromotion": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "from_league",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "to_league",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points_at_promotion",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "promoted_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 12
+    },
+    "practice_listeningattempt": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "attempt_number",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "attempt_type",
+          "type": "varchar(25)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "question_text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "question_index",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_answer",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "correct_answer",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_correct",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "partial_credit",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "similarity_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "time_to_answer",
+          "type": "bigint",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "audio_replays_before_answer",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "feedback_text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "hints_used",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "session_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_listeningexercise": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "exercise_type",
+          "type": "varchar(25)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "difficulty",
+          "type": "varchar(15)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "accent_type",
+          "type": "varchar(15)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "audio_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "audio_duration",
+          "type": "bigint",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "transcript",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "allow_replay",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "max_replays",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "playback_speeds",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "questions",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "correct_answers",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "key_vocabulary",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "vocabulary_definitions",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points_reward",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "hearts_cost",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "minimum_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_by_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "practice_lesson_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "auto_generated",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_course_specific",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "lesson_context",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_listeningprogress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "total_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_hours_listened",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_audio_content",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "avg_comprehension_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "avg_dictation_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "avg_vocabulary_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "overall_listening_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "beginner_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "intermediate_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "advanced_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "american_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "british_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "other_accents_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "preferred_speed",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "speeds_comfort_level",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "strong_exercise_types",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "weak_exercise_types",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "difficult_vocabulary",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "mastered_vocabulary",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "recommended_exercises",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "suggested_focus_areas",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "current_listening_streak",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "longest_listening_streak",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "perfect_comprehension_count",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_session_date",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_listeningsession": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "status",
+          "type": "varchar(15)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "started_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "total_duration",
+          "type": "bigint",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "audio_replays_used",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "playback_speed_used",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_answers",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "dictation_attempts",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "comprehension_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "accuracy_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "vocabulary_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "overall_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "points_earned",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "hearts_used",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_passed",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "detailed_feedback",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "improvement_areas",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "exercise_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "practice_practicechallenge": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "question",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "lesson_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "conversation_context",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "minimum_speaking_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "target_pronunciation",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "speaking_exercise_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "audio_content_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "audio_transcript",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "listening_questions",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "minimum_listening_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "type",
+          "type": "varchar(25)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "listening_exercise_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        }
+      ],
+      "row_count": 12
+    },
+    "practice_practicelesson": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "unit_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 13
+    },
+    "practice_practiceunit": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 10
+    },
+    "practice_speakingexercise": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "title",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "exercise_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "difficulty",
+          "type": "varchar(15)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "target_text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "conversation_prompt",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "vocabulary_words",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "pronunciation_weight",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "fluency_weight",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "accuracy_weight",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points_reward",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "hearts_cost",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "minimum_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_by_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "practice_lesson_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "auto_generated",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_course_specific",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "lesson_context",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        }
+      ],
+      "row_count": 3
+    },
+    "practice_speakingprogress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "total_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_hours_practiced",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_words_spoken",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "average_pronunciation",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "average_fluency",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "average_accuracy",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "overall_average",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "beginner_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "intermediate_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "advanced_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "current_streak",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "longest_streak",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "weak_phonemes",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "strong_areas",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "practice_recommendations",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_session_date",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 1
+    },
+    "practice_speakingsession": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "status",
+          "type": "varchar(15)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "started_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "total_duration",
+          "type": "bigint",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "turns_count",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "overall_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "pronunciation_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "fluency_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "accuracy_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "points_earned",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "hearts_used",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_passed",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "ai_feedback",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "improvement_suggestions",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "exercise_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 1
+    },
+    "practice_speakingturn": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "turn_number",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "turn_type",
+          "type": "varchar(15)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "timestamp",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "audio_url",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "transcribed_text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "target_text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "ai_response_text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "pronunciation_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "fluency_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "accuracy_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "confidence_score",
+          "type": "REAL",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "words_analysis",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "pronunciation_errors",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "grammar_errors",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "duration",
+          "type": "bigint",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "session_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 1
+    },
+    "practice_userachievement": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "is_unlocked",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "current_progress",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "unlocked_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "achievement_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 82
+    },
+    "practice_userleague": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "current_league",
+          "type": "varchar(10)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points_when_promoted",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "promoted_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 26
+    },
+    "practice_userprogress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "hearts",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_image_src",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "active_course_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "average_fluency_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "average_pronunciation_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_speaking_session",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "speaking_streak_days",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_speaking_minutes",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_speaking_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "average_comprehension_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "average_dictation_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_listening_session",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "listening_streak_days",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_listening_minutes",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_listening_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 26
+    },
+    "practice_userstreak": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "current_streak",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "longest_streak",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_practice_date",
+          "type": "date",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 26
+    },
+    "quiz_questions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "metadata",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "question_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "question_text",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "image",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "audio",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "options",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "explanation",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "quiz_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "resource_access_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "access_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "ip_address",
+          "type": "char(39)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "user_agent",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "referrer",
+          "type": "varchar(200)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "session_id",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "resource_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "resource_categories": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "color",
+          "type": "varchar(7)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "icon",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "order",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "resource_tags": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "color",
+          "type": "varchar(7)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "student_quiz_attempts": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "score",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "max_score",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "time_taken",
+          "type": "integer unsigned",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "hearts_lost",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "points_earned",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_completed",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_passed",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "attempt_number",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "completed_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "chapter_quiz_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "practice_progress_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "student_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "answers_data",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "metadata",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "started_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "subscriptions_promocodeusage": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "discount_applied",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "used_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "promo_code_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "subscription_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "subscriptions_promotionalcode": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "code",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "discount_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "discount_value",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "max_uses",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "current_uses",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "valid_from",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "valid_until",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "first_time_users_only",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "subscriptions_promotionalcode_applicable_plans": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "promotionalcode_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "subscriptionplan_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "subscriptions_subscriptionhistory": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "event_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "amount_paid",
+          "type": "decimal",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "notes",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "new_plan_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "previous_plan_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "subscription_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "subscriptions_subscriptionplan": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "name",
+          "type": "varchar(100)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "plan_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "monthly_price",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "yearly_price",
+          "type": "decimal",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "daily_lessons_limit",
+          "type": "INTEGER",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "daily_speaking_minutes",
+          "type": "INTEGER",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "daily_listening_minutes",
+          "type": "INTEGER",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "hearts_limit",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "hearts_recharge_hours",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "offline_downloads",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "certificates",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "ai_tutor",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "native_teacher_sessions",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "advanced_analytics",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "priority_support",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "streak_freeze",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "multiple_devices",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "sort_order",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 3
+    },
+    "subscriptions_usersubscription": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "status",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "started_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "expires_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "canceled_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "trial_ends_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "stripe_subscription_id",
+          "type": "varchar(200)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "stripe_customer_id",
+          "type": "varchar(200)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "last_payment_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "next_billing_date",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "daily_lessons_used",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "daily_speaking_minutes_used",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "daily_listening_minutes_used",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "current_hearts",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_heart_recharge",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "plan_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_reset_date",
+          "type": "date",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 1
+    },
+    "transaction_logs": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "action",
+          "type": "varchar(50)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "decimal",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "details",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "provider_reference",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "performed_by_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "transaction_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "transactions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "transactionId",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "dateTime",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "amount",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "paymentProvider",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "currency",
+          "type": "varchar(3)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "ip_address",
+          "type": "char(39)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "metadata",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "payment_fee",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "payment_intent_id",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "platform_fee",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "refund_reason",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "refunded_amount",
+          "type": "decimal",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "refunded_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "status",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_agent",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 11
+    },
+    "user_addresses": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "address_type",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_default",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "address_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "user_course_progress": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "enrollmentDate",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "overallProgress",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "lastAccessedTimestamp",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "course_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "completion_date",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "current_chapter_id",
+          "type": "char(32)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "total_time_spent",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "avg_listening_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "avg_speaking_score",
+          "type": "REAL",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "listening_practice_progress",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "speaking_practice_progress",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_listening_sessions",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "total_speaking_sessions",
+          "type": "integer unsigned",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 10
+    },
+    "users": {
+      "columns": [
+        {
+          "name": "password",
+          "type": "varchar(128)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_login",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "is_superuser",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "username",
+          "type": "varchar(150)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "first_name",
+          "type": "varchar(150)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_name",
+          "type": "varchar(150)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "is_staff",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "date_joined",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "email",
+          "type": "varchar(254)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "name",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "phone",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "avatar",
+          "type": "varchar(100)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "email_verified",
+          "type": "bool",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "email_verification_token",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "reset_password_token",
+          "type": "varchar(255)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "reset_password_expires",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "created_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "updated_at",
+          "type": "datetime",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "last_login_at",
+          "type": "datetime",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "preferences",
+          "type": "TEXT",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "google_id",
+          "type": "varchar(255)",
+          "not_null": 0,
+          "pk": 0
+        },
+        {
+          "name": "role",
+          "type": "varchar(20)",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 26
+    },
+    "users_groups": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "group_id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    },
+    "users_user_permissions": {
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 1
+        },
+        {
+          "name": "user_id",
+          "type": "char(32)",
+          "not_null": 1,
+          "pk": 0
+        },
+        {
+          "name": "permission_id",
+          "type": "INTEGER",
+          "not_null": 1,
+          "pk": 0
+        }
+      ],
+      "row_count": 0
+    }
+  },
+  "foreign_keys": {
+    "auth_group_permissions": [
+      [
+        0,
+        0,
+        "auth_permission",
+        "permission_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "auth_group",
+        "group_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "auth_permission": [
+      [
+        0,
+        0,
+        "django_content_type",
+        "content_type_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "chapter_comments": [
+      [
+        0,
+        0,
+        "chapter_comments",
+        "parent_comment_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "chapters",
+        "chapter_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "chapter_progress": [
+      [
+        0,
+        0,
+        "user_course_progress",
+        "user_progress_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "chapters",
+        "chapter_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "chapter_quizzes": [
+      [
+        0,
+        0,
+        "practice_practicelesson",
+        "practice_lesson_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "users",
+        "created_by_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "chapters",
+        "chapter_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "chapter_resource_tags": [
+      [
+        0,
+        0,
+        "resource_tags",
+        "tag_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "chapter_resources",
+        "resource_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "chapter_resources": [
+      [
+        0,
+        0,
+        "users",
+        "created_by_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "chapters",
+        "chapter_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "chapters": [
+      [
+        0,
+        0,
+        "practice_practicelesson",
+        "practice_lesson_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "course_sections",
+        "section_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "cms_serviceitem_target_companies": [
+      [
+        0,
+        0,
+        "cms_company",
+        "company_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "cms_serviceitem",
+        "serviceitem_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "cms_testimonial": [
+      [
+        0,
+        0,
+        "cms_company",
+        "company_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "course_enrollments": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "courses",
+        "course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "course_sections": [
+      [
+        0,
+        0,
+        "courses",
+        "course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "courses": [
+      [
+        0,
+        0,
+        "users",
+        "teacher_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "email_verifications": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "enrollment_logs": [
+      [
+        0,
+        0,
+        "users",
+        "performed_by_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "course_enrollments",
+        "enrollment_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "notification_settings": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "payment_methods": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_achievementnotification": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_achievement",
+        "achievement_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_audiosegment": [
+      [
+        0,
+        0,
+        "practice_listeningexercise",
+        "listening_exercise_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_challengeoption": [
+      [
+        0,
+        0,
+        "practice_practicechallenge",
+        "challenge_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_challengeprogress": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_practicechallenge",
+        "challenge_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_competitionparticipant": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_competition",
+        "competition_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_leaderboardsnapshot": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_leaguepromotion": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_listeningattempt": [
+      [
+        0,
+        0,
+        "practice_listeningsession",
+        "session_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_listeningexercise": [
+      [
+        0,
+        0,
+        "courses",
+        "course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_practicelesson",
+        "practice_lesson_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "users",
+        "created_by_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_listeningprogress": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_listeningsession": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_listeningexercise",
+        "exercise_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_practicechallenge": [
+      [
+        0,
+        0,
+        "practice_listeningexercise",
+        "listening_exercise_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_speakingexercise",
+        "speaking_exercise_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "practice_practicelesson",
+        "lesson_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_practicelesson": [
+      [
+        0,
+        0,
+        "practice_practiceunit",
+        "unit_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_practiceunit": [
+      [
+        0,
+        0,
+        "courses",
+        "course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_speakingexercise": [
+      [
+        0,
+        0,
+        "courses",
+        "course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_practicelesson",
+        "practice_lesson_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "users",
+        "created_by_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_speakingprogress": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_speakingsession": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_speakingexercise",
+        "exercise_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_speakingturn": [
+      [
+        0,
+        0,
+        "practice_speakingsession",
+        "session_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_userachievement": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_achievement",
+        "achievement_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_userleague": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_userprogress": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "courses",
+        "active_course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "practice_userstreak": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "quiz_questions": [
+      [
+        0,
+        0,
+        "chapter_quizzes",
+        "quiz_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "resource_access_logs": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "chapter_resources",
+        "resource_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "resource_categories": [
+      [
+        0,
+        0,
+        "courses",
+        "course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "student_quiz_attempts": [
+      [
+        0,
+        0,
+        "users",
+        "student_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "practice_challengeprogress",
+        "practice_progress_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "chapter_quizzes",
+        "chapter_quiz_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "subscriptions_promocodeusage": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "subscriptions_usersubscription",
+        "subscription_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "subscriptions_promotionalcode",
+        "promo_code_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "subscriptions_promotionalcode_applicable_plans": [
+      [
+        0,
+        0,
+        "subscriptions_subscriptionplan",
+        "subscriptionplan_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "subscriptions_promotionalcode",
+        "promotionalcode_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "subscriptions_subscriptionhistory": [
+      [
+        0,
+        0,
+        "subscriptions_usersubscription",
+        "subscription_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "subscriptions_subscriptionplan",
+        "previous_plan_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "subscriptions_subscriptionplan",
+        "new_plan_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "subscriptions_usersubscription": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "subscriptions_subscriptionplan",
+        "plan_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "transaction_logs": [
+      [
+        0,
+        0,
+        "transactions",
+        "transaction_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "users",
+        "performed_by_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "transactions": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "courses",
+        "course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "user_addresses": [
+      [
+        0,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "core_address",
+        "address_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "user_course_progress": [
+      [
+        0,
+        0,
+        "chapters",
+        "current_chapter_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        2,
+        0,
+        "courses",
+        "course_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "users_groups": [
+      [
+        0,
+        0,
+        "auth_group",
+        "group_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ],
+    "users_user_permissions": [
+      [
+        0,
+        0,
+        "auth_permission",
+        "permission_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ],
+      [
+        1,
+        0,
+        "users",
+        "user_id",
+        "id",
+        "NO ACTION",
+        "NO ACTION",
+        "NONE"
+      ]
+    ]
+  },
+  "indexes": {
+    "auth_group": [
+      [
+        0,
+        "sqlite_autoindex_auth_group_1",
+        1,
+        "u",
+        0
+      ]
+    ],
+    "auth_group_permissions": [
+      [
+        0,
+        "auth_group_permissions_permission_id_84c5c92e",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "auth_group_permissions_group_id_b120cbf9",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "auth_group_permissions_group_id_permission_id_0cd325b0_uniq",
+        1,
+        "c",
+        0
+      ]
+    ],
+    "auth_permission": [
+      [
+        0,
+        "auth_permission_content_type_id_2f476e4b",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "auth_permission_content_type_id_codename_01ab375a_uniq",
+        1,
+        "c",
+        0
+      ]
+    ],
+    "chapter_comments": [
+      [
+        0,
+        "chapter_com_parent__879a09_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "chapter_comments_parent_comment_id_24a555f1",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "chapter_com_user_id_73d1e3_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "chapter_com_chapter_832c28_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "chapter_comments_user_id_58da103f",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "chapter_comments_chapter_id_dd4c69ab",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "sqlite_autoindex_chapter_comments_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "chapter_progress": [
+      [
+        0,
+        "chapter_pro_complet_f30e88_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "chapter_pro_complet_f1f6c9_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "chapter_pro_chapter_4e0731_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "chapter_pro_user_pr_c62bb3_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "chapter_progress_user_progress_id_3b7da804",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "chapter_progress_chapter_id_2ded0456",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "chapter_progress_user_progress_id_chapter_id_d8432e0f_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        7,
+        "sqlite_autoindex_chapter_progress_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "chapter_quizzes": [
+      [
+        0,
+        "chapter_qui_availab_8113b4_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "chapter_qui_difficu_6060de_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "chapter_qui_practic_b483f4_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "chapter_qui_created_69e5d7_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "chapter_qui_is_acti_b09fb0_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "chapter_quizzes_practice_lesson_id_e0f381d8",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "chapter_quizzes_created_by_id_51eb73f5",
+        0,
+        "c",
+        0
+      ],
+      [
+        7,
+        "sqlite_autoindex_chapter_quizzes_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        8,
+        "sqlite_autoindex_chapter_quizzes_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "chapter_resource_tags": [
+      [
+        0,
+        "chapter_resource_tags_resource_id_tag_id_d2249034_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        1,
+        "chapter_res_tag_id_e07f2b_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "chapter_res_resourc_93c7c3_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "chapter_resource_tags_tag_id_c85d93b7",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "chapter_resource_tags_resource_id_df074ee5",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_chapter_resource_tags_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "chapter_resources": [
+      [
+        0,
+        "chapter_res_created_2cc19a_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "chapter_res_access__ba5023_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "chapter_res_is_acti_2fa2a3_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "chapter_res_is_feat_9ea358_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "chapter_res_resourc_5b3884_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "chapter_res_chapter_d369b3_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "chapter_resources_created_by_id_40217871",
+        0,
+        "c",
+        0
+      ],
+      [
+        7,
+        "chapter_resources_chapter_id_9b6a96e8",
+        0,
+        "c",
+        0
+      ],
+      [
+        8,
+        "sqlite_autoindex_chapter_resources_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "chapters": [
+      [
+        0,
+        "chapters_type_18ba47_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "chapters_section_6c0e0a_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "chapters_practice_lesson_id_7c95d8b6",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "chapters_section_id_92dfba28",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "sqlite_autoindex_chapters_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "cms_seosettings": [
+      [
+        0,
+        "sqlite_autoindex_cms_seosettings_1",
+        1,
+        "u",
+        0
+      ]
+    ],
+    "cms_serviceitem_target_companies": [
+      [
+        0,
+        "cms_serviceitem_target_companies_company_id_2101b8a7",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "cms_serviceitem_target_companies_serviceitem_id_7776e907",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "cms_serviceitem_target_companies_serviceitem_id_company_id_737ac130_uniq",
+        1,
+        "c",
+        0
+      ]
+    ],
+    "cms_testimonial": [
+      [
+        0,
+        "cms_testimonial_company_id_c6646556",
+        0,
+        "c",
+        0
+      ]
+    ],
+    "core_address": [
+      [
+        0,
+        "sqlite_autoindex_core_address_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "course_enrollments": [
+      [
+        0,
+        "course_enro_is_acti_3aaf39_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "enrollment_course_date_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "course_enro_enrollm_7b95c1_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "course_enro_course__4c96ff_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "course_enro_user_id_79d5a1_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "course_enrollments_user_id_7c6e9041",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "course_enrollments_course_id_e80b84cd",
+        0,
+        "c",
+        0
+      ],
+      [
+        7,
+        "course_enrollments_user_id_course_id_4517d44a_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        8,
+        "sqlite_autoindex_course_enrollments_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "course_sections": [
+      [
+        0,
+        "course_sect_course__be0a09_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "course_sections_course_id_ff682291",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_course_sections_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "courses": [
+      [
+        0,
+        "course_category_level_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "course_status_date_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "course_teacher_status_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "course_status_category_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "courses_created_0aa93c_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "courses_status_67f368_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "courses_level_838724_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        7,
+        "courses_categor_33f89e_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        8,
+        "courses_teacher_e891c2_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        9,
+        "courses_teacher_id_79a070ce",
+        0,
+        "c",
+        0
+      ],
+      [
+        10,
+        "sqlite_autoindex_courses_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "email_verifications": [
+      [
+        0,
+        "email_verif_is_used_1f597c_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "email_verif_expires_fdd67c_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "email_verif_code_2d0f52_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "email_verif_email_66a8a7_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "email_verif_user_id_d1db3b_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "email_verifications_user_id_a6e578be",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "sqlite_autoindex_email_verifications_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "enrollment_logs": [
+      [
+        0,
+        "enrollment__created_e8aaf9_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "enrollment__action_1978bd_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "enrollment__enrollm_19f261_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "enrollment_logs_performed_by_id_f8f13e57",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "enrollment_logs_enrollment_id_899a563f",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_enrollment_logs_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "notification_settings": [
+      [
+        0,
+        "sqlite_autoindex_notification_settings_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_notification_settings_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "payment_methods": [
+      [
+        0,
+        "payment_met_is_acti_395fa6_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "payment_met_is_defa_11be74_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "payment_met_type_e77616_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "payment_met_user_id_6649e0_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "payment_methods_user_id_d4fe6d88",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_payment_methods_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_achievement": [
+      [
+        0,
+        "sqlite_autoindex_practice_achievement_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_achievementcategory": [
+      [
+        0,
+        "sqlite_autoindex_practice_achievementcategory_1",
+        1,
+        "u",
+        0
+      ]
+    ],
+    "practice_achievementnotification": [
+      [
+        0,
+        "practice_achievementnotification_user_id_eb263452",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_achievementnotification_achievement_id_b6f8dfff",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "practice_achievementnotification_user_id_achievement_id_a9cb226e_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        3,
+        "sqlite_autoindex_practice_achievementnotification_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_audiosegment": [
+      [
+        0,
+        "practice_audiosegment_listening_exercise_id_c0f34503",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_practice_audiosegment_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_challengeoption": [
+      [
+        0,
+        "practice_challengeoption_challenge_id_4be23696",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_practice_challengeoption_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_challengeprogress": [
+      [
+        0,
+        "practice_ch_challen_dd11f1_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_ch_user_id_6aac9c_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "practice_challengeprogress_user_id_8404125a",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "practice_challengeprogress_challenge_id_34efaa9c",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "practice_challengeprogress_user_id_challenge_id_f6a24e5d_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_practice_challengeprogress_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_competition": [
+      [
+        0,
+        "sqlite_autoindex_practice_competition_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_competitionparticipant": [
+      [
+        0,
+        "practice_competitionparticipant_user_id_be5784ac",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_competitionparticipant_competition_id_323c493a",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "practice_competitionparticipant_competition_id_user_id_e8745745_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        3,
+        "sqlite_autoindex_practice_competitionparticipant_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_leaderboardsnapshot": [
+      [
+        0,
+        "practice_leaderboardsnapshot_user_id_2317cf27",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_leaderboardsnapshot_user_id_snapshot_date_snapshot_type_fce4685f_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_practice_leaderboardsnapshot_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_leaguepromotion": [
+      [
+        0,
+        "practice_leaguepromotion_user_id_273571fc",
+        0,
+        "c",
+        0
+      ]
+    ],
+    "practice_listeningattempt": [
+      [
+        0,
+        "practice_listeningattempt_session_id_8d255f79",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_listeningattempt_session_id_attempt_number_c6f8142f_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_practice_listeningattempt_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_listeningexercise": [
+      [
+        0,
+        "practice_li_is_cour_ba4578_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_li_course__c2e06e_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "practice_listeningexercise_course_id_1f6aecb5",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "practice_listeningexercise_practice_lesson_id_738ef167",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "practice_listeningexercise_created_by_id_b39275f2",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_practice_listeningexercise_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_listeningprogress": [
+      [
+        0,
+        "sqlite_autoindex_practice_listeningprogress_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_practice_listeningprogress_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_listeningsession": [
+      [
+        0,
+        "practice_listeningsession_user_id_a92b6e76",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_listeningsession_exercise_id_5ce117a6",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_practice_listeningsession_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_practicechallenge": [
+      [
+        0,
+        "practice_practicechallenge_listening_exercise_id_89255d98",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_practicechallenge_speaking_exercise_id_8bd44b64",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "practice_practicechallenge_lesson_id_597d2385",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "practice_practicechallenge_lesson_id_order_f0be0893_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        4,
+        "sqlite_autoindex_practice_practicechallenge_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_practicelesson": [
+      [
+        0,
+        "practice_practicelesson_unit_id_3b3326e0",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_practicelesson_unit_id_order_ad912c89_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_practice_practicelesson_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_practiceunit": [
+      [
+        0,
+        "practice_practiceunit_course_id_904f1ce3",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_practiceunit_course_id_order_28d336d9_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_practice_practiceunit_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_speakingexercise": [
+      [
+        0,
+        "practice_sp_is_cour_3aa78a_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_sp_course__ab9ab9_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "practice_speakingexercise_course_id_a7546418",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "practice_speakingexercise_practice_lesson_id_5f04c9f5",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "practice_speakingexercise_created_by_id_9db6236e",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_practice_speakingexercise_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_speakingprogress": [
+      [
+        0,
+        "sqlite_autoindex_practice_speakingprogress_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_practice_speakingprogress_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_speakingsession": [
+      [
+        0,
+        "practice_speakingsession_user_id_958d40fa",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_speakingsession_exercise_id_dd4f0aba",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_practice_speakingsession_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_speakingturn": [
+      [
+        0,
+        "practice_speakingturn_session_id_60e2def5",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_speakingturn_session_id_turn_number_26f81bed_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_practice_speakingturn_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_userachievement": [
+      [
+        0,
+        "practice_userachievement_user_id_7747de13",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "practice_userachievement_achievement_id_f89fa62a",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "practice_userachievement_user_id_achievement_id_8443d1a2_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        3,
+        "sqlite_autoindex_practice_userachievement_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "practice_userleague": [
+      [
+        0,
+        "sqlite_autoindex_practice_userleague_1",
+        1,
+        "u",
+        0
+      ]
+    ],
+    "practice_userprogress": [
+      [
+        0,
+        "practice_userprogress_active_course_id_445e60e9",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_practice_userprogress_1",
+        1,
+        "u",
+        0
+      ]
+    ],
+    "practice_userstreak": [
+      [
+        0,
+        "sqlite_autoindex_practice_userstreak_1",
+        1,
+        "u",
+        0
+      ]
+    ],
+    "quiz_questions": [
+      [
+        0,
+        "quiz_questi_is_acti_260010_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "quiz_questi_questio_4b375f_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "quiz_questi_quiz_id_76bc24_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "quiz_questions_quiz_id_908ef63c",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "sqlite_autoindex_quiz_questions_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "resource_access_logs": [
+      [
+        0,
+        "resource_ac_created_793c42_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "resource_ac_access__8a8336_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "resource_ac_user_id_07a5f8_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "resource_ac_resourc_a2aa80_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "resource_access_logs_user_id_bace40d8",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "resource_access_logs_resource_id_e0ec5b99",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "sqlite_autoindex_resource_access_logs_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "resource_categories": [
+      [
+        0,
+        "resource_categories_course_id_name_39875ec6_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        1,
+        "resource_ca_is_acti_20f31d_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "resource_ca_course__6f89df_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "resource_categories_course_id_7fa0738e",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "sqlite_autoindex_resource_categories_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "resource_tags": [
+      [
+        0,
+        "sqlite_autoindex_resource_tags_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_resource_tags_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "student_quiz_attempts": [
+      [
+        0,
+        "student_qui_chapter_5787eb_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "student_qui_is_comp_21ac5b_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "student_qui_student_67d2ee_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "student_qui_student_37db5d_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "student_quiz_attempts_student_id_354a6e0a",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "student_quiz_attempts_practice_progress_id_22ae5a70",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "student_quiz_attempts_chapter_quiz_id_ddb3de1b",
+        0,
+        "c",
+        0
+      ],
+      [
+        7,
+        "student_quiz_attempts_student_id_chapter_quiz_id_attempt_number_baa66331_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        8,
+        "sqlite_autoindex_student_quiz_attempts_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "subscriptions_promocodeusage": [
+      [
+        0,
+        "subscriptions_promocodeusage_user_id_62266a3e",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "subscriptions_promocodeusage_subscription_id_b59a538c",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "subscriptions_promocodeusage_promo_code_id_ef9c49fd",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "subscriptions_promocodeusage_promo_code_id_user_id_c2dda8f7_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        4,
+        "sqlite_autoindex_subscriptions_promocodeusage_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "subscriptions_promotionalcode": [
+      [
+        0,
+        "sqlite_autoindex_subscriptions_promotionalcode_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_subscriptions_promotionalcode_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "subscriptions_promotionalcode_applicable_plans": [
+      [
+        0,
+        "subscriptions_promotionalcode_applicable_plans_subscriptionplan_id_2c2a4d4f",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "subscriptions_promotionalcode_applicable_plans_promotionalcode_id_fa757cc5",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "subscriptions_promotionalcode_applicable_plans_promotionalcode_id_subscriptionplan_id_b44f2149_uniq",
+        1,
+        "c",
+        0
+      ]
+    ],
+    "subscriptions_subscriptionhistory": [
+      [
+        0,
+        "subscriptions_subscriptionhistory_subscription_id_51d70879",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "subscriptions_subscriptionhistory_previous_plan_id_0c314ef7",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "subscriptions_subscriptionhistory_new_plan_id_994f39e1",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "sqlite_autoindex_subscriptions_subscriptionhistory_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "subscriptions_subscriptionplan": [
+      [
+        0,
+        "sqlite_autoindex_subscriptions_subscriptionplan_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_subscriptions_subscriptionplan_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "subscriptions_usersubscription": [
+      [
+        0,
+        "subscriptions_usersubscription_plan_id_553a4857",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "sqlite_autoindex_subscriptions_usersubscription_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        2,
+        "sqlite_autoindex_subscriptions_usersubscription_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "transaction_logs": [
+      [
+        0,
+        "transaction_created_644523_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "transaction_action_6a790c_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "transaction_transac_567f79_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "transaction_logs_transaction_id_8fd35968",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "transaction_logs_performed_by_id_065a11cf",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_transaction_logs_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "transactions": [
+      [
+        0,
+        "transaction_user_id_08c743_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "transaction_status_1d912a_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "transaction_payment_d6c5f2_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "transaction_status_505a2f_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "transaction_transac_687046_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "transaction_dateTim_f46b0e_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "transaction_course__d6118e_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        7,
+        "transaction_user_id_b5bcfd_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        8,
+        "transactions_user_id_766cc893",
+        0,
+        "c",
+        0
+      ],
+      [
+        9,
+        "transactions_course_id_ebb330de",
+        0,
+        "c",
+        0
+      ],
+      [
+        10,
+        "sqlite_autoindex_transactions_2",
+        1,
+        "u",
+        0
+      ],
+      [
+        11,
+        "sqlite_autoindex_transactions_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "user_addresses": [
+      [
+        0,
+        "user_addresses_user_id_c7113441",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "user_addresses_address_id_d0d203a6",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "user_addresses_user_id_address_type_is_default_ec1a0d94_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        3,
+        "user_addres_is_defa_43d9e3_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "user_addres_user_id_8ff364_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_user_addresses_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "user_course_progress": [
+      [
+        0,
+        "user_course_overall_e8726d_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "user_course_lastAcc_d86131_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "user_course_course__689467_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "user_course_user_id_8166b8_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "user_course_progress_current_chapter_id_6b5bc632",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "user_course_progress_user_id_2fadfe47",
+        0,
+        "c",
+        0
+      ],
+      [
+        6,
+        "user_course_progress_course_id_1ef9b1b3",
+        0,
+        "c",
+        0
+      ],
+      [
+        7,
+        "user_course_progress_user_id_course_id_66fd996b_uniq",
+        1,
+        "c",
+        0
+      ],
+      [
+        8,
+        "sqlite_autoindex_user_course_progress_1",
+        1,
+        "pk",
+        0
+      ]
+    ],
+    "users": [
+      [
+        0,
+        "users_email_v_0e5f70_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "users_created_6541e9_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "users_is_acti_847b48_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        3,
+        "users_role_0ace22_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        4,
+        "users_email_4b85f2_idx",
+        0,
+        "c",
+        0
+      ],
+      [
+        5,
+        "sqlite_autoindex_users_4",
+        1,
+        "u",
+        0
+      ],
+      [
+        6,
+        "sqlite_autoindex_users_3",
+        1,
+        "u",
+        0
+      ],
+      [
+        7,
+        "sqlite_autoindex_users_2",
+        1,
+        "pk",
+        0
+      ],
+      [
+        8,
+        "sqlite_autoindex_users_1",
+        1,
+        "u",
+        0
+      ]
+    ],
+    "users_groups": [
+      [
+        0,
+        "users_groups_group_id_2f3517aa",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "users_groups_user_id_f500bee5",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "users_groups_user_id_group_id_fc7788e8_uniq",
+        1,
+        "c",
+        0
+      ]
+    ],
+    "users_user_permissions": [
+      [
+        0,
+        "users_user_permissions_permission_id_6d08dcd2",
+        0,
+        "c",
+        0
+      ],
+      [
+        1,
+        "users_user_permissions_user_id_92473840",
+        0,
+        "c",
+        0
+      ],
+      [
+        2,
+        "users_user_permissions_user_id_permission_id_3b86cbdf_uniq",
+        1,
+        "c",
+        0
+      ]
+    ]
+  },
+  "data_counts": {
+    "auth_group": 0,
+    "auth_group_permissions": 0,
+    "auth_permission": 280,
+    "chapter_comments": 0,
+    "chapter_progress": 39,
+    "chapter_quizzes": 0,
+    "chapter_resource_tags": 0,
+    "chapter_resources": 28,
+    "chapters": 77,
+    "cms_calltoaction": 0,
+    "cms_company": 9,
+    "cms_faqitem": 0,
+    "cms_feature": 0,
+    "cms_herosection": 1,
+    "cms_landingpagesettings": 1,
+    "cms_pricingtier": 3,
+    "cms_seosettings": 1,
+    "cms_serviceitem": 7,
+    "cms_serviceitem_target_companies": 0,
+    "cms_statitem": 3,
+    "cms_testimonial": 0,
+    "core_address": 0,
+    "course_enrollments": 10,
+    "course_sections": 27,
+    "courses": 72,
+    "email_verifications": 8,
+    "enrollment_logs": 0,
+    "notification_settings": 26,
+    "payment_methods": 0,
+    "practice_achievement": 20,
+    "practice_achievementcategory": 5,
+    "practice_achievementnotification": 27,
+    "practice_audiosegment": 0,
+    "practice_challengeoption": 37,
+    "practice_challengeprogress": 11,
+    "practice_competition": 2,
+    "practice_competitionparticipant": 24,
+    "practice_leaderboardsnapshot": 0,
+    "practice_leaguepromotion": 12,
+    "practice_listeningattempt": 0,
+    "practice_listeningexercise": 0,
+    "practice_listeningprogress": 0,
+    "practice_listeningsession": 0,
+    "practice_practicechallenge": 12,
+    "practice_practicelesson": 13,
+    "practice_practiceunit": 10,
+    "practice_speakingexercise": 3,
+    "practice_speakingprogress": 1,
+    "practice_speakingsession": 1,
+    "practice_speakingturn": 1,
+    "practice_userachievement": 82,
+    "practice_userleague": 26,
+    "practice_userprogress": 26,
+    "practice_userstreak": 26,
+    "quiz_questions": 0,
+    "resource_access_logs": 0,
+    "resource_categories": 0,
+    "resource_tags": 0,
+    "student_quiz_attempts": 0,
+    "subscriptions_promocodeusage": 0,
+    "subscriptions_promotionalcode": 0,
+    "subscriptions_promotionalcode_applicable_plans": 0,
+    "subscriptions_subscriptionhistory": 0,
+    "subscriptions_subscriptionplan": 3,
+    "subscriptions_usersubscription": 1,
+    "transaction_logs": 0,
+    "transactions": 11,
+    "user_addresses": 0,
+    "user_course_progress": 10,
+    "users": 26,
+    "users_groups": 0,
+    "users_user_permissions": 0
+  }
+}

@@ -1,0 +1,44 @@
+name: Deploy to EKS
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Docker image"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsDeployRole
+          aws-region: eu-west-1
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'v1.28.0'
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name tuwi-eks --region eu-west-1
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image
+          path: ./image
+
+      - name: Read IMAGE
+        run: |
+          IMAGE=$(cat ./image/image.txt | sed 's/IMAGE=//')
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Set image in deployment (rolling update)
+        run: |
+          kubectl set image deployment/django django=${{ env.IMAGE }} --record
+          kubectl rollout status deployment/django --timeout=120s

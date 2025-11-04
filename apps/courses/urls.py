@@ -57,7 +57,13 @@ urlpatterns = [
     path('<uuid:courseId>/sections/<uuid:sectionId>/chapters/<uuid:chapterId>/get-resource-upload-url/', 
          views.get_resource_upload_url, name='get_resource_upload_url'),
     
-    # Image upload for course cover
+    # Course image upload presigned URL (new method - direct S3 upload)
+    path('<uuid:courseId>/get-image-upload-url/', views.get_course_image_upload_url, name='get_course_image_upload_url'),
+    
+    # Update course image URL in database after S3 upload
+    path('<uuid:courseId>/update-image-url/', views.update_course_image_url, name='update_course_image_url'),
+    
+    # Image upload for course cover (old method - via backend)
     path('<uuid:courseId>/upload-image/', views.upload_course_image, name='upload_course_image'),
     
     # Chapter resources (Phase 1 Bridge - maintained for compatibility)
@@ -77,5 +83,19 @@ urlpatterns = [
          views.StudentQuizAttemptListCreateView.as_view(), name='quiz_attempts'),
     path('chapters/<uuid:chapterId>/quiz/summary/', 
          views.get_student_quiz_summary, name='quiz_summary'),
+    
+    # Admin Analytics - Course performance and insights
+    path('admin/analytics/overview/', 
+         views.course_analytics_overview, name='admin_analytics_overview'),
+    path('admin/analytics/real-time/', 
+         views.course_analytics_real_time, name='admin_analytics_real_time'),
+    path('admin/analytics/export/', 
+         views.export_course_data, name='admin_analytics_export'),
+    path('admin/analytics/clear-cache/', 
+         views.clear_analytics_cache, name='admin_analytics_clear_cache'),
+    
+    # Admin Course Management
+    path('admin/list/', 
+         views.admin_courses_list, name='admin_courses_list'),
 ]
 

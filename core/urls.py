@@ -24,6 +24,9 @@ urlpatterns = [
     # API endpoints
     path('api/v1/users/', include('apps.users.urls')),
     
+    # Admin APIs
+    path('api/v1/admin/', include('apps.platform_admin.urls')),
+    
     # Student APIs (organized)
     path('api/v1/student/video-courses/', include('apps.courses.api.student.video_courses.urls')),
     path('api/v1/student/practice-courses/', include('apps.courses.api.student.practice_courses.urls')),

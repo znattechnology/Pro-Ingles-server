@@ -751,6 +751,164 @@ def get_upload_video_url(request, courseId, sectionId, chapterId):
 
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
+def get_course_image_upload_url(request, courseId):
+    """
+    Generate presigned URL for course image upload to S3.
+    
+    POST /api/v1/courses/{courseId}/get-image-upload-url/
+    
+    Similar to video upload but for course cover images
+    """
+    print(f"🖼️ Course image upload URL request for course: {courseId}")
+    print(f"   Request data: {request.data}")
+    
+    # Get file details
+    fileName = request.data.get('fileName') or request.data.get('file_name')
+    fileType = request.data.get('fileType') or request.data.get('file_type')
+    
+    if not fileName or not fileType:
+        return Response({
+            'message': 'O nome e o tipo do ficheiro são obrigatórios'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Validate image file type
+    allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if fileType not in allowed_types:
+        return Response({
+            'message': 'Tipo de arquivo não suportado. Use JPG, PNG ou WebP.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        # Verify course ownership
+        course = get_object_or_404(Course, id=courseId)
+        if course.teacher != request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Apenas o professor pode alterar a imagem do curso")
+        
+        import boto3
+        import uuid
+        from django.conf import settings
+        from botocore.exceptions import ClientError
+        
+        if not all([settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, settings.AWS_STORAGE_BUCKET_NAME]):
+            return Response({
+                'error': 'Configuração S3 incompleta'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # Create S3 client
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+        
+        # Generate unique filename and S3 key
+        file_extension = fileName.split('.')[-1].lower()
+        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        s3_key = f'courses/images/{unique_filename}'
+        
+        # Generate presigned URL for PUT operation
+        upload_url = s3_client.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                'Key': s3_key,
+                'ContentType': fileType,
+                'CacheControl': 'max-age=86400'
+            },
+            ExpiresIn=3600  # 1 hour expiration
+        )
+        
+        # Generate final image URL (using CloudFront if available)
+        if getattr(settings, 'AWS_CLOUDFRONT_DOMAIN', ''):
+            image_url = f"{settings.AWS_CLOUDFRONT_DOMAIN}/courses/images/{unique_filename}"
+        else:
+            image_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/courses/images/{unique_filename}"
+        
+        return Response({
+            'message': 'URL de upload de imagem gerado com sucesso',
+            'data': {
+                'uploadUrl': upload_url,
+                'imageUrl': image_url
+            }
+        })
+        
+    except ClientError as e:
+        return Response({
+            'error': f'Erro S3: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except ImportError:
+        return Response({
+            'error': 'Biblioteca boto3 não instalada'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response({
+            'error': f'Erro ao gerar URL de upload de imagem: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+@permission_classes([permissions.IsAuthenticated])
+def update_course_image_url(request, courseId):
+    """
+    Update course image URL in database after successful S3 upload.
+    
+    PUT /api/v1/courses/{courseId}/update-image-url/
+    """
+    try:
+        course = get_object_or_404(Course, id=courseId)
+        if course.teacher != request.user:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Apenas o professor pode alterar a imagem do curso")
+        
+        image_url = request.data.get('imageUrl')
+        if not image_url:
+            return Response({
+                'message': 'URL da imagem é obrigatória'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Delete old image from S3 if exists
+        if course.image and 'amazonaws.com' in course.image:
+            try:
+                import boto3
+                from django.conf import settings
+                
+                s3_client = boto3.client(
+                    's3',
+                    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                    region_name=settings.AWS_S3_REGION_NAME
+                )
+                
+                # Extract filename from old URL
+                old_filename = course.image.split('/')[-1]
+                old_s3_key = f'courses/images/{old_filename}'
+                s3_client.delete_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=old_s3_key)
+                print(f"✅ Deleted old image from S3: {old_s3_key}")
+            except Exception as e:
+                print(f"⚠️ Failed to delete old image: {e}")
+        
+        # Update course with new image URL
+        course.image = image_url
+        course.save()
+        
+        return Response({
+            'message': 'URL da imagem atualizada com sucesso',
+            'data': {
+                'imageUrl': image_url,
+                'course': CourseDetailSerializer(course, context={'request': request}).data
+            }
+        })
+        
+    except Exception as e:
+        return Response({
+            'error': f'Erro ao atualizar URL da imagem: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
 def get_resource_upload_url(request, courseId, sectionId, chapterId):
     """
     Generate presigned URL for resource upload to S3.
@@ -1410,3 +1568,449 @@ def get_student_quiz_summary(request, chapterId):
         'message': 'Resumo do quiz recuperado com sucesso',
         'data': summary_data
     })
+
+
+# =============================================================================
+# 📊 ADMIN ANALYTICS ENDPOINTS - Course Analytics and Insights
+# =============================================================================
+
+from django.db.models import Count, Avg, Sum, Q, F
+from django.db.models.functions import TruncMonth
+from django.core.cache import cache
+from datetime import datetime, timedelta
+import calendar
+
+
+def is_admin_user(user):
+    """Check if user has admin permissions"""
+    return user.is_authenticated and user.role == 'admin'
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def course_analytics_overview(request):
+    """
+    Comprehensive course analytics overview
+    
+    Returns:
+        - Course overview statistics
+        - Student engagement metrics
+        - Performance data
+        - Revenue analytics
+    """
+    
+    if not is_admin_user(request.user):
+        return Response(
+            {'error': 'Acesso negado. Apenas administradores podem acessar.'}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Cache key for analytics data
+    cache_key = 'admin_course_analytics_overview'
+    cached_data = cache.get(cache_key)
+    
+    if cached_data:
+        return Response(cached_data)
+    
+    try:
+        # Calculate analytics data
+        analytics_data = {
+            'overview': get_course_overview_stats(),
+            'engagement': get_student_engagement_stats(),
+            'performance': get_course_performance_stats(),
+            'revenue': get_revenue_analytics()
+        }
+        
+        # Cache for 15 minutes
+        cache.set(cache_key, analytics_data, 900)
+        
+        return Response(analytics_data)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao calcular analytics: {str(e)}'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+def get_course_overview_stats():
+    """Get basic course statistics"""
+    
+    # Current month start
+    current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_month_start = (current_month_start - timedelta(days=32)).replace(day=1)
+    
+    # Course counts
+    total_courses = Course.objects.count()
+    published_courses = Course.objects.filter(status='Published').count()
+    draft_courses = Course.objects.filter(status='Draft').count()
+    video_courses = Course.objects.filter(course_type='video').count()
+    practice_courses = Course.objects.filter(course_type='practice').count()
+    
+    # Growth calculation
+    courses_this_month = Course.objects.filter(created_at__gte=current_month_start).count()
+    courses_last_month = Course.objects.filter(
+        created_at__gte=last_month_start,
+        created_at__lt=current_month_start
+    ).count()
+    
+    growth_percentage = 0
+    if courses_last_month > 0:
+        growth_percentage = round(((courses_this_month - courses_last_month) / courses_last_month) * 100, 1)
+    
+    return {
+        'total_courses': total_courses,
+        'published_courses': published_courses,
+        'draft_courses': draft_courses,
+        'video_courses': video_courses,
+        'practice_courses': practice_courses,
+        'courses_growth_percentage': growth_percentage
+    }
+
+
+def get_student_engagement_stats():
+    """Get student engagement metrics"""
+    
+    # Date ranges
+    now = timezone.now()
+    one_day_ago = now - timedelta(days=1)
+    one_week_ago = now - timedelta(days=7)
+    current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_month_start = (current_month_start - timedelta(days=32)).replace(day=1)
+    
+    # Enrollment stats
+    total_enrollments = CourseEnrollment.objects.count()
+    active_enrollments = CourseEnrollment.objects.filter(is_active=True).count()
+    
+    # Active users (based on last access)
+    daily_active_users = UserCourseProgress.objects.filter(
+        lastAccessedTimestamp__gte=one_day_ago
+    ).values('user').distinct().count()
+    
+    weekly_active_users = UserCourseProgress.objects.filter(
+        lastAccessedTimestamp__gte=one_week_ago
+    ).values('user').distinct().count()
+    
+    # Enrollment growth
+    enrollments_this_month = CourseEnrollment.objects.filter(
+        enrollment_date__gte=current_month_start
+    ).count()
+    enrollments_last_month = CourseEnrollment.objects.filter(
+        enrollment_date__gte=last_month_start,
+        enrollment_date__lt=current_month_start
+    ).count()
+    
+    enrollment_growth = 0
+    if enrollments_last_month > 0:
+        enrollment_growth = round(((enrollments_this_month - enrollments_last_month) / enrollments_last_month) * 100, 1)
+    
+    # Average completion rate
+    avg_completion_rate = UserCourseProgress.objects.filter(
+        overallProgress__gt=0
+    ).aggregate(
+        avg_completion=Avg('overallProgress')
+    )['avg_completion'] or 0
+    
+    return {
+        'total_enrollments': total_enrollments,
+        'active_enrollments': active_enrollments,
+        'daily_active_users': daily_active_users,
+        'weekly_active_users': weekly_active_users,
+        'enrollment_growth': enrollment_growth,
+        'average_completion_rate': round(avg_completion_rate, 1)
+    }
+
+
+def get_course_performance_stats():
+    """Get course performance data"""
+    
+    # Top performing courses
+    top_courses = Course.objects.filter(
+        status='Published'
+    ).annotate(
+        enrollment_count=Count('enrollments'),
+        avg_completion=Avg('user_progress__overallProgress')
+    ).order_by('-enrollment_count')[:5]
+    
+    top_courses_data = []
+    for course in top_courses:
+        # Calculate average rating (mock for now, you can implement a rating system later)
+        avg_rating = 4.5  # Mock rating
+        
+        top_courses_data.append({
+            'id': str(course.id),
+            'title': course.title,
+            'course_type': course.course_type,
+            'enrollments': course.enrollment_count or 0,
+            'completion_rate': round(course.avg_completion or 0, 1),
+            'average_rating': avg_rating
+        })
+    
+    # Completion trends for last 6 months
+    six_months_ago = timezone.now() - timedelta(days=180)
+    
+    completion_trends = UserCourseProgress.objects.filter(
+        completion_date__gte=six_months_ago,
+        completion_date__isnull=False
+    ).annotate(
+        month=TruncMonth('completion_date')
+    ).values('month').annotate(
+        completions=Count('id')
+    ).order_by('month')
+    
+    # Also get enrollments for the same period
+    enrollment_trends = CourseEnrollment.objects.filter(
+        enrollment_date__gte=six_months_ago
+    ).annotate(
+        month=TruncMonth('enrollment_date')
+    ).values('month').annotate(
+        enrollments=Count('id')
+    ).order_by('month')
+    
+    # Combine completion and enrollment trends
+    trends_data = []
+    for i in range(6):
+        month_date = timezone.now() - timedelta(days=30*i)
+        month_name = calendar.month_name[month_date.month][:3]
+        
+        # Find completions for this month
+        completions = 0
+        for trend in completion_trends:
+            if trend['month'].month == month_date.month and trend['month'].year == month_date.year:
+                completions = trend['completions']
+                break
+        
+        # Find enrollments for this month
+        enrollments = 0
+        for trend in enrollment_trends:
+            if trend['month'].month == month_date.month and trend['month'].year == month_date.year:
+                enrollments = trend['enrollments']
+                break
+        
+        trends_data.append({
+            'month': month_name,
+            'completions': completions,
+            'enrollments': enrollments
+        })
+    
+    # Reverse to show chronological order
+    trends_data.reverse()
+    
+    return {
+        'top_courses': top_courses_data,
+        'completion_trends': trends_data
+    }
+
+
+def get_revenue_analytics():
+    """Get revenue analytics (mock data for now)"""
+    
+    # Note: This is mock data. In a real implementation, you would:
+    # 1. Have a payments/billing system
+    # 2. Track subscription revenues
+    # 3. Calculate actual revenue by course/template
+    
+    # For now, we'll generate realistic mock data based on course enrollments
+    total_enrollments = CourseEnrollment.objects.count()
+    
+    # Estimate revenue (assuming average price per enrollment)
+    avg_price_per_enrollment = 15000  # 15,000 AOA average
+    estimated_total_revenue = total_enrollments * avg_price_per_enrollment
+    
+    # Monthly revenue (last month's enrollments)
+    current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    monthly_enrollments = CourseEnrollment.objects.filter(
+        enrollment_date__gte=current_month_start
+    ).count()
+    estimated_monthly_revenue = monthly_enrollments * avg_price_per_enrollment
+    
+    # Revenue by template (based on course distribution)
+    template_distribution = Course.objects.filter(
+        status='Published'
+    ).values('template').annotate(
+        course_count=Count('id'),
+        enrollment_count=Count('enrollments')
+    )
+    
+    revenue_by_template = {}
+    for template_data in template_distribution:
+        template = template_data['template']
+        enrollments = template_data['enrollment_count'] or 0
+        revenue = enrollments * avg_price_per_enrollment
+        revenue_by_template[template] = f"{revenue:,.0f} AOA"
+    
+    return {
+        'total_revenue': f"{estimated_total_revenue:,.0f} AOA",
+        'monthly_revenue': f"{estimated_monthly_revenue:,.0f} AOA",
+        'revenue_growth': 22.3,  # Mock growth percentage
+        'revenue_by_template': revenue_by_template
+    }
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def course_analytics_real_time(request):
+    """
+    Real-time course analytics for dashboard updates
+    """
+    
+    if not is_admin_user(request.user):
+        return Response(
+            {'error': 'Acesso negado. Apenas administradores podem acessar.'}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    # Get real-time stats (no caching)
+    now = timezone.now()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    real_time_data = {
+        'online_users': 45,  # Mock data - would need WebSocket/session tracking
+        'enrollments_today': CourseEnrollment.objects.filter(
+            enrollment_date__gte=today_start
+        ).count(),
+        'active_sessions': 23,  # Mock data
+        'courses_completed_today': UserCourseProgress.objects.filter(
+            completion_date__gte=today_start
+        ).count(),
+        'last_updated': now.isoformat()
+    }
+    
+    return Response(real_time_data)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def export_course_data(request):
+    """
+    Export course analytics data for download
+    """
+    
+    if not is_admin_user(request.user):
+        return Response(
+            {'error': 'Acesso negado. Apenas administradores podem acessar.'}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    export_format = request.GET.get('format', 'json')
+    
+    # Get comprehensive data for export
+    export_data = {
+        'generated_at': timezone.now().isoformat(),
+        'overview': get_course_overview_stats(),
+        'engagement': get_student_engagement_stats(),
+        'performance': get_course_performance_stats(),
+        'revenue': get_revenue_analytics()
+    }
+    
+    if export_format == 'csv':
+        # For CSV format, you would need to flatten the data
+        # This is a simplified version
+        return Response({
+            'message': 'CSV export not yet implemented',
+            'data': export_data
+        })
+    
+    return Response(export_data)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def clear_analytics_cache(request):
+    """
+    Clear analytics cache to force fresh data
+    """
+    
+    if not is_admin_user(request.user):
+        return Response(
+            {'error': 'Acesso negado. Apenas administradores podem acessar.'}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    cache_keys = [
+        'admin_course_analytics_overview',
+        'admin_course_performance_stats',
+        'admin_engagement_stats'
+    ]
+    
+    for key in cache_keys:
+        cache.delete(key)
+    
+    return Response({'message': 'Cache de analytics limpo com sucesso'})
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def admin_courses_list(request):
+    """
+    List all courses for admin management with statistics
+    """
+    
+    if not is_admin_user(request.user):
+        return Response(
+            {'error': 'Acesso negado. Apenas administradores podem acessar.'}, 
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
+    try:
+        # Get all courses with related data
+        courses = Course.objects.select_related('teacher').prefetch_related('enrollments').all()
+        
+        # Calculate basic stats
+        total_courses = courses.count()
+        published_courses = courses.filter(status='Published').count()
+        
+        # Calculate total students (enrollments)
+        total_students = CourseEnrollment.objects.filter(is_active=True).count()
+        
+        # Calculate monthly growth (simplified)
+        current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        courses_this_month = courses.filter(created_at__gte=current_month_start).count()
+        monthly_growth = round(courses_this_month / max(total_courses, 1) * 100, 1)
+        
+        # Estimate revenue (mock calculation)
+        estimated_revenue = total_students * 15000  # 15,000 AOA average per enrollment
+        
+        # Prepare course data
+        courses_data = []
+        for course in courses:
+            enrollment_count = course.enrollments.filter(is_active=True).count()
+            
+            courses_data.append({
+                'id': str(course.id),
+                'title': course.title,
+                'teacher': {
+                    'id': str(course.teacher.id),
+                    'name': course.teacher.name,
+                    'email': course.teacher.email,
+                },
+                'enrollment_count': enrollment_count,
+                'status': course.status,
+                'template': course.template,
+                'course_type': course.course_type,
+                'created_at': course.created_at.isoformat(),
+                'updated_at': course.updated_at.isoformat(),
+                'description': course.description,
+                'image': course.image,
+            })
+        
+        # Prepare stats data
+        stats_data = {
+            'total_courses': total_courses,
+            'published_courses': published_courses,
+            'total_students': total_students,
+            'total_revenue': f'{estimated_revenue:,.0f} AOA',
+            'monthly_growth': monthly_growth,
+        }
+        
+        return Response({
+            'courses': courses_data,
+            'stats': stats_data,
+            'message': 'Cursos carregados com sucesso'
+        })
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Erro ao carregar cursos: {str(e)}'}, 
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

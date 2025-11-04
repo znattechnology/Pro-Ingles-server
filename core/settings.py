@@ -58,6 +58,7 @@ LOCAL_APPS = [
     'apps.practice',  # Temporarily enabled for testing - functionality moved to courses/api structure
     'apps.subscriptions',
     'apps.cms',
+    'apps.platform_admin',  # Platform admin dashboard and management
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
