@@ -104,18 +104,18 @@ urlpatterns = [
     ),
     
     # Estatísticas de códigos promocionais
-    path(
-        'admin/promo-code-stats/', 
-        views.admin_promo_code_stats, 
-        name='admin-promo-code-stats'
-    ),
+    # path(
+    #     'admin/promo-code-stats/', 
+    #     views.admin_promo_code_stats, 
+    #     name='admin-promo-code-stats'
+    # ),
     
     # Relatórios detalhados de assinaturas
-    path(
-        'admin/reports/', 
-        views.admin_subscription_reports, 
-        name='admin-subscription-reports'
-    ),
+    # path(
+    #     'admin/reports/', 
+    #     views.admin_subscription_reports, 
+    #     name='admin-subscription-reports'
+    # ),
     
     # ========================================================================
     # UTILITIES ENDPOINTS - Analytics e verificação de limitações
