@@ -134,9 +134,11 @@ resource "aws_instance" "app" {
 
   # User data for initial setup
   user_data = base64encode(templatefile("${path.module}/userdata-simple.sh", {
-    project_name = var.project
-    neon_db_url  = var.neon_database_url
-    secret_key   = var.django_secret_key
+    project_name        = var.project
+    neon_db_url         = var.neon_database_url
+    secret_key          = var.django_secret_key
+    aws_access_key_id   = var.aws_access_key_id
+    aws_secret_access_key = var.aws_secret_access_key
   }))
 
   tags = merge(var.common_tags, {

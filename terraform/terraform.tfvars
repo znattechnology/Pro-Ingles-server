@@ -41,6 +41,11 @@ cors_allowed_origins = "http://localhost:3000,http://127.0.0.1:3000,https://proe
 csrf_trusted_origins = "http://localhost:3000,http://127.0.0.1:3000,https://proenglish.ao,https://pro-ingles-client-nine.vercel.app,https://pro-ingles-client-git-main-znattechnology95-1655s-projects.vercel.app,https://proenglish.com,https://www.proenglish.com"
 
 # =============================================================================
+# AWS CREDENTIALS - Set via environment variables or terraform.auto.tfvars (local only)
+# aws_access_key_id and aws_secret_access_key should not be in version control
+# =============================================================================
+
+# =============================================================================
 # COST OPTIMIZATION SETTINGS
 # =============================================================================
 
