@@ -68,7 +68,12 @@ class EmailVerificationService:
             bool: True if email sent successfully
         """
         try:
-            subject = 'Verificação de Email - Tuwi'
+            print(f"DEBUG: Preparing to send verification email to {verification.email}")
+            print(f"DEBUG: EMAIL_BACKEND: {settings.EMAIL_BACKEND}")
+            print(f"DEBUG: EMAIL_HOST: {settings.EMAIL_HOST}")
+            print(f"DEBUG: DEFAULT_FROM_EMAIL: {settings.DEFAULT_FROM_EMAIL}")
+            
+            subject = 'Verificação de Email - ProEnglish'
             
             # Create email context
             context = {
@@ -80,10 +85,14 @@ class EmailVerificationService:
                 'frontend_url': settings.FRONTEND_URL,
             }
             
+            print(f"DEBUG: Email context: {context}")
+            
             # Render HTML template
             html_message = render_to_string('emails/email_verification.html', context)
             # Create plain text version
             text_message = strip_tags(html_message)
+            
+            print(f"DEBUG: Email template rendered successfully")
             
             # Create email message
             msg = EmailMultiAlternatives(
@@ -94,13 +103,18 @@ class EmailVerificationService:
             )
             msg.attach_alternative(html_message, "text/html")
             
+            print(f"DEBUG: Email message created, attempting to send...")
+            
             # Send email
-            msg.send()
+            result = msg.send()
+            print(f"DEBUG: Email send result: {result}")
             
             return True
             
         except Exception as e:
-            print(f"Error sending verification email: {e}")
+            print(f"ERROR: Exception sending verification email: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     @staticmethod

@@ -52,9 +52,14 @@ class UserRegistrationView(generics.CreateAPIView):
         try:
             verification = EmailVerificationService.create_verification_code(user)
             email_sent = EmailVerificationService.send_verification_email(verification)
+            print(f"DEBUG: Email verification created for {user.email}, code: {verification.code}")
             print(f"DEBUG: Email verification sent to {user.email}: {email_sent}")
+            if not email_sent:
+                print(f"ERROR: Failed to send verification email to {user.email}")
         except Exception as e:
-            print(f"DEBUG: Error sending verification email to {user.email}: {e}")
+            print(f"ERROR: Exception sending verification email to {user.email}: {e}")
+            import traceback
+            traceback.print_exc()
             # Continue with registration even if email fails
         
         # Do NOT generate JWT tokens - user must verify email first
