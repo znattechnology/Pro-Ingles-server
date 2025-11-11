@@ -76,9 +76,9 @@ class UserRegistrationView(generics.CreateAPIView):
         """
         verification_url = f"{settings.FRONTEND_URL}/verify-email/{user.email_verification_token}/"
         
-        subject = 'Verify your Tuwi account'
+        subject = 'Verify your ProEnglish account'
         message = f"""
-        Welcome to Tuwi!
+        Welcome to ProEnglish!
         
         Please click the link below to verify your email address:
         {verification_url}
@@ -318,7 +318,7 @@ class EmailVerificationView(generics.GenericAPIView):
                 print(f"Failed to send welcome email: {e}")
             
             return Response({
-                'message': 'Email verificado com sucesso! Bem-vindo(a) ao Tuwi!',
+                'message': 'Email verificado com sucesso! Bem-vindo(a) ao ProEnglish!',
                 'user': {
                     'id': str(user.id),
                     'email': user.email,

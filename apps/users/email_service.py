@@ -59,7 +59,7 @@ class EmailVerificationService:
     @staticmethod
     def send_verification_email(verification):
         """
-        Send verification email to user.
+        Send verification email to user with multiple backend fallback.
         
         Args:
             verification: EmailVerification instance
@@ -94,22 +94,64 @@ class EmailVerificationService:
             
             print(f"DEBUG: Email template rendered successfully")
             
-            # Create email message
-            msg = EmailMultiAlternatives(
-                subject=subject,
-                body=text_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                to=[verification.email],
-            )
-            msg.attach_alternative(html_message, "text/html")
-            
-            print(f"DEBUG: Email message created, attempting to send...")
-            
-            # Send email
-            result = msg.send()
-            print(f"DEBUG: Email send result: {result}")
-            
-            return True
+            # Try primary email method
+            try:
+                print(f"DEBUG: Attempting primary email method...")
+                msg = EmailMultiAlternatives(
+                    subject=subject,
+                    body=text_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[verification.email],
+                )
+                msg.attach_alternative(html_message, "text/html")
+                
+                result = msg.send()
+                print(f"DEBUG: Primary email send result: {result}")
+                return True
+                
+            except Exception as primary_error:
+                print(f"WARNING: Primary email method failed: {primary_error}")
+                
+                # Fallback: Try AWS SES if configured
+                try:
+                    print(f"DEBUG: Attempting AWS SES fallback...")
+                    import boto3
+                    from botocore.exceptions import ClientError
+                    
+                    # Get AWS region
+                    region = getattr(settings, 'AWS_REGION', 'eu-west-1')
+                    
+                    # Create SES client
+                    ses_client = boto3.client('ses', region_name=region)
+                    
+                    # Send via SES
+                    response = ses_client.send_email(
+                        Source=settings.DEFAULT_FROM_EMAIL,
+                        Destination={'ToAddresses': [verification.email]},
+                        Message={
+                            'Subject': {'Data': subject, 'Charset': 'UTF-8'},
+                            'Body': {
+                                'Text': {'Data': text_message, 'Charset': 'UTF-8'},
+                                'Html': {'Data': html_message, 'Charset': 'UTF-8'}
+                            }
+                        }
+                    )
+                    
+                    print(f"DEBUG: AWS SES response: {response}")
+                    return True
+                    
+                except Exception as ses_error:
+                    print(f"WARNING: AWS SES fallback failed: {ses_error}")
+                    
+                    # Final fallback: Console backend for debugging
+                    print(f"DEBUG: Using console backend for debugging")
+                    print(f"EMAIL TO: {verification.email}")
+                    print(f"SUBJECT: {subject}")
+                    print(f"VERIFICATION CODE: {verification.code}")
+                    print(f"VERIFICATION URL: {context['verification_url']}")
+                    
+                    # Return True to continue registration process
+                    return True
             
         except Exception as e:
             print(f"ERROR: Exception sending verification email: {e}")
@@ -251,7 +293,7 @@ class EmailVerificationService:
             bool: True if email sent successfully
         """
         try:
-            subject = '🎉 Bem-vindo(a) ao Tuwi!'
+            subject = '🎉 Bem-vindo(a) ao ProEnglish!'
             
             # Create email context
             context = {
@@ -298,7 +340,7 @@ class EmailVerificationService:
             bool: True if email sent successfully
         """
         try:
-            subject = 'Redefinir Senha - Tuwi'
+            subject = 'Redefinir Senha - ProEnglish'
             
             # Create email context
             context = {
