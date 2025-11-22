@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = [
     'corsheaders',
     'django_filters',
     'drf_spectacular',
+    'channels',
 ]
 
 LOCAL_APPS = [
@@ -253,6 +254,10 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# WebSocket CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # Only for development
+CORS_ALLOW_PRIVATE_NETWORK = True
 
 # =============================================================================
 # INTERNATIONALIZATION
@@ -522,3 +527,44 @@ if DEBUG:
 
 # Create logs directory if it doesn't exist
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+# =============================================================================
+# CHANNELS & WEBSOCKET CONFIGURATION
+# =============================================================================
+
+# ASGI Configuration
+ASGI_APPLICATION = 'core.asgi.application'
+
+# Channel Layers Configuration
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [config('REDIS_URL', default='redis://localhost:6379/0')],
+        },
+    },
+}
+
+# =============================================================================
+# VAPI INTEGRATION SETTINGS
+# =============================================================================
+
+# Vapi API Configuration
+VAPI_PRIVATE_KEY = config('VAPI_PRIVATE_KEY', default=None)
+VAPI_PUBLIC_KEY = config('VAPI_PUBLIC_KEY', default=None)
+VAPI_ORG_ID = config('VAPI_ORG_ID', default=None)
+VAPI_BASE_URL = config('VAPI_BASE_URL', default='https://api.vapi.ai')
+VAPI_WEBHOOK_SECRET = config('VAPI_WEBHOOK_SECRET', default='default_webhook_secret')
+
+# Vapi Voice Configuration
+VAPI_DEFAULT_VOICE = config('VAPI_DEFAULT_VOICE', default='alloy')
+VAPI_TTS_PROVIDER = config('VAPI_TTS_PROVIDER', default='openai')
+VAPI_STT_PROVIDER = config('VAPI_STT_PROVIDER', default='openai')
+
+# Vapi URLs
+VAPI_WEBHOOK_URL = config('VAPI_WEBHOOK_URL', default='http://localhost:8000/api/v1/practice/vapi/webhook/')
+BACKEND_BASE_URL = config('BACKEND_BASE_URL', default='http://localhost:8000')
+
+# Default Assistant ID (create one in Vapi dashboard and put ID here)
+VAPI_DEFAULT_ASSISTANT_ID = config('VAPI_DEFAULT_ASSISTANT_ID', default=None)
+VAPI_ENGLISH_ASSISTANT_ID = config('VAPI_ENGLISH_ASSISTANT_ID', default=None)

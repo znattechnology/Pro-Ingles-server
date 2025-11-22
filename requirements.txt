@@ -29,6 +29,11 @@ drf-spectacular>=0.26.3
 # AI & OpenAI Integration
 openai>=1.107.0
 
+# WebSocket Support
+channels>=4.0.0
+channels-redis>=4.1.0
+redis>=4.5.0
+
 # Development Tools (optional)
 # django-extensions>=3.2.3
 # ipython>=8.14.0

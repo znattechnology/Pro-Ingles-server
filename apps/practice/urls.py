@@ -42,20 +42,20 @@ urlpatterns = [
     #     name='challenges-list-frontend'
     # ),
     
-    # Test endpoints for verification
+    # Test endpoints for verification (using working imports)
     path(
         'test-units/', 
-        views.test_units_simple, 
+        views.UnitsListView.as_view(), 
         name='test-units'
     ),
     path(
         'test-lessons/', 
-        views.test_lessons_simple, 
+        views.LessonsListView.as_view(), 
         name='test-lessons'
     ),
     path(
         'test-challenges/', 
-        views.test_challenges_simple, 
+        views.ChallengesListView.as_view(), 
         name='test-challenges'
     ),
 
@@ -386,6 +386,23 @@ urlpatterns = [
         name='speaking-analyze'
     ),
     
+    # AI Conversation endpoints
+    path(
+        'speaking/conversation/start/',
+        views.start_ai_conversation,
+        name='ai-conversation-start'
+    ),
+    path(
+        'speaking/conversation/continue/',
+        views.continue_ai_conversation,
+        name='ai-conversation-continue'
+    ),
+    path(
+        'speaking/conversation/analyze/',
+        views.analyze_ai_conversation,
+        name='ai-conversation-analyze'
+    ),
+    
     # Progress and statistics
     path(
         'speaking/progress/',
@@ -682,6 +699,45 @@ urlpatterns = [
         'achievements/<uuid:achievement_id>/celebrate/',
         views.mark_achievement_celebrated,
         name='mark-achievement-celebrated'
+    ),
+    
+    # ========================================================================
+    # VAPI INTEGRATION ENDPOINTS - Speech Practice with Vapi
+    # ========================================================================
+    
+    # Vapi session management
+    path(
+        'vapi/session/',
+        views.VapiSessionView.as_view(),
+        name='vapi-session'
+    ),
+    
+    # Vapi templates and configuration
+    path(
+        'vapi/templates/',
+        views.vapi_templates,
+        name='vapi-templates'
+    ),
+    
+    # Vapi conversation simulation for testing
+    path(
+        'vapi/simulate/',
+        views.vapi_simulate,
+        name='vapi-simulate'
+    ),
+    
+    # Vapi webhook endpoint
+    path(
+        'vapi/webhook/',
+        views.vapi_webhook,
+        name='vapi-webhook'
+    ),
+    
+    # Vapi assistant management
+    path(
+        'vapi/assistants/',
+        views.vapi_assistant_manager,
+        name='vapi-assistant-manager'
     ),
     
 ]

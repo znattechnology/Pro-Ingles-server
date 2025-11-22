@@ -8,6 +8,7 @@ implementing all necessary endpoints for the Duolingo-style learning experience.
 from django.shortcuts import get_object_or_404
 from django.db import models
 from django.utils import timezone
+import time
 from rest_framework import generics, status as status_module
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
@@ -17,6 +18,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 # Import course management views
 from .views_course_management import PracticeCourseManagementView
+
+# Import Vapi views
+from .views.vapi_views import VapiSessionView, vapi_templates, vapi_simulate, vapi_webhook, vapi_assistant_manager
 
 # Import subscription decorators
 from apps.subscriptions.decorators import (
@@ -2220,8 +2224,8 @@ class SpeakingSessionCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = SpeakingSessionCreateSerializer
     
-    @subscription_required('speaking')
     def post(self, request, *args, **kwargs):
+        # TODO: Re-add subscription check for speaking practice
         return super().post(request, *args, **kwargs)
     
     def perform_create(self, serializer):
@@ -2237,6 +2241,19 @@ class SpeakingSessionCreateView(generics.CreateAPIView):
             # In a real implementation, this would be handled by Celery or similar
         
         return session
+    
+    def create(self, request, *args, **kwargs):
+        """Override to return complete session data"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        session = self.perform_create(serializer)
+        
+        # Return complete session data using detailed serializer
+        from apps.practice.serializers import SpeakingSessionSerializer
+        response_serializer = SpeakingSessionSerializer(session)
+        headers = self.get_success_headers(response_serializer.data)
+        
+        return Response(response_serializer.data, status=status_module.HTTP_201_CREATED, headers=headers)
 
 
 class SpeakingSessionDetailView(generics.RetrieveAPIView):
@@ -2307,10 +2324,20 @@ def analyze_speech(request):
     
     Analyze uploaded speech audio using AI services.
     """
+    # Debug logging
+    print(f"🎙️ ANALYZE_SPEECH DEBUG:")
+    print(f"📁 FILES: {list(request.FILES.keys())}")
+    print(f"📄 DATA: {dict(request.data)}")
+    print(f"👤 USER: {request.user}")
+    
     audio_file = request.FILES.get('audio_file')
     target_text = request.data.get('target_text', '')
     
+    print(f"🎵 audio_file: {audio_file}")
+    print(f"🎯 target_text: '{target_text}'")
+    
     if not audio_file:
+        print(f"❌ No audio file provided!")
         return Response(
             {'error': 'Audio file is required'}, 
             status=status_module.HTTP_400_BAD_REQUEST
@@ -2348,13 +2375,283 @@ def analyze_speech(request):
         
         serializer = SpeakingAnalysisSerializer(data=mock_result)
         if serializer.is_valid():
+            print(f"✅ Serializer valid, returning response")
             return Response(serializer.data)
         else:
+            print(f"❌ Serializer errors: {serializer.errors}")
             return Response(serializer.errors, status=status_module.HTTP_400_BAD_REQUEST)
             
     except Exception as e:
+        import traceback
+        print(f"💥 EXCEPTION in analyze_speech: {str(e)}")
+        print(f"📊 TRACEBACK: {traceback.format_exc()}")
         return Response(
             {'error': f'Analysis failed: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+# ========================================================================
+# AI CONVERSATION ENDPOINTS - Real-time conversation practice with AI
+# ========================================================================
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def start_ai_conversation(request):
+    """
+    POST /api/v1/practice/speaking/conversation/start/
+    
+    Inicia nova conversação com IA
+    
+    Body: {
+        "level": "BEGINNER|INTERMEDIATE|ADVANCED",
+        "topic": "introductions|travel|work|etc",
+        "user_profile": {...} (opcional)
+    }
+    """
+    try:
+        level = request.data.get('level', '').upper()
+        topic = request.data.get('topic', '')
+        user_profile = request.data.get('user_profile', {})
+        
+        if not level or not topic:
+            return Response(
+                {'error': 'Level and topic are required'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Importar serviço de IA
+        from .services.conversation_ai import ConversationAIService
+        
+        ai_service = ConversationAIService()
+        
+        # Verificar se nível é válido
+        if level not in ai_service.LEVELS:
+            return Response(
+                {
+                    'error': f'Invalid level: {level}',
+                    'available_levels': list(ai_service.LEVELS.keys())
+                },
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Verificar se tópico é válido para o nível
+        available_topics = ai_service.get_available_topics(level)
+        if topic not in available_topics:
+            return Response(
+                {
+                    'error': f'Invalid topic for level {level}',
+                    'available_topics': available_topics
+                },
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Iniciar conversa
+        import asyncio
+        ai_response = asyncio.run(ai_service.start_conversation(level, topic, user_profile))
+        
+        # Criar sessão (opcional - pode ser apenas em memória)
+        level_info = ai_service.get_level_info(level)
+        
+        response_data = {
+            'session_id': f'conv_{level.lower()}_{topic}_{request.user.id}_{int(time.time())}',
+            'ai_message': {
+                'content': ai_response.text,
+                'audio_url': ai_response.audio_url,
+                'metadata': ai_response.conversation_metadata
+            },
+            'session_config': {
+                'level': level,
+                'topic': topic,
+                'target_turns': level_info['target_turns'] if level_info else 10,
+                'conversation_style': level_info['conversation_style'] if level_info else 'natural'
+            }
+        }
+        
+        return Response(response_data, status=status_module.HTTP_200_OK)
+        
+    except Exception as e:
+        import traceback
+        print(f"💥 EXCEPTION in start_ai_conversation: {str(e)}")
+        print(f"📊 TRACEBACK: {traceback.format_exc()}")
+        return Response(
+            {'error': f'Failed to start conversation: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def continue_ai_conversation(request):
+    """
+    POST /api/v1/practice/speaking/conversation/continue/
+    
+    Continua conversação existente
+    
+    Body: {
+        "session_id": "...",
+        "level": "BEGINNER|INTERMEDIATE|ADVANCED", 
+        "topic": "...",
+        "conversation_history": [...],
+        "user_input": "user speech transcription",
+        "user_audio_analysis": {
+            "pronunciation_score": 85,
+            "fluency_score": 78,
+            ...
+        }
+    }
+    """
+    try:
+        session_id = request.data.get('session_id', '')
+        level = request.data.get('level', '').upper()
+        topic = request.data.get('topic', '')
+        conversation_history = request.data.get('conversation_history', [])
+        user_input = request.data.get('user_input', '')
+        user_audio_analysis = request.data.get('user_audio_analysis', {})
+        
+        if not all([session_id, level, topic, user_input]):
+            return Response(
+                {'error': 'session_id, level, topic, and user_input are required'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Importar e configurar serviço
+        from .services.conversation_ai import ConversationAIService, ConversationContext
+        
+        ai_service = ConversationAIService()
+        
+        # Verificar nível válido
+        if level not in ai_service.LEVELS:
+            return Response(
+                {'error': f'Invalid level: {level}'},
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Reconstruir contexto da conversa
+        level_obj = ai_service.LEVELS[level]
+        
+        context = ConversationContext(
+            level=level_obj,
+            topic=topic,
+            turns=conversation_history,
+            user_language_level=level.lower(),
+            conversation_goals=['practice_speaking', 'improve_fluency']
+        )
+        
+        # Continuar conversa
+        import asyncio
+        ai_response = asyncio.run(ai_service.continue_conversation(
+            context, 
+            user_input, 
+            user_audio_analysis
+        ))
+        
+        response_data = {
+            'session_id': session_id,
+            'ai_message': {
+                'content': ai_response.text,
+                'audio_url': ai_response.audio_url,
+                'metadata': ai_response.conversation_metadata
+            },
+            'conversation_progress': {
+                'current_turn': len(context.turns),
+                'target_turns': context.level.target_turns,
+                'progress_percentage': min(100, (len(context.turns) / context.level.target_turns) * 100)
+            }
+        }
+        
+        return Response(response_data, status=status_module.HTTP_200_OK)
+        
+    except Exception as e:
+        import traceback
+        print(f"💥 EXCEPTION in continue_ai_conversation: {str(e)}")
+        print(f"📊 TRACEBACK: {traceback.format_exc()}")
+        return Response(
+            {'error': f'Failed to continue conversation: {str(e)}'}, 
+            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def analyze_ai_conversation(request):
+    """
+    POST /api/v1/practice/speaking/conversation/analyze/
+    
+    Analisa conversa completa e gera feedback
+    
+    Body: {
+        "session_id": "...",
+        "level": "BEGINNER|INTERMEDIATE|ADVANCED",
+        "topic": "...",
+        "conversation_history": [
+            {
+                "speaker": "user|ai",
+                "content": "...",
+                "analysis": {...} (para turnos do usuário)
+            }
+        ]
+    }
+    """
+    try:
+        session_id = request.data.get('session_id', '')
+        level = request.data.get('level', '').upper()
+        topic = request.data.get('topic', '')
+        conversation_history = request.data.get('conversation_history', [])
+        
+        if not all([session_id, level, topic, conversation_history]):
+            return Response(
+                {'error': 'session_id, level, topic, and conversation_history are required'}, 
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Importar e configurar serviço
+        from .services.conversation_ai import ConversationAIService, ConversationContext
+        
+        ai_service = ConversationAIService()
+        
+        # Verificar nível válido
+        if level not in ai_service.LEVELS:
+            return Response(
+                {'error': f'Invalid level: {level}'},
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+        
+        # Criar contexto para análise
+        level_obj = ai_service.LEVELS[level]
+        
+        context = ConversationContext(
+            level=level_obj,
+            topic=topic,
+            turns=conversation_history,
+            user_language_level=level.lower(),
+            conversation_goals=['practice_speaking']
+        )
+        
+        # Analisar conversa completa
+        import asyncio
+        analysis_result = asyncio.run(ai_service.analyze_conversation_completion(context))
+        
+        response_data = {
+            'session_id': session_id,
+            'analysis': analysis_result,
+            'session_summary': {
+                'level': level,
+                'topic': topic,
+                'total_turns': len([t for t in conversation_history if t['speaker'] == 'user']),
+                'target_turns': level_obj.target_turns,
+                'completion_rate': min(100, (len(conversation_history) / (level_obj.target_turns * 2)) * 100)
+            }
+        }
+        
+        return Response(response_data, status=status_module.HTTP_200_OK)
+        
+    except Exception as e:
+        import traceback
+        print(f"💥 EXCEPTION in analyze_ai_conversation: {str(e)}")
+        print(f"📊 TRACEBACK: {traceback.format_exc()}")
+        return Response(
+            {'error': f'Failed to analyze conversation: {str(e)}'}, 
             status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
