@@ -9,5 +9,5 @@ app_name = 'teacher_practice_courses'
 
 # Redirect to practice app URLs - the practice app already handles course management
 urlpatterns = [
-    path('', include('apps.practice.urls')),
+    path('', include('apps.practice.urls_minimal')),
 ]
