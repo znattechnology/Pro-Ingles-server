@@ -104,9 +104,36 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     """
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_object(self):
         return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        """Override update to add detailed logging for avatar uploads."""
+        print("\n" + "="*80)
+        print("📸 USER PROFILE UPDATE REQUEST")
+        print("="*80)
+        print(f"Method: {request.method}")
+        print(f"User: {request.user.email}")
+        print(f"Content-Type: {request.content_type}")
+        print(f"Request DATA keys: {request.data.keys()}")
+        print(f"Request FILES keys: {request.FILES.keys()}")
+
+        if 'avatar' in request.FILES:
+            avatar_file = request.FILES['avatar']
+            print(f"\n✅ Avatar file detected:")
+            print(f"  - Name: {avatar_file.name}")
+            print(f"  - Size: {avatar_file.size} bytes")
+            print(f"  - Content-Type: {avatar_file.content_type}")
+        else:
+            print("\n❌ No avatar file in request.FILES")
+
+        if 'avatar' in request.data:
+            print(f"✅ Avatar in request.data: {type(request.data['avatar'])}")
+
+        print("="*80 + "\n")
+
+        return super().update(request, *args, **kwargs)
 
 
 class PasswordChangeView(generics.GenericAPIView):
