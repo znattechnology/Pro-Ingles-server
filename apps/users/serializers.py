@@ -118,24 +118,16 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     """
     Serializer for user profile management.
+    Avatar field now stores S3/CloudFront URLs directly.
     """
-    avatar_url = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = User
         fields = [
-            'id', 'email', 'name', 'phone', 'avatar', 'avatar_url',
+            'id', 'email', 'name', 'phone', 'avatar',
             'role', 'email_verified', 'preferences', 'created_at'
         ]
         read_only_fields = ['id', 'email', 'role', 'email_verified', 'created_at']
-    
-    def get_avatar_url(self, obj):
-        if obj.avatar:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.avatar.url)
-            return obj.avatar.url
-        return None
 
 
 class PasswordChangeSerializer(serializers.Serializer):
