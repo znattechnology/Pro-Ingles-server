@@ -113,12 +113,8 @@ class TestimonialSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
     def get_avatar_url(self, obj):
-        if obj.avatar:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.avatar.url)
-            return obj.avatar.url
-        return None
+        # avatar is now a URLField containing the full S3/CloudFront URL
+        return obj.avatar if obj.avatar else None
     
     def get_company_name(self, obj):
         return obj.company.name if obj.company else ""

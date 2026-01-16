@@ -156,7 +156,7 @@ class TestimonialAdmin(admin.ModelAdmin):
         if obj.avatar:
             return format_html(
                 '<img src="{}" style="max-height: 50px; max-width: 50px; border-radius: 50%;"/>',
-                obj.avatar.url
+                obj.avatar  # avatar is now a URLField, not ImageField
             )
         return "Sem avatar"
     avatar_preview.short_description = "Avatar"

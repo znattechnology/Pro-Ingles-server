@@ -92,7 +92,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'email': user.email,
             'name': user.name,
             'role': user.role,
-            'avatar': user.avatar.url if user.avatar else None,
+            'avatar': user.avatar or None,  # avatar is now a URLField, not ImageField
             'email_verified': user.email_verified,
         }
         

@@ -294,7 +294,7 @@ class UserService:
             'name': user.name,
             'phone': user.phone,
             'role': user.role,
-            'avatar': user.avatar.url if user.avatar else None,
+            'avatar': user.avatar or None,
             'email_verified': user.email_verified,
             'google_id': user.google_id,
             'preferences': user.preferences,

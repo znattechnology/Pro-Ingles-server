@@ -75,7 +75,7 @@ class UserAdmin(BaseUserAdmin):
         if obj.avatar:
             return format_html(
                 '<img src="{}" width="50" height="50" style="border-radius: 50%;" />',
-                obj.avatar.url
+                obj.avatar  # avatar is now a URLField, not ImageField
             )
         return "No Avatar"
     avatar_preview.short_description = "Avatar"

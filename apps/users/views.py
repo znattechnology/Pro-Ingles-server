@@ -462,7 +462,7 @@ class EmailVerificationView(generics.GenericAPIView):
                     'email': user.email,
                     'name': user.name,
                     'role': user.role,
-                    'avatar': user.avatar.url if user.avatar else None,
+                    'avatar': user.avatar or None,
                     'email_verified': user.email_verified,
                 },
                 'access': str(access),
@@ -594,7 +594,7 @@ class AdminUsersListView(generics.ListAPIView):
                 'email_verified': user.email_verified,
                 'date_joined': user.date_joined.isoformat(),
                 'last_login': user.last_login.isoformat() if user.last_login else None,
-                'avatar': user.avatar.url if user.avatar else None,
+                'avatar': user.avatar or None,
             })
         
         # Calculate stats for dashboard
@@ -650,7 +650,7 @@ class AdminUserDetailView(generics.RetrieveAPIView):
                 'email_verified': user.email_verified,
                 'date_joined': user.date_joined.isoformat(),
                 'last_login': user.last_login.isoformat() if user.last_login else None,
-                'avatar': user.avatar.url if user.avatar else None,
+                'avatar': user.avatar or None,
                 'google_id': user.google_id if hasattr(user, 'google_id') else None,
             }
             
@@ -735,7 +735,7 @@ class AdminUserUpdateView(generics.UpdateAPIView):
                 'email_verified': user.email_verified,
                 'date_joined': user.date_joined.isoformat(),
                 'last_login': user.last_login.isoformat() if user.last_login else None,
-                'avatar': user.avatar.url if user.avatar else None,
+                'avatar': user.avatar or None,
             }
             
             return Response({
