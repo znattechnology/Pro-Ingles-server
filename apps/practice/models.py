@@ -26,8 +26,13 @@ class PracticeUnit(models.Model):
         on_delete=models.CASCADE, 
         related_name='practice_units'
     )
-    title = models.CharField(max_length=200)
-    description = models.TextField()
+    title = models.CharField(
+        max_length=500,  # ✅ CATEGORIA 2: Título com limite generoso sincronizado (era 200)
+        help_text="Unit title"
+    )
+    description = models.TextField(
+        help_text="Unit description - sem limite para conteúdo rico"  # ✅ CATEGORIA 1: Sem limite
+    )
     order = models.PositiveIntegerField(help_text="Display order within the course")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -53,7 +58,10 @@ class PracticeLesson(models.Model):
         on_delete=models.CASCADE, 
         related_name='lessons'
     )
-    title = models.CharField(max_length=200)
+    title = models.CharField(
+        max_length=500,  # ✅ CATEGORIA 2: Título com limite generoso sincronizado (era 200)
+        help_text="Lesson title"
+    )
     order = models.PositiveIntegerField(help_text="Display order within the unit")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -136,7 +144,10 @@ class ChallengeOption(models.Model):
         on_delete=models.CASCADE, 
         related_name='options'
     )
-    text = models.CharField(max_length=200, help_text="Option text/answer")
+    text = models.CharField(
+        max_length=300,  # ✅ CATEGORIA 3: Campo curto aumentado (era 200)
+        help_text="Option text/answer"
+    )
     is_correct = models.BooleanField(
         default=False,
         help_text="Whether this option is the correct answer"
@@ -823,3 +834,164 @@ class AchievementNotification(models.Model):
 # - apps/practice/services/conversation_ai.py  
 # - apps/practice/views/vapi_views.py
 # =============================================================================
+
+
+class VapiSession(models.Model):
+    """
+    Vapi Conversation Session - Historical progress tracking
+    
+    Focused model for continuous progress analysis and daily improvement tracking.
+    Stores essential metrics for long-term progress visualization.
+    """
+    
+    # Core Identification
+    session_id = models.CharField(max_length=100, unique=True, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vapi_sessions')
+    
+    # Session Context
+    level = models.CharField(max_length=10)  # A1, A2, B1, B2, C1, C2
+    domain = models.CharField(max_length=50)  # general, petroleum, IT, business
+    duration_minutes = models.PositiveIntegerField()
+    
+    # Core Scores (0-100) - Essential for progress tracking
+    fluency_score = models.PositiveIntegerField(default=0)
+    pronunciation_score = models.PositiveIntegerField(default=0)
+    grammar_score = models.PositiveIntegerField(default=0)
+    vocabulary_score = models.PositiveIntegerField(default=0)
+    overall_score = models.PositiveIntegerField(default=0)
+    
+    # Speaking Performance Metrics
+    total_words = models.PositiveIntegerField(default=0)
+    words_per_minute = models.PositiveIntegerField(default=0)
+    corrections_count = models.PositiveIntegerField(default=0)
+    
+    # Progress Indicators
+    improvement_from_last = models.FloatField(default=0, help_text="Score improvement from last session")
+    streak_days = models.PositiveIntegerField(default=0)
+    
+    # Rich Data (for detailed analysis)
+    full_session_data = models.JSONField(default=dict, help_text="Complete session data including corrections, phrases, etc.")
+    
+    # Timestamps for Progress Tracking
+    created_at = models.DateTimeField(auto_now_add=True)
+    date = models.DateField(auto_now_add=True)  # For daily grouping
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user', '-date']),
+            models.Index(fields=['user', 'level', '-date']),
+            models.Index(fields=['date']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.session_id} ({self.overall_score}%)"
+    
+    def calculate_improvement(self):
+        """Calculate improvement from previous session"""
+        previous_session = VapiSession.objects.filter(
+            user=self.user,
+            created_at__lt=self.created_at
+        ).first()
+        
+        if previous_session:
+            self.improvement_from_last = self.overall_score - previous_session.overall_score
+        else:
+            self.improvement_from_last = 0
+    
+    def update_streak(self):
+        """Update daily practice streak"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        yesterday = timezone.now().date() - timedelta(days=1)
+        
+        # Check if user practiced yesterday
+        if VapiSession.objects.filter(user=self.user, date=yesterday).exists():
+            # Get the latest streak count and increment
+            latest = VapiSession.objects.filter(user=self.user).exclude(pk=self.pk).first()
+            self.streak_days = (latest.streak_days if latest else 0) + 1
+        else:
+            # Reset streak if gap in practice
+            self.streak_days = 1
+    
+    def save(self, *args, **kwargs):
+        """Auto-calculate metrics on save"""
+        if not self.pk:  # Only on creation
+            self.calculate_improvement()
+            self.update_streak()
+        super().save(*args, **kwargs)
+
+
+class DailyProgressSummary(models.Model):
+    """
+    Daily aggregated progress data for quick dashboard queries
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_progress')
+    date = models.DateField()
+    
+    # Daily Aggregates
+    sessions_count = models.PositiveIntegerField(default=0)
+    total_practice_minutes = models.PositiveIntegerField(default=0)
+    average_score = models.FloatField(default=0)
+    best_score = models.PositiveIntegerField(default=0)
+    total_words = models.PositiveIntegerField(default=0)
+    total_corrections = models.PositiveIntegerField(default=0)
+    
+    # Progress Metrics
+    score_improvement = models.FloatField(default=0)
+    current_streak = models.PositiveIntegerField(default=0)
+    
+    # Achievements
+    new_level_reached = models.BooleanField(default=False)
+    personal_best = models.BooleanField(default=False)
+    
+    class Meta:
+        unique_together = ['user', 'date']
+        ordering = ['-date']
+        indexes = [
+            models.Index(fields=['user', '-date']),
+        ]
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.date} ({self.sessions_count} sessions)"
+    
+    @classmethod
+    def update_for_user_date(cls, user, date):
+        """Update daily summary for a specific user and date"""
+        sessions = VapiSession.objects.filter(user=user, date=date)
+        
+        if not sessions.exists():
+            return None
+        
+        summary, created = cls.objects.get_or_create(
+            user=user,
+            date=date,
+            defaults={
+                'sessions_count': 0,
+                'total_practice_minutes': 0,
+                'average_score': 0,
+                'best_score': 0,
+                'total_words': 0,
+                'total_corrections': 0,
+            }
+        )
+        
+        # Calculate aggregates
+        summary.sessions_count = sessions.count()
+        summary.total_practice_minutes = sum(s.duration_minutes for s in sessions)
+        summary.average_score = sum(s.overall_score for s in sessions) / summary.sessions_count
+        summary.best_score = max(s.overall_score for s in sessions)
+        summary.total_words = sum(s.total_words for s in sessions)
+        summary.total_corrections = sum(s.corrections_count for s in sessions)
+        summary.current_streak = sessions.last().streak_days if sessions.last() else 0
+        
+        # Check for achievements
+        previous_best = cls.objects.filter(user=user, date__lt=date).aggregate(
+            max_score=models.Max('best_score')
+        )['max_score'] or 0
+        
+        summary.personal_best = summary.best_score > previous_best
+        
+        summary.save()
+        return summary

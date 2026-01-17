@@ -43,13 +43,13 @@ class Course(BaseModel):
     
     # Course basic info
     title = models.CharField(
-        max_length=255,
+        max_length=500,  # ✅ CATEGORIA 2: Título com limite generoso sincronizado
         default="Curso sem título",
         help_text="Course title"
     )
     description = models.TextField(
         blank=True,
-        help_text="Course description"
+        help_text="Course description (sem limite para conteúdo rico)"  # ✅ CATEGORIA 1: Sem limite
     )
     category = models.CharField(
         max_length=100,
@@ -180,12 +180,12 @@ class CourseSection(BaseModel, OrderedModelMixin):
     )
     
     sectionTitle = models.CharField(
-        max_length=255,
+        max_length=500,  # ✅ CATEGORIA 2: Título com limite generoso sincronizado
         help_text="Section title"
     )
     sectionDescription = models.TextField(
         blank=True,
-        help_text="Section description"
+        help_text="Section description (sem limite para conteúdo rico)"  # ✅ CATEGORIA 1: Sem limite
     )
     
     class Meta:
@@ -230,11 +230,11 @@ class Chapter(BaseModel, OrderedModelMixin, MetadataModelMixin):
     )
     
     title = models.CharField(
-        max_length=255,
+        max_length=500,  # ✅ CATEGORIA 2: Título com limite generoso sincronizado
         help_text="Chapter title"
     )
     content = models.TextField(
-        help_text="Chapter content (text, quiz questions, etc.)"
+        help_text="Chapter content - sem limite para conteúdo rico"  # ✅ CATEGORIA 1: Sem limite
     )
     type = models.CharField(
         max_length=20,
