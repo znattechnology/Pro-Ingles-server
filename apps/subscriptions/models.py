@@ -8,7 +8,8 @@ planos (Free, Premium, Premium+) e limitações por tipo de usuário.
 import uuid
 from datetime import timedelta
 from decimal import Decimal
-from django.db import models
+from django.db import models, transaction
+from django.db.models import F
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils import timezone
@@ -245,11 +246,24 @@ class UserSubscription(models.Model):
             
         return (self.daily_listening_minutes_used + minutes_needed) <= self.plan.daily_listening_minutes
     
+    @transaction.atomic
     def use_heart(self):
-        """Usa uma vida"""
-        if self.current_hearts > 0:
-            self.current_hearts -= 1
-            self.save(update_fields=['current_hearts'])
+        """
+        Usa uma vida de forma thread-safe.
+
+        Uses select_for_update to prevent race conditions when multiple
+        requests try to use hearts simultaneously.
+        """
+        # Lock the row for update to prevent race conditions
+        locked_sub = UserSubscription.objects.select_for_update().get(pk=self.pk)
+
+        if locked_sub.current_hearts > 0:
+            # Use F() expression for atomic decrement
+            UserSubscription.objects.filter(pk=self.pk).update(
+                current_hearts=F('current_hearts') - 1
+            )
+            # Refresh to get updated value
+            self.refresh_from_db()
             return True
         return False
     

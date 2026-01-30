@@ -6,7 +6,8 @@ providing a gamified learning experience similar to Duolingo.
 """
 
 import uuid
-from django.db import models
+from django.db import models, transaction
+from django.db.models import F
 from django.contrib.auth import get_user_model
 from apps.courses.models import Course
 
@@ -218,21 +219,49 @@ class UserProgress(models.Model):
     def __str__(self):
         return f"{self.user.name} - {self.points} pts, {self.hearts} hearts"
     
+    @transaction.atomic
     def reduce_hearts(self):
-        """Reduce hearts by 1 (minimum 0)"""
-        self.hearts = max(0, self.hearts - 1)
-        self.save()
-    
+        """
+        Reduce hearts by 1 (minimum 0) in a thread-safe manner.
+
+        Uses select_for_update and F() expression to prevent race conditions.
+        """
+        # Lock the row for update
+        locked_progress = UserProgress.objects.select_for_update().get(pk=self.pk)
+
+        if locked_progress.hearts > 0:
+            UserProgress.objects.filter(pk=self.pk).update(
+                hearts=F('hearts') - 1
+            )
+            self.refresh_from_db()
+
+    @transaction.atomic
     def add_hearts(self, amount=1):
-        """Add hearts (maximum 5)"""
-        self.hearts = min(5, self.hearts + amount)
-        self.save()
-    
+        """
+        Add hearts (maximum 5) in a thread-safe manner.
+
+        Uses select_for_update and conditional update to prevent race conditions.
+        """
+        # Lock the row for update
+        locked_progress = UserProgress.objects.select_for_update().get(pk=self.pk)
+
+        new_hearts = min(5, locked_progress.hearts + amount)
+        UserProgress.objects.filter(pk=self.pk).update(hearts=new_hearts)
+        self.refresh_from_db()
+
+    @transaction.atomic
     def add_points(self, amount=10, check_achievements=True):
-        """Add points for correct answers"""
-        self.points += amount
-        self.save()
-        
+        """
+        Add points for correct answers in a thread-safe manner.
+
+        Uses F() expression for atomic increment to prevent race conditions.
+        """
+        # Use F() expression for atomic increment
+        UserProgress.objects.filter(pk=self.pk).update(
+            points=F('points') + amount
+        )
+        self.refresh_from_db()
+
         # Trigger achievement progress check (unless disabled to prevent recursion)
         if check_achievements:
             self._check_achievements_for_points()

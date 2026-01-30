@@ -5,7 +5,7 @@ This module contains models for course enrollments, user progress tracking,
 and chapter completion records.
 """
 
-from django.db import models
+from django.db import models, transaction
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from apps.core.models import BaseModel
@@ -194,21 +194,25 @@ class UserCourseProgress(BaseModel, TimestampedModelMixin):
     def __str__(self):
         return f"{self.user.name} - {self.course.title} ({self.overallProgress:.1f}%)"
     
+    @transaction.atomic
     def update_overall_progress(self):
-        """Recalculate and update overall progress based on completed chapters."""
+        """Recalculate and update overall progress based on completed chapters.
+
+        Uses atomic transaction to ensure data consistency.
+        """
         total_chapters = self.course.total_chapters
         if total_chapters == 0:
             self.overallProgress = 0.0
         else:
             completed_chapters = self.chapter_progress.filter(completed=True).count()
             self.overallProgress = (completed_chapters / total_chapters) * 100
-        
+
         # Check if course is completed
         if self.overallProgress >= 100.0 and not self.completion_date:
             self.completion_date = timezone.now()
         elif self.overallProgress < 100.0 and self.completion_date:
             self.completion_date = None
-        
+
         self.save(update_fields=['overallProgress', 'completion_date'])
     
     def get_next_chapter(self):
@@ -239,43 +243,85 @@ class UserCourseProgress(BaseModel, TimestampedModelMixin):
         self.save(update_fields=['total_time_spent', 'lastAccessedTimestamp'])
     
     # 🆕 MÉTODOS PARA PRÁTICAS AUXILIARES
+    @transaction.atomic
     def update_speaking_progress(self, exercise_id, score, completed=True):
-        """Atualiza progresso de exercício de speaking específico."""
-        if not self.speaking_practice_progress:
-            self.speaking_practice_progress = {}
-        
-        self.speaking_practice_progress[str(exercise_id)] = {
+        """
+        Atualiza progresso de exercício de speaking específico.
+
+        Uses transaction.atomic to ensure data consistency when updating
+        multiple fields simultaneously.
+        """
+        # Lock the row for update to prevent race conditions
+        locked_progress = UserCourseProgress.objects.select_for_update().get(pk=self.pk)
+
+        if not locked_progress.speaking_practice_progress:
+            locked_progress.speaking_practice_progress = {}
+
+        locked_progress.speaking_practice_progress[str(exercise_id)] = {
             'completed': completed,
             'score': score,
             'completed_at': timezone.now().isoformat() if completed else None
         }
-        
+
         if completed:
-            self.total_speaking_sessions += 1
+            locked_progress.total_speaking_sessions += 1
             # Recalcular média
-            total_scores = sum(ex['score'] for ex in self.speaking_practice_progress.values() if ex['completed'])
-            self.avg_speaking_score = total_scores / len([ex for ex in self.speaking_practice_progress.values() if ex['completed']])
-        
-        self.save(update_fields=['speaking_practice_progress', 'total_speaking_sessions', 'avg_speaking_score'])
-    
+            completed_exercises = [
+                ex for ex in locked_progress.speaking_practice_progress.values()
+                if ex.get('completed')
+            ]
+            if completed_exercises:
+                total_scores = sum(ex['score'] for ex in completed_exercises)
+                locked_progress.avg_speaking_score = total_scores / len(completed_exercises)
+
+        locked_progress.save(update_fields=[
+            'speaking_practice_progress',
+            'total_speaking_sessions',
+            'avg_speaking_score'
+        ])
+
+        # Refresh self to get updated values
+        self.refresh_from_db()
+
+    @transaction.atomic
     def update_listening_progress(self, exercise_id, score, completed=True):
-        """Atualiza progresso de exercício de listening específico."""
-        if not self.listening_practice_progress:
-            self.listening_practice_progress = {}
-        
-        self.listening_practice_progress[str(exercise_id)] = {
+        """
+        Atualiza progresso de exercício de listening específico.
+
+        Uses transaction.atomic to ensure data consistency when updating
+        multiple fields simultaneously.
+        """
+        # Lock the row for update to prevent race conditions
+        locked_progress = UserCourseProgress.objects.select_for_update().get(pk=self.pk)
+
+        if not locked_progress.listening_practice_progress:
+            locked_progress.listening_practice_progress = {}
+
+        locked_progress.listening_practice_progress[str(exercise_id)] = {
             'completed': completed,
             'score': score,
             'completed_at': timezone.now().isoformat() if completed else None
         }
-        
+
         if completed:
-            self.total_listening_sessions += 1
+            locked_progress.total_listening_sessions += 1
             # Recalcular média
-            total_scores = sum(ex['score'] for ex in self.listening_practice_progress.values() if ex['completed'])
-            self.avg_listening_score = total_scores / len([ex for ex in self.listening_practice_progress.values() if ex['completed']])
-        
-        self.save(update_fields=['listening_practice_progress', 'total_listening_sessions', 'avg_listening_score'])
+            completed_exercises = [
+                ex for ex in locked_progress.listening_practice_progress.values()
+                if ex.get('completed')
+            ]
+            if completed_exercises:
+                total_scores = sum(ex['score'] for ex in completed_exercises)
+                locked_progress.avg_listening_score = total_scores / len(completed_exercises)
+
+        locked_progress.save(update_fields=[
+            'listening_practice_progress',
+            'total_listening_sessions',
+            'avg_listening_score'
+        ])
+
+        # Refresh self to get updated values
+        self.refresh_from_db()
     
     def get_overall_progress_with_practices(self):
         """Calcula progresso geral incluindo práticas (80% trilha principal, 20% práticas)."""

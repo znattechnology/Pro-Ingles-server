@@ -71,6 +71,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'apps.users.middleware.JWTCookieAuthenticationMiddleware',  # JWT from HttpOnly cookies
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -256,8 +257,10 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # WebSocket CORS settings
-CORS_ALLOW_ALL_ORIGINS = True  # Only for development
-CORS_ALLOW_PRIVATE_NETWORK = True
+# SECURITY: Never enable CORS_ALLOW_ALL_ORIGINS in production
+# Use CORS_ALLOWED_ORIGINS from environment variable instead
+CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bool)
+CORS_ALLOW_PRIVATE_NETWORK = config('CORS_ALLOW_PRIVATE_NETWORK', default=False, cast=bool)
 
 # =============================================================================
 # INTERNATIONALIZATION
