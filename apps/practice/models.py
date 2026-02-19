@@ -90,7 +90,9 @@ class PracticeChallenge(models.Model):
         ('MATCH_PAIRS', 'Match Pairs'),
         ('SENTENCE_ORDER', 'Sentence Order'),
         ('TRUE_FALSE', 'True/False Questions'),
-        
+        ('LISTENING', 'Listening Comprehension'),
+        ('SPEAKING', 'Speaking Practice'),
+
         # 🚀 VAPI AI CONVERSATION TYPES
         ('VAPI_CONVERSATION', 'AI Conversation Practice'),
     ]
@@ -107,8 +109,30 @@ class PracticeChallenge(models.Model):
         help_text="Type of challenge exercise"
     )
     question = models.TextField(help_text="The question or prompt for the user")
+    instruction = models.TextField(
+        blank=True,
+        null=True,
+        help_text="General instruction for the exercise (e.g., 'Complete using I/You/am/are')"
+    )
     order = models.PositiveIntegerField(help_text="Display order within the lesson")
-    
+    hint = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Optional hint to help the student (shown on request)"
+    )
+    explanation = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Explanation shown after the challenge is answered"
+    )
+
+    # 🎤 SPEAKING CHALLENGE FIELDS
+    reference_audio_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text="URL of the reference audio for pronunciation practice (TTS generated)"
+    )
+
     # 🚀 VAPI CONVERSATION CHALLENGE FIELDS
     # Note: Traditional separate speaking/listening fields removed.
     # All conversation practice now handled through Vapi integration.
@@ -177,25 +201,32 @@ class ChallengeOption(models.Model):
 class UserProgress(models.Model):
     """
     User Progress - Tracks overall user progress and gamification stats.
-    
+
     Maps to Drizzle 'userProgress' table from the client project.
     Manages hearts, points, active course, and profile information.
+
+    P2 UNIFIED: Hearts are now managed through UserSubscription.current_hearts
+    to ensure consistency across the system. The hearts field here is kept
+    for backward compatibility but delegates to the subscription system.
     """
     user = models.OneToOneField(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='practice_progress'
     )
     active_course = models.ForeignKey(
-        Course, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+        Course,
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
         help_text="Currently selected course for practice"
     )
-    hearts = models.PositiveIntegerField(
+    # DEPRECATED: Use subscription.current_hearts instead
+    # Kept for migration compatibility, but hearts property reads from subscription
+    _hearts_legacy = models.PositiveIntegerField(
         default=5,
-        help_text="Lives/hearts (max 5, lose 1 per wrong answer)"
+        db_column='hearts',
+        help_text="DEPRECATED: Use subscription.current_hearts instead"
     )
     points = models.PositiveIntegerField(
         default=0,
@@ -205,49 +236,93 @@ class UserProgress(models.Model):
         default="/mascot.jpg",
         help_text="Profile image URL"
     )
-    
-    # 🚀 VAPI CONVERSATION PRACTICE FIELDS  
+
+    # 🚀 VAPI CONVERSATION PRACTICE FIELDS
     total_conversation_sessions = models.IntegerField(default=0)
     total_conversation_minutes = models.FloatField(default=0.0)
     average_conversation_score = models.FloatField(default=0.0)
     conversation_streak_days = models.IntegerField(default=0)
     last_conversation_session = models.DateTimeField(null=True, blank=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+    @property
+    def hearts(self):
+        """
+        Get hearts from the unified subscription system.
+        Falls back to legacy field if no subscription exists.
+        """
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.select_related('plan').get(user=self.user)
+            # Trigger automatic heart recharge
+            subscription.recharge_hearts_if_needed()
+            return subscription.current_hearts
+        except Exception:
+            # Fallback to legacy field if subscription doesn't exist
+            return self._hearts_legacy
+
+    @hearts.setter
+    def hearts(self, value):
+        """
+        Set hearts in both subscription and legacy field for compatibility.
+        """
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.get(user=self.user)
+            max_hearts = subscription.plan.hearts_limit if subscription.plan.hearts_limit > 0 else 5
+            subscription.current_hearts = min(value, max_hearts)
+            subscription.save(update_fields=['current_hearts'])
+        except Exception:
+            pass
+        # Also update legacy field for compatibility
+        self._hearts_legacy = value
+
     def __str__(self):
         return f"{self.user.name} - {self.points} pts, {self.hearts} hearts"
-    
+
     @transaction.atomic
     def reduce_hearts(self):
         """
         Reduce hearts by 1 (minimum 0) in a thread-safe manner.
 
-        Uses select_for_update and F() expression to prevent race conditions.
+        UNIFIED: Now delegates to UserSubscription.use_heart() for consistency.
         """
-        # Lock the row for update
-        locked_progress = UserProgress.objects.select_for_update().get(pk=self.pk)
-
-        if locked_progress.hearts > 0:
-            UserProgress.objects.filter(pk=self.pk).update(
-                hearts=F('hearts') - 1
-            )
-            self.refresh_from_db()
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.get(user=self.user)
+            subscription.use_heart()
+        except Exception:
+            # Fallback to legacy behavior if no subscription
+            locked_progress = UserProgress.objects.select_for_update().get(pk=self.pk)
+            if locked_progress._hearts_legacy > 0:
+                UserProgress.objects.filter(pk=self.pk).update(
+                    _hearts_legacy=F('_hearts_legacy') - 1
+                )
+                self.refresh_from_db()
 
     @transaction.atomic
     def add_hearts(self, amount=1):
         """
-        Add hearts (maximum 5) in a thread-safe manner.
+        Add hearts (up to plan limit) in a thread-safe manner.
 
-        Uses select_for_update and conditional update to prevent race conditions.
+        UNIFIED: Now updates UserSubscription.current_hearts for consistency.
         """
-        # Lock the row for update
-        locked_progress = UserProgress.objects.select_for_update().get(pk=self.pk)
-
-        new_hearts = min(5, locked_progress.hearts + amount)
-        UserProgress.objects.filter(pk=self.pk).update(hearts=new_hearts)
-        self.refresh_from_db()
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.select_for_update().get(user=self.user)
+            max_hearts = subscription.plan.hearts_limit if subscription.plan.hearts_limit > 0 else 5
+            new_hearts = min(max_hearts, subscription.current_hearts + amount)
+            UserSubscription.objects.filter(pk=subscription.pk).update(
+                current_hearts=new_hearts
+            )
+        except Exception:
+            # Fallback to legacy behavior if no subscription
+            locked_progress = UserProgress.objects.select_for_update().get(pk=self.pk)
+            new_hearts = min(5, locked_progress._hearts_legacy + amount)
+            UserProgress.objects.filter(pk=self.pk).update(_hearts_legacy=new_hearts)
+            self.refresh_from_db()
 
     @transaction.atomic
     def add_points(self, amount=10, check_achievements=True):
@@ -268,7 +343,7 @@ class UserProgress(models.Model):
     
     def _check_achievements_for_points(self):
         """Check and update achievements related to points"""
-        from .views import check_achievement_progress
+        from .achievement_utils import check_achievement_progress
         check_achievement_progress(self.user, 'points_earned', self.points)
 
 
@@ -315,7 +390,7 @@ class ChallengeProgress(models.Model):
     
     def _check_achievements_for_completion(self):
         """Check and update achievements related to challenge completions"""
-        from .views import check_achievement_progress
+        from .achievement_utils import check_achievement_progress
         
         # Count total challenges completed by this user
         total_completed = ChallengeProgress.objects.filter(
@@ -624,7 +699,7 @@ class UserStreak(models.Model):
     
     def _check_achievements_for_streak(self):
         """Check and update achievements related to streaks"""
-        from .views import check_achievement_progress
+        from .achievement_utils import check_achievement_progress
         check_achievement_progress(self.user, 'streak_days', self.current_streak)
     
     def __str__(self):
@@ -1021,6 +1096,7 @@ class DailyProgressSummary(models.Model):
         )['max_score'] or 0
         
         summary.personal_best = summary.best_score > previous_best
-        
+
         summary.save()
         return summary
+

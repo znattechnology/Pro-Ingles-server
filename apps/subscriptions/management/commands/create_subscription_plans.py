@@ -29,14 +29,16 @@ class Command(BaseCommand):
             {
                 'name': 'Gratuito',
                 'plan_type': 'FREE',
-                'description': 'Plano básico para começar a aprender inglês com limitações diárias.',
+                'description': 'Perfeito para começar. Acesso básico com limite diário de lições e prática de conversação IA.',
                 'monthly_price': 0.00,
                 'yearly_price': 0.00,
                 'daily_lessons_limit': 3,
-                'daily_speaking_minutes': 5,
+                'daily_speaking_minutes': 5,  # 5 min/dia de conversação VAPI
                 'daily_listening_minutes': 5,
                 'hearts_limit': 3,
                 'hearts_recharge_hours': 4,
+                'trial_days': 7,  # 7 dias de trial
+                'trial_speaking_minutes': 5,  # 5 min durante trial
                 'offline_downloads': False,
                 'certificates': False,
                 'ai_tutor': False,
@@ -50,14 +52,16 @@ class Command(BaseCommand):
             {
                 'name': 'Premium',
                 'plan_type': 'PREMIUM',
-                'description': 'Acesso completo a todos os cursos e funcionalidades avançadas.',
-                'monthly_price': 14950.00,  # 14.950 Kz
+                'description': 'Aprendizagem sem limites. Lições ilimitadas, certificados oficiais, e relatórios avançados.',
+                'monthly_price': 14950.00,  # 14.950 Kz (~$18 USD)
                 'yearly_price': 149500.00,  # 149.500 Kz (economia de ~17%)
                 'daily_lessons_limit': None,  # Ilimitado
-                'daily_speaking_minutes': None,  # Ilimitado
+                'daily_speaking_minutes': 10,  # 10 min/dia de conversação VAPI
                 'daily_listening_minutes': None,  # Ilimitado
                 'hearts_limit': 0,  # Ilimitado
                 'hearts_recharge_hours': 0,
+                'trial_days': 0,
+                'trial_speaking_minutes': 0,
                 'offline_downloads': True,
                 'certificates': True,
                 'ai_tutor': False,
@@ -70,15 +74,17 @@ class Command(BaseCommand):
             },
             {
                 'name': 'Premium Plus',
-                'plan_type': 'PREMIUM_PLUS', 
-                'description': 'Experiência completa com IA Personal Tutor e sessões com professores nativos.',
-                'monthly_price': 24950.00,  # 24.950 Kz
+                'plan_type': 'PREMIUM_PLUS',
+                'description': 'A experiência completa. Tudo do Premium + IA Professor pessoal e sessões com professores nativos.',
+                'monthly_price': 24950.00,  # 24.950 Kz (~$30 USD)
                 'yearly_price': 249500.00,  # 249.500 Kz (economia de ~17%)
                 'daily_lessons_limit': None,  # Ilimitado
-                'daily_speaking_minutes': None,  # Ilimitado
+                'daily_speaking_minutes': 20,  # 20 min/dia de conversação VAPI
                 'daily_listening_minutes': None,  # Ilimitado
                 'hearts_limit': 0,  # Ilimitado
                 'hearts_recharge_hours': 0,
+                'trial_days': 0,
+                'trial_speaking_minutes': 0,
                 'offline_downloads': True,
                 'certificates': True,
                 'ai_tutor': True,
