@@ -302,7 +302,7 @@ class UserStreakAdmin(admin.ModelAdmin):
 
 @admin.register(Competition)
 class CompetitionAdmin(admin.ModelAdmin):
-    list_display = ['title', 'status', 'start_date', 'end_date', 'participant_count', 'prize']
+    list_display = ['title', 'status', 'start_date', 'end_date', 'participant_count', 'first_place_prize']
     list_filter = ['status', 'start_date']
     search_fields = ['title', 'description']
     ordering = ['-start_date']

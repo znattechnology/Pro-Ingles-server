@@ -15,7 +15,7 @@ from django.db import models, transaction
 from django.utils import timezone
 from rest_framework import generics, status as status_module
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
