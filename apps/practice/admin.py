@@ -1,11 +1,22 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import (
-    PracticeUnit, 
-    PracticeLesson, 
-    PracticeChallenge, 
-    ChallengeOption, 
-    UserProgress, 
-    ChallengeProgress
+    PracticeUnit,
+    PracticeLesson,
+    PracticeChallenge,
+    ChallengeOption,
+    UserProgress,
+    ChallengeProgress,
+    # Gamification models
+    Achievement,
+    UserAchievement,
+    AchievementCategory,
+    AchievementNotification,
+    UserLeague,
+    UserStreak,
+    Competition,
+    CompetitionParticipant,
+    LeaderboardSnapshot,
 )
 
 
@@ -87,7 +98,6 @@ class ChallengeProgressAdmin(admin.ModelAdmin):
 # VAPI AI CONVERSATION SESSIONS
 # =============================================================================
 
-from django.utils.html import format_html
 from .models import VapiSession
 
 
@@ -157,3 +167,172 @@ class VapiSessionAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False  # Sessões são read-only
+
+
+# =============================================================================
+# GAMIFICATION MODELS - Achievements, Leaderboard, Competitions
+# =============================================================================
+
+class UserAchievementInline(admin.TabularInline):
+    model = UserAchievement
+    extra = 0
+    readonly_fields = ['user', 'current_progress', 'is_unlocked', 'unlocked_at']
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(Achievement)
+class AchievementAdmin(admin.ModelAdmin):
+    list_display = [
+        'icon', 'title', 'category', 'rarity_display', 'points',
+        'requirement_type', 'requirement_target', 'is_active', 'unlocked_count'
+    ]
+    list_filter = ['category', 'rarity', 'is_active', 'created_at']
+    search_fields = ['title', 'description']
+    list_editable = ['is_active', 'points']
+    ordering = ['category', 'order']
+    inlines = [UserAchievementInline]
+
+    fieldsets = (
+        ('Informações Básicas', {
+            'fields': ('title', 'description', 'icon', 'category', 'rarity', 'points')
+        }),
+        ('Critérios de Desbloqueio', {
+            'fields': ('requirement_type', 'requirement_target', 'requirement_unit')
+        }),
+        ('Configurações', {
+            'fields': ('is_active', 'is_secret', 'order')
+        }),
+    )
+
+    def rarity_display(self, obj):
+        colors = {
+            'common': '#9CA3AF',
+            'rare': '#3B82F6',
+            'epic': '#8B5CF6',
+            'legendary': '#F59E0B'
+        }
+        color = colors.get(obj.rarity, '#9CA3AF')
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{}</span>',
+            color, obj.rarity.upper()
+        )
+    rarity_display.short_description = 'Raridade'
+
+    def unlocked_count(self, obj):
+        return UserAchievement.objects.filter(achievement=obj, is_unlocked=True).count()
+    unlocked_count.short_description = 'Desbloqueadas'
+
+
+@admin.register(UserAchievement)
+class UserAchievementAdmin(admin.ModelAdmin):
+    list_display = ['user', 'achievement', 'current_progress', 'progress_bar', 'is_unlocked', 'unlocked_at']
+    list_filter = ['is_unlocked', 'achievement__category', 'achievement__rarity']
+    search_fields = ['user__name', 'user__email', 'achievement__title']
+    readonly_fields = ['unlocked_at']
+    ordering = ['-unlocked_at', '-current_progress']
+
+    def progress_bar(self, obj):
+        target = obj.achievement.requirement_target
+        progress = min(obj.current_progress, target)
+        percentage = (progress / target * 100) if target > 0 else 0
+        color = 'green' if obj.is_unlocked else 'blue'
+        return format_html(
+            '<div style="width:100px;background:#374151;border-radius:4px;">'
+            '<div style="width:{}%;background:{};height:8px;border-radius:4px;"></div>'
+            '</div> {}%',
+            percentage, color, int(percentage)
+        )
+    progress_bar.short_description = 'Progresso'
+
+
+@admin.register(AchievementCategory)
+class AchievementCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'display_name', 'icon_class', 'order', 'is_active']
+    list_editable = ['order', 'is_active']
+    ordering = ['order']
+
+
+@admin.register(AchievementNotification)
+class AchievementNotificationAdmin(admin.ModelAdmin):
+    list_display = ['user', 'achievement', 'is_read', 'is_celebrated', 'created_at']
+    list_filter = ['is_read', 'is_celebrated', 'created_at']
+    search_fields = ['user__name', 'achievement__title']
+    readonly_fields = ['created_at', 'read_at']
+
+
+@admin.register(UserLeague)
+class UserLeagueAdmin(admin.ModelAdmin):
+    list_display = ['user', 'current_league_display', 'points_when_promoted', 'promoted_at']
+    list_filter = ['current_league', 'promoted_at']
+    search_fields = ['user__name', 'user__email']
+    ordering = ['-points_when_promoted']
+
+    def current_league_display(self, obj):
+        colors = {
+            'bronze': '#CD7F32',
+            'silver': '#C0C0C0',
+            'gold': '#FFD700',
+            'diamond': '#B9F2FF'
+        }
+        icons = {
+            'bronze': '🥉',
+            'silver': '🥈',
+            'gold': '🥇',
+            'diamond': '💎'
+        }
+        color = colors.get(obj.current_league, '#9CA3AF')
+        icon = icons.get(obj.current_league, '')
+        return format_html(
+            '{} <span style="color: {}; font-weight: bold;">{}</span>',
+            icon, color, obj.current_league.upper()
+        )
+    current_league_display.short_description = 'Liga'
+
+
+@admin.register(UserStreak)
+class UserStreakAdmin(admin.ModelAdmin):
+    list_display = ['user', 'current_streak', 'longest_streak', 'last_practice_date']
+    list_filter = ['last_practice_date']
+    search_fields = ['user__name', 'user__email']
+    ordering = ['-current_streak']
+
+
+@admin.register(Competition)
+class CompetitionAdmin(admin.ModelAdmin):
+    list_display = ['title', 'status', 'start_date', 'end_date', 'participant_count', 'prize']
+    list_filter = ['status', 'start_date']
+    search_fields = ['title', 'description']
+    ordering = ['-start_date']
+
+    def participant_count(self, obj):
+        return CompetitionParticipant.objects.filter(competition=obj).count()
+    participant_count.short_description = 'Participantes'
+
+
+@admin.register(CompetitionParticipant)
+class CompetitionParticipantAdmin(admin.ModelAdmin):
+    list_display = ['user', 'competition', 'points_earned', 'current_rank', 'joined_at']
+    list_filter = ['competition', 'joined_at']
+    search_fields = ['user__name', 'competition__title']
+    ordering = ['competition', 'current_rank']
+
+
+@admin.register(LeaderboardSnapshot)
+class LeaderboardSnapshotAdmin(admin.ModelAdmin):
+    list_display = ['user', 'snapshot_type', 'rank', 'points', 'league', 'rank_change_display', 'snapshot_date']
+    list_filter = ['snapshot_type', 'league', 'snapshot_date']
+    search_fields = ['user__name', 'user__email']
+    ordering = ['-snapshot_date', 'rank']
+    readonly_fields = ['snapshot_date']
+
+    def rank_change_display(self, obj):
+        if obj.rank_change > 0:
+            return format_html('<span style="color: green;">▲ {}</span>', obj.rank_change)
+        elif obj.rank_change < 0:
+            return format_html('<span style="color: red;">▼ {}</span>', abs(obj.rank_change))
+        else:
+            return format_html('<span style="color: gray;">━</span>')
+    rank_change_display.short_description = 'Mudança'
