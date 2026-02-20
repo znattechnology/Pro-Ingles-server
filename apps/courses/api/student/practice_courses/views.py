@@ -5,8 +5,13 @@ This module provides DRF views for the Practice Lab system,
 implementing all necessary endpoints for the Duolingo-style learning experience.
 """
 
+import logging
+
 from django.shortcuts import get_object_or_404
-from django.db import models
+from django.utils.decorators import method_decorator
+
+logger = logging.getLogger(__name__)
+from django.db import models, transaction
 from django.utils import timezone
 from rest_framework import generics, status as status_module
 from rest_framework.decorators import api_view, permission_classes
@@ -14,6 +19,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
+
+# Rate limiting for security
+from apps.practice.throttling import ChallengeProgressThrottle
 
 # Course management views removed - student endpoints only
 
@@ -27,6 +35,7 @@ from apps.subscriptions.decorators import (
     premium_required,
     premium_plus_required
 )
+from apps.subscriptions.models import UserSubscription
 
 from apps.courses.models import Course
 from apps.practice.models import (
@@ -79,10 +88,28 @@ from .serializers import (
 )
 
 
+def has_unlimited_hearts(user):
+    """
+    Check if user has an active subscription with unlimited hearts.
+
+    Returns True if user has a subscription where hearts_limit == 0 (unlimited).
+    """
+    try:
+        subscription = UserSubscription.objects.select_related('plan').get(user=user)
+        if subscription.plan and subscription.is_active() and subscription.plan.hearts_limit == 0:
+            logger.info(f"User {user.username} has unlimited hearts (subscription: {subscription.plan.name})")
+            return True
+    except UserSubscription.DoesNotExist:
+        pass
+    except Exception as e:
+        logger.error(f"Error checking unlimited hearts for user {user}: {e}")
+    return False
+
+
 class CoursesListView(generics.ListAPIView):
     """
     GET /api/v1/student/practice-courses/courses/
-    
+
     List all published practice courses for students.
     """
     permission_classes = []
@@ -112,10 +139,13 @@ class CoursesListView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         courses = self.get_queryset()
         data = []
-        
+
         # Check if statistics are requested (for student course info)
         include_stats = request.query_params.get('include_stats', 'false').lower() in ['true', '1', 'yes']
-        
+
+        # Check if user is authenticated for progress calculation
+        user = request.user if request.user.is_authenticated else None
+
         for course in courses:
             course_data = {
                 'id': str(course.id),
@@ -128,23 +158,41 @@ class CoursesListView(generics.ListAPIView):
                 'created_at': course.created_at.isoformat() if course.created_at else None,
                 'updated_at': course.updated_at.isoformat() if course.updated_at else None,
             }
-            
+
             # Add statistics if requested for student course selection
             if include_stats:
                 try:
                     # Get units count for this course
                     units_count = course.practice_units.count()
-                    
-                    # Get lessons count for this course  
-                    lessons_count = PracticeLesson.objects.filter(
-                        unit__course=course
-                    ).count()
-                    
+
+                    # Get lessons for this course
+                    lessons = PracticeLesson.objects.filter(unit__course=course)
+                    lessons_count = lessons.count()
+
                     # Get challenges count for this course
                     challenges_count = PracticeChallenge.objects.filter(
                         lesson__unit__course=course
                     ).count()
-                    
+
+                    # Calculate user progress if authenticated
+                    progress = 0
+                    completed_lessons = 0
+                    if user and lessons_count > 0:
+                        # For each lesson, check if ALL its challenges are completed
+                        for lesson in lessons:
+                            lesson_challenges_count = lesson.challenges.count()
+                            if lesson_challenges_count > 0:
+                                completed_challenges = ChallengeProgress.objects.filter(
+                                    user=user,
+                                    challenge__lesson=lesson,
+                                    completed=True
+                                ).count()
+                                if completed_challenges == lesson_challenges_count:
+                                    completed_lessons += 1
+
+                        # Calculate percentage
+                        progress = round((completed_lessons / lessons_count) * 100)
+
                     course_data.update({
                         'units_count': units_count,
                         'lessons_count': lessons_count,
@@ -152,8 +200,10 @@ class CoursesListView(generics.ListAPIView):
                         'totalUnits': units_count,
                         'total_lessons': lessons_count,
                         'total_challenges': challenges_count,
+                        'progress': progress,
+                        'completed_lessons': completed_lessons,
                     })
-                    
+
                 except Exception as e:
                     import logging
                     logger = logging.getLogger(__name__)
@@ -165,10 +215,12 @@ class CoursesListView(generics.ListAPIView):
                         'totalUnits': 0,
                         'total_lessons': 0,
                         'total_challenges': 0,
+                        'progress': 0,
+                        'completed_lessons': 0,
                     })
-            
+
             data.append(course_data)
-        
+
         return Response(data)
 
 
@@ -196,16 +248,19 @@ class CourseUnitsView(generics.ListAPIView):
 class LessonDetailView(generics.RetrieveAPIView):
     """
     GET /api/v1/practice/lessons/{lesson_id}/
-    
+
     Get detailed lesson with challenges for quiz page.
     Maps to getLesson query from client project.
+
+    P1 FIX: Now enforces subscription limits via @subscription_required decorator.
     """
     serializer_class = LessonDetailSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'
     lookup_url_kwarg = 'lesson_id'
-    
-    # @subscription_required('lesson')  # Commented out - will implement later
+
+    # P1 FIX: Enforce subscription limits on lesson access
+    @method_decorator(subscription_required('lesson'))
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
     
@@ -230,7 +285,7 @@ class UserProgressView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        """Get user's current progress"""
+        """Get user's current progress including subscription status"""
         user_progress, created = UserProgress.objects.get_or_create(
             user=request.user,
             defaults={
@@ -240,7 +295,26 @@ class UserProgressView(APIView):
             }
         )
         serializer = UserProgressSerializer(user_progress)
-        return Response(serializer.data)
+        data = serializer.data
+
+        # Add subscription status to response
+        has_active_subscription = False
+        has_unlimited_hearts_flag = False
+        try:
+            subscription = UserSubscription.objects.select_related('plan').get(user=request.user)
+            if subscription.plan and subscription.is_active():
+                has_active_subscription = True
+                if subscription.plan.hearts_limit == 0:
+                    has_unlimited_hearts_flag = True
+        except UserSubscription.DoesNotExist:
+            pass
+        except Exception as e:
+            logger.error(f"Error checking subscription for user {request.user}: {e}")
+
+        data['has_active_subscription'] = has_active_subscription
+        data['has_unlimited_hearts'] = has_unlimited_hearts_flag
+
+        return Response(data)
     
     def put(self, request):
         """Update user's progress (hearts, points, active course)"""
@@ -286,82 +360,571 @@ class UserProgressView(APIView):
 class ChallengeProgressView(APIView):
     """
     POST /api/v1/practice/challenge-progress/
-    
+
     Create or update challenge progress when user completes a challenge.
     Maps to upsertChallengeProgress action from client project.
+
+    Uses database transaction to ensure consistency when updating
+    challenge progress and user points/hearts atomically.
+
+    SECURITY: Rate limited to prevent abuse of points/hearts system.
+
+    P1 FIX: Now enforces hearts requirement via @hearts_required decorator.
+
+    Supports multiple challenge types:
+    - SELECT/ASSIST/TRUE_FALSE: selected_option (option ID)
+    - FILL_BLANK/TRANSLATION: text_answer (string with typo tolerance)
+    - SENTENCE_ORDER: ordered_options (array of option IDs in user's order)
+    - MATCH_PAIRS: paired_options (dict mapping left option ID to right option ID)
     """
     permission_classes = [IsAuthenticated]
-    
-    # @hearts_required()  # Commented out - will implement later
+    throttle_classes = [ChallengeProgressThrottle]
+
+    # P1 FIX: Enforce hearts requirement before processing challenge
+    @method_decorator(hearts_required())
+    @transaction.atomic
     def post(self, request):
         """Complete a challenge and update user progress"""
         import logging
+        from difflib import SequenceMatcher
         logger = logging.getLogger(__name__)
-        
+
         logger.info(f"ChallengeProgress POST request: {request.data}")
-        
-        challenge_id = request.data.get('challenge')
+
+        # Accept both 'challenge' and 'challenge_id' for compatibility
+        challenge_id = request.data.get('challenge_id') or request.data.get('challenge')
         selected_option_id = request.data.get('selected_option')
-        
-        logger.info(f"Challenge ID: {challenge_id}, Selected Option: {selected_option_id}")
-        
-        if not challenge_id or not selected_option_id:
+        text_answer = request.data.get('text_answer')
+        text_answers = request.data.get('text_answers')  # Array for multiple blanks
+        ordered_options = request.data.get('ordered_options')
+        paired_options = request.data.get('paired_options')
+        pronunciation_score = request.data.get('pronunciation_score')
+
+        logger.info(f"Challenge ID: {challenge_id}, Selected Option: {selected_option_id}, Text Answer: {text_answer is not None}, Text Answers: {text_answers is not None}")
+
+        # Input length validation to prevent abuse
+        MAX_TEXT_LENGTH = 2000
+        MAX_ANSWER_COUNT = 50
+
+        if text_answer and len(str(text_answer)) > MAX_TEXT_LENGTH:
+            logger.warning(f"Text answer too long: {len(str(text_answer))} chars")
             return Response(
-                {'error': 'challenge and selected_option are required'}, 
+                {'error': f'Text answer exceeds maximum length of {MAX_TEXT_LENGTH} characters'},
                 status=status_module.HTTP_400_BAD_REQUEST
             )
-        
+
+        if text_answers:
+            if len(text_answers) > MAX_ANSWER_COUNT:
+                logger.warning(f"Too many text answers: {len(text_answers)}")
+                return Response(
+                    {'error': f'Too many answers (max {MAX_ANSWER_COUNT})'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+            for i, ans in enumerate(text_answers):
+                if ans and len(str(ans)) > MAX_TEXT_LENGTH:
+                    logger.warning(f"Text answer {i} too long: {len(str(ans))} chars")
+                    return Response(
+                        {'error': f'Text answer exceeds maximum length of {MAX_TEXT_LENGTH} characters'},
+                        status=status_module.HTTP_400_BAD_REQUEST
+                    )
+
+        if not challenge_id:
+            return Response(
+                {'error': 'challenge is required'},
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+
         try:
-            challenge = PracticeChallenge.objects.get(id=challenge_id)
-            logger.info(f"Found challenge: {challenge}")
-            
-            selected_option = ChallengeOption.objects.get(id=selected_option_id, challenge=challenge)
-            logger.info(f"Found option: {selected_option}")
+            challenge = PracticeChallenge.objects.select_related('lesson', 'lesson__unit', 'lesson__unit__course').get(id=challenge_id)
+            logger.info(f"Found challenge: {challenge}, type: {challenge.type}")
+
+            # Validate hierarchy: challenge belongs to a valid lesson/unit/course
+            if not challenge.lesson:
+                logger.error(f"Challenge {challenge_id} has no associated lesson")
+                return Response(
+                    {'error': 'Invalid challenge configuration'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
         except PracticeChallenge.DoesNotExist:
             logger.error(f"Challenge not found: {challenge_id}")
             return Response(
-                {'error': 'Invalid challenge'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        except ChallengeOption.DoesNotExist:
-            logger.error(f"Option not found: {selected_option_id} for challenge: {challenge_id}")
-            return Response(
-                {'error': 'Invalid option'}, 
+                {'error': 'Invalid challenge'},
                 status=status_module.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             logger.error(f"Unexpected error: {e}")
             return Response(
-                {'error': f'Unexpected error: {str(e)}'}, 
+                {'error': f'Unexpected error: {str(e)}'},
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
+
         # Get user progress
         user_progress, created = UserProgress.objects.get_or_create(
             user=request.user,
             defaults={'hearts': 5, 'points': 0}
         )
         logger.info(f"User progress: hearts={user_progress.hearts}, points={user_progress.points}, created={created}")
-        
+
         # Check if this is practice mode (challenge already completed)
         existing_progress = ChallengeProgress.objects.filter(
             user=request.user,
             challenge=challenge
         ).first()
-        
+
         is_practice = existing_progress is not None
         logger.info(f"Is practice mode: {is_practice}, existing progress: {existing_progress}")
-        
-        # Check hearts for new challenges
-        if user_progress.hearts == 0 and not is_practice:
+
+        # Duplicate submission protection: prevent rapid re-submissions (within 2 seconds)
+        if existing_progress and existing_progress.updated_at:
+            from datetime import timedelta
+            time_since_last = timezone.now() - existing_progress.updated_at
+            if time_since_last < timedelta(seconds=2):
+                logger.warning(f"Duplicate submission detected for challenge {challenge_id} by user {request.user.id}")
+                # Return success with existing data to prevent frontend errors
+                return Response({
+                    'success': True,
+                    'correct': existing_progress.completed,
+                    'duplicate': True,
+                    'message': 'Submission already processed',
+                    'user_progress': {
+                        'hearts': user_progress.hearts,
+                        'points': user_progress.points
+                    }
+                }, status=status_module.HTTP_200_OK)
+
+        # Check hearts for new challenges (skip for users with unlimited hearts subscription)
+        if user_progress.hearts == 0 and not is_practice and not has_unlimited_hearts(request.user):
             logger.info("User has no hearts and this is not practice mode")
             return Response(
-                {'error': 'hearts', 'message': 'No hearts remaining'}, 
+                {'error': 'hearts', 'message': 'No hearts remaining'},
                 status=status_module.HTTP_400_BAD_REQUEST
             )
-        
-        # Check if the selected option is correct
-        if selected_option.is_correct:
+
+        # Validate answer based on challenge type
+        is_correct = False
+        challenge_type = challenge.type
+
+        # Initialize variables that may be used in response
+        similarity = None
+        matched = None
+
+        if challenge_type in ['SELECT', 'ASSIST', 'TRUE_FALSE']:
+            # Simple option selection - validate selected_option
+            if not selected_option_id:
+                return Response(
+                    {'error': f'selected_option is required for {challenge_type} challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+            try:
+                selected_option = ChallengeOption.objects.get(id=selected_option_id, challenge=challenge)
+                is_correct = selected_option.is_correct
+                logger.info(f"Option validation: {selected_option.text}, is_correct: {is_correct}")
+            except ChallengeOption.DoesNotExist:
+                logger.error(f"Option not found: {selected_option_id} for challenge: {challenge_id}")
+                return Response(
+                    {'error': 'Invalid option'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+        elif challenge_type == 'LISTENING':
+            # LISTENING can be either:
+            # 1. Dictation style (has text_answer/text_answers) - validate like FILL_BLANK
+            # 2. Multiple choice style (has selected_option) - validate option selection
+
+            if text_answer or text_answers:
+                # Dictation style - validate text answers like FILL_BLANK
+                logger.info(f"LISTENING dictation mode: text_answer={text_answer}, text_answers={text_answers}")
+
+                correct_options = list(challenge.options.filter(is_correct=True).order_by('order'))
+                if not correct_options:
+                    logger.error(f"No correct options for LISTENING challenge: {challenge_id}")
+                    return Response(
+                        {'error': 'Challenge has no correct answer configured'},
+                        status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+
+                from apps.practice.services.text_validation import TextValidationService
+
+                # Handle multiple blanks
+                if text_answers and isinstance(text_answers, list) and len(text_answers) > 1:
+                    logger.info(f"LISTENING multiple blanks: {len(text_answers)} answers for {len(correct_options)} blanks")
+
+                    # Validate answer count matches expected blank count
+                    if len(text_answers) != len(correct_options):
+                        logger.warning(f"LISTENING: Answer count mismatch. Expected {len(correct_options)}, got {len(text_answers)}")
+                        return Response(
+                            {'error': f'Expected {len(correct_options)} answers, received {len(text_answers)}'},
+                            status=status_module.HTTP_400_BAD_REQUEST
+                        )
+
+                    all_correct = True
+                    total_similarity = 0.0
+
+                    for i, user_ans in enumerate(text_answers):
+                        # Validate that answer is not empty
+                        if not user_ans or not str(user_ans).strip():
+                            logger.info(f"LISTENING Blank {i+1}: Empty answer provided")
+                            all_correct = False
+                            continue
+
+                        correct_ans = correct_options[i].text
+                        ans_correct, ans_similarity, _ = TextValidationService.validate_against_multiple(
+                            user_answer=str(user_ans).strip(),
+                            correct_answers=[correct_ans],
+                            tolerance=TextValidationService.DEFAULT_TOLERANCE
+                        )
+                        if not ans_correct:
+                            all_correct = False
+                        total_similarity += ans_similarity
+                        logger.info(f"LISTENING Blank {i+1}: '{user_ans}' vs '{correct_ans}' = {ans_correct} ({ans_similarity:.2%})")
+
+                    is_correct = all_correct
+                    similarity = total_similarity / len(text_answers) if text_answers else 0
+                    matched = ', '.join([opt.text for opt in correct_options])
+                    logger.info(f"LISTENING multiple blanks result: is_correct={is_correct}, avg_similarity={similarity:.2%}")
+                else:
+                    # Single blank
+                    correct_answers = [opt.text for opt in correct_options]
+                    is_correct, similarity, matched = TextValidationService.validate_against_multiple(
+                        user_answer=text_answer,
+                        correct_answers=correct_answers,
+                        tolerance=TextValidationService.DEFAULT_TOLERANCE
+                    )
+                    logger.info(f"LISTENING single blank result: is_correct={is_correct}, similarity={similarity:.2%}")
+
+            elif selected_option_id:
+                # Multiple choice style - original behavior
+                try:
+                    selected_option = ChallengeOption.objects.get(id=selected_option_id, challenge=challenge)
+                    is_correct = selected_option.is_correct
+                    logger.info(f"LISTENING option validation: {selected_option.text}, is_correct: {is_correct}")
+                except ChallengeOption.DoesNotExist:
+                    logger.error(f"Option not found: {selected_option_id} for LISTENING challenge: {challenge_id}")
+                    return Response(
+                        {'error': 'Invalid option'},
+                        status=status_module.HTTP_400_BAD_REQUEST
+                    )
+            else:
+                return Response(
+                    {'error': 'Either selected_option or text_answer/text_answers is required for LISTENING challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+        elif challenge_type == 'TRANSLATION':
+            # Translation with aggressive normalization and multiple correct answers
+            if not text_answer:
+                return Response(
+                    {'error': 'text_answer is required for TRANSLATION challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Get all correct options (supports multiple correct translations)
+            correct_options = challenge.options.filter(is_correct=True)
+            if not correct_options.exists():
+                logger.error(f"No correct options for challenge: {challenge_id}")
+                return Response(
+                    {'error': 'Challenge has no correct answer configured'},
+                    status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            # Use specialized translation validation with aggressive normalization
+            from apps.practice.services.text_validation import TextValidationService
+
+            correct_answers = [opt.text for opt in correct_options]
+
+            # Debug: Log expected answers for troubleshooting
+            logger.info(f"TRANSLATION challenge {challenge_id}: "
+                       f"User answer: '{text_answer}', "
+                       f"Expected answers: {correct_answers}")
+
+            is_correct, similarity, matched = TextValidationService.validate_translation(
+                user_answer=text_answer,
+                correct_answers=correct_answers
+                # Uses TRANSLATION_TOLERANCE (70%) by default
+            )
+
+            logger.info(f"Translation validation result: is_correct={is_correct}, "
+                       f"similarity={similarity:.2%}, matched='{matched}'")
+
+        elif challenge_type == 'FILL_BLANK':
+            # Fill blank with typo tolerance - supports single or multiple blanks
+            if not text_answer and not text_answers:
+                return Response(
+                    {'error': 'text_answer or text_answers is required for FILL_BLANK challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Get correct options ordered by position
+            correct_options = list(challenge.options.filter(is_correct=True).order_by('order'))
+            if not correct_options:
+                logger.error(f"No correct options for challenge: {challenge_id}")
+                return Response(
+                    {'error': 'Challenge has no correct answer configured'},
+                    status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            from apps.practice.services.text_validation import TextValidationService
+
+            # Handle multiple blanks (text_answers array)
+            if text_answers and isinstance(text_answers, list) and len(text_answers) > 1:
+                logger.info(f"Multiple blanks validation: {len(text_answers)} answers for {len(correct_options)} blanks")
+
+                # Validate answer count matches expected blank count
+                if len(text_answers) != len(correct_options):
+                    logger.warning(f"FILL_BLANK: Answer count mismatch. Expected {len(correct_options)}, got {len(text_answers)}")
+                    return Response(
+                        {'error': f'Expected {len(correct_options)} answers, received {len(text_answers)}'},
+                        status=status_module.HTTP_400_BAD_REQUEST
+                    )
+
+                # Validate each answer against corresponding correct option
+                all_correct = True
+                total_similarity = 0.0
+                results = []
+
+                for i, user_ans in enumerate(text_answers):
+                    # Validate that answer is not empty
+                    if not user_ans or not str(user_ans).strip():
+                        logger.info(f"Blank {i+1}: Empty answer provided")
+                        all_correct = False
+                        results.append({
+                            'blank': i + 1,
+                            'user': user_ans,
+                            'correct': False,
+                            'similarity': 0.0
+                        })
+                        continue
+
+                    correct_ans = correct_options[i].text
+                    ans_correct, ans_similarity, ans_matched = TextValidationService.validate_against_multiple(
+                        user_answer=str(user_ans).strip(),
+                        correct_answers=[correct_ans],
+                        tolerance=TextValidationService.DEFAULT_TOLERANCE
+                    )
+                    results.append({
+                        'blank': i + 1,
+                        'user': user_ans,
+                        'correct': ans_correct,
+                        'similarity': ans_similarity
+                    })
+                    total_similarity += ans_similarity
+                    if not ans_correct:
+                        all_correct = False
+                    logger.info(f"Blank {i+1}: '{user_ans}' vs '{correct_ans}' = {ans_correct} ({ans_similarity:.2%})")
+
+                is_correct = all_correct
+                similarity = total_similarity / len(text_answers) if text_answers else 0
+                matched = ', '.join([opt.text for opt in correct_options])
+
+                logger.info(f"Multiple blanks result: is_correct={is_correct}, avg_similarity={similarity:.2%}")
+            else:
+                # Single blank - original validation
+                correct_answers = [opt.text for opt in correct_options]
+                is_correct, similarity, matched = TextValidationService.validate_against_multiple(
+                    user_answer=text_answer,
+                    correct_answers=correct_answers,
+                    tolerance=TextValidationService.DEFAULT_TOLERANCE  # 85%
+                )
+                logger.info(f"Fill blank validation: '{text_answer}', is_correct: {is_correct}, "
+                           f"similarity: {similarity:.2%}, matched: '{matched}'")
+
+        elif challenge_type == 'SENTENCE_ORDER':
+            # Ordered sequence validation
+            if not ordered_options or not isinstance(ordered_options, list):
+                return Response(
+                    {'error': 'ordered_options (array) is required for SENTENCE_ORDER challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Get correct order from options using the 'order' field
+            correct_order = list(
+                challenge.options.order_by('order')
+                .values_list('id', flat=True)
+            )
+            correct_order_str = [str(opt_id) for opt_id in correct_order]
+
+            # Convert user order to comparable format (string UUIDs)
+            user_order = [str(opt_id) for opt_id in ordered_options]
+
+            # Validate array length matches expected options
+            if len(user_order) != len(correct_order_str):
+                logger.warning(f"SENTENCE_ORDER: Length mismatch. Expected {len(correct_order_str)}, got {len(user_order)}")
+                return Response(
+                    {'error': f'Expected {len(correct_order_str)} items, received {len(user_order)}'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Check for duplicates in user submission
+            if len(user_order) != len(set(user_order)):
+                logger.warning(f"SECURITY: SENTENCE_ORDER duplicate IDs in submission")
+                return Response(
+                    {'error': 'Duplicate option IDs are not allowed'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate that all submitted UUIDs belong to this challenge
+            valid_option_ids = set(correct_order_str)
+            submitted_ids = set(user_order)
+
+            if submitted_ids != valid_option_ids:
+                invalid_ids = submitted_ids - valid_option_ids
+                missing_ids = valid_option_ids - submitted_ids
+                logger.warning(f"SECURITY: SENTENCE_ORDER invalid submission. Invalid IDs: {invalid_ids}, Missing: {missing_ids}")
+                return Response(
+                    {'error': 'Invalid option IDs submitted'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            is_correct = user_order == correct_order_str
+            logger.info(f"Sentence order validation: user={user_order}, correct={correct_order_str}, is_correct: {is_correct}")
+
+        elif challenge_type == 'MATCH_PAIRS':
+            # Paired matching validation
+            # Frontend sends: { "option_id": "portuguese_text", ... }
+            # Options are stored as "English - Portuguese" format
+            if not paired_options or not isinstance(paired_options, dict):
+                return Response(
+                    {'error': 'paired_options (object) is required for MATCH_PAIRS challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Get all options for this challenge
+            all_options = list(challenge.options.order_by('order'))
+            valid_option_ids = {str(opt.id) for opt in all_options}
+
+            # SECURITY: Validate that all submitted IDs belong to this challenge
+            submitted_ids = set(paired_options.keys())
+            if not submitted_ids.issubset(valid_option_ids):
+                invalid_ids = submitted_ids - valid_option_ids
+                logger.warning(f"SECURITY: MATCH_PAIRS invalid IDs submitted: {invalid_ids}")
+                return Response(
+                    {'error': 'Invalid option IDs submitted'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Check all options are paired
+            if len(paired_options) != len(all_options):
+                logger.info(f"MATCH_PAIRS: Incomplete pairs. Expected {len(all_options)}, got {len(paired_options)}")
+                return Response(
+                    {'error': 'All pairs must be matched'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Helper function for text normalization
+            def normalize_text(text):
+                if not text:
+                    return ""
+                return ' '.join(text.lower().strip().split())
+
+            # TYPO_TOLERANCE for MATCH_PAIRS (85% - stricter than text input)
+            MATCH_PAIRS_TOLERANCE = 0.85
+
+            # Validate each pair
+            all_correct = True
+            for opt in all_options:
+                opt_id = str(opt.id)
+                if opt_id in paired_options:
+                    # Parse the expected format - support multiple delimiters
+                    text = opt.text
+                    parts = None
+
+                    # Try common delimiters: " - ", " – ", " = ", " : "
+                    for delimiter in [' - ', ' – ', ' = ', ' : ']:
+                        if delimiter in text:
+                            parts = text.split(delimiter, 1)  # Split only on first occurrence
+                            break
+
+                    if parts and len(parts) == 2:
+                        expected_portuguese = normalize_text(parts[1])
+                        submitted_portuguese = normalize_text(paired_options[opt_id])
+
+                        if expected_portuguese != submitted_portuguese:
+                            similarity = SequenceMatcher(None, expected_portuguese, submitted_portuguese).ratio()
+                            if similarity < MATCH_PAIRS_TOLERANCE:
+                                all_correct = False
+                                logger.info(f"MATCH_PAIRS: Mismatch for {opt_id}. Expected: '{parts[1]}', Got: '{paired_options[opt_id]}' (similarity: {similarity:.2%})")
+                                break
+                    else:
+                        # Fallback: compare full text if no delimiter found
+                        logger.warning(f"MATCH_PAIRS: No delimiter found in '{opt.text}', using full text comparison")
+                        expected = normalize_text(opt.text)
+                        submitted = normalize_text(paired_options[opt_id])
+                        similarity = SequenceMatcher(None, expected, submitted).ratio()
+                        if similarity < MATCH_PAIRS_TOLERANCE:
+                            all_correct = False
+                            break
+
+            is_correct = all_correct
+            logger.info(f"Match pairs validation: paired_options={paired_options}, is_correct: {is_correct}")
+
+        elif challenge_type == 'VAPI_CONVERSATION':
+            # SECURITY FIX: Verify score from server-side VapiSession, not client
+            # Frontend must send: { "session_id": "uuid" }
+            session_id = request.data.get('session_id')
+
+            if not session_id:
+                logger.warning("VAPI_CONVERSATION: No session_id provided")
+                return Response(
+                    {'error': 'session_id is required for VAPI_CONVERSATION challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Look up the VapiSession to get the authoritative score
+            try:
+                from apps.practice.models import VapiSession
+                vapi_session = VapiSession.objects.get(
+                    session_id=session_id,
+                    user=request.user  # Ensure session belongs to this user
+                )
+                score = float(vapi_session.overall_score)
+                logger.info(f"VAPI_CONVERSATION: Retrieved server-side score={score} for session={session_id}")
+            except VapiSession.DoesNotExist:
+                logger.warning(f"VAPI_CONVERSATION: Session not found or doesn't belong to user: {session_id}")
+                return Response(
+                    {'error': 'Invalid session_id or session not found'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Minimum passing score is 60%
+            VAPI_PASSING_SCORE = 60.0
+            is_correct = score >= VAPI_PASSING_SCORE
+            logger.info(f"VAPI_CONVERSATION: score={score}, passing={VAPI_PASSING_SCORE}, is_correct={is_correct}")
+
+        elif challenge_type == 'SPEAKING':
+            # SECURITY FIX: SPEAKING challenges must use AIPronunciationAnalysisView endpoint
+            # which performs server-side AI validation (Whisper + GPT-4) and updates progress.
+            #
+            # This endpoint does NOT accept client-supplied pronunciation_score to prevent
+            # score injection attacks. Users must call:
+            # POST /api/v1/practice/analyze-ai-pronunciation/
+            # with audio file and challenge_id for proper server-side validation.
+            #
+            # The AIPronunciationAnalysisView already handles:
+            # - Server-side AI pronunciation analysis
+            # - ChallengeProgress creation/update
+            # - Hearts and points management
+            # - Subscription-based AI analysis limits
+
+            logger.warning(f"SPEAKING: Direct validation not allowed. Use AIPronunciationAnalysisView endpoint.")
+            return Response(
+                {
+                    'error': 'SPEAKING challenges must use the AI pronunciation analysis endpoint',
+                    'endpoint': '/api/v1/practice/analyze-ai-pronunciation/',
+                    'message': 'Submit audio file with challenge_id for server-side pronunciation analysis'
+                },
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+
+        else:
+            logger.warning(f"Unknown challenge type: {challenge_type}")
+            return Response(
+                {'error': f'Unsupported challenge type: {challenge_type}'},
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+
+        # Process result based on correctness
+        if is_correct:
             # Correct answer: mark challenge as completed
             if existing_progress:
                 existing_progress.completed = True
@@ -373,7 +936,7 @@ class ChallengeProgressView(APIView):
                     challenge=challenge,
                     completed=True
                 )
-            
+
             # Update user progress based on practice mode
             if is_practice:
                 # Practice mode: restore hearts and add points
@@ -382,7 +945,7 @@ class ChallengeProgressView(APIView):
             else:
                 # New challenge: just add points
                 user_progress.add_points(10)
-            
+
             return Response({
                 'success': True,
                 'correct': True,
@@ -398,17 +961,34 @@ class ChallengeProgressView(APIView):
             }, status=status_module.HTTP_200_OK)
         else:
             # Wrong answer: don't complete challenge, reduce hearts if not practice
-            if not is_practice and user_progress.hearts > 0:
+            # Check if user has active subscription with unlimited hearts
+            user_has_unlimited = has_unlimited_hearts(request.user)
+
+            if not is_practice and user_progress.hearts > 0 and not user_has_unlimited:
                 user_progress.reduce_hearts()
-            
-            return Response({
+
+            # Build response with optional feedback for text challenges
+            response_data = {
                 'success': True,
                 'correct': False,
                 'user_progress': {
-                    'hearts': user_progress.hearts,
+                    'hearts': user_progress.hearts if not user_has_unlimited else 999,
                     'points': user_progress.points
+                },
+                'heartsUsed': 1 if not user_has_unlimited and not is_practice else 0,
+            }
+
+            # Add feedback for TRANSLATION/FILL_BLANK challenges
+            if challenge_type in ('TRANSLATION', 'FILL_BLANK', 'LISTENING') and similarity is not None:
+                response_data['feedback'] = {
+                    'similarity': round(similarity * 100, 1),
                 }
-            }, status=status_module.HTTP_200_OK)
+                if matched:
+                    # Give a hint without revealing full answer
+                    hint_text = matched[:3] + '...' if len(matched) > 3 else matched
+                    response_data['feedback']['hint'] = hint_text
+
+            return Response(response_data, status=status_module.HTTP_200_OK)
 
 
 class ReduceHeartsView(APIView):
@@ -421,22 +1001,30 @@ class ReduceHeartsView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        """Reduce user hearts by 1"""
+        """Reduce user hearts by 1 (skip for users with unlimited hearts subscription)"""
+        # Check if user has unlimited hearts subscription
+        if has_unlimited_hearts(request.user):
+            return Response({
+                'hearts': 999,  # Symbolic infinite value
+                'points': 0,
+                'unlimited': True
+            })
+
         user_progress, created = UserProgress.objects.get_or_create(
             user=request.user,
             defaults={'hearts': 5, 'points': 0}
         )
-        
+
         if user_progress.hearts > 0:
             user_progress.reduce_hearts()
-            
+
             return Response({
                 'hearts': user_progress.hearts,
                 'points': user_progress.points
             })
-        
+
         return Response(
-            {'error': 'No hearts to reduce'}, 
+            {'error': 'No hearts to reduce'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -444,24 +1032,29 @@ class ReduceHeartsView(APIView):
 class RefillHeartsView(APIView):
     """
     POST /api/v1/practice/refill-hearts/
-    
-    Refill user hearts (for premium users or heart purchases).
+
+    Refill user hearts (for premium users only).
+
+    P1 FIX: This is a premium feature - now enforces premium subscription.
     """
     permission_classes = [IsAuthenticated]
-    
+
+    # P1 FIX: Require premium subscription for heart refill
+    @method_decorator(premium_required())
     def post(self, request):
-        """Refill hearts to maximum (5)"""
+        """Refill hearts to maximum (5) - PREMIUM ONLY"""
         user_progress, created = UserProgress.objects.get_or_create(
             user=request.user,
             defaults={'hearts': 5, 'points': 0}
         )
-        
+
         user_progress.hearts = 5
         user_progress.save()
-        
+
         return Response({
             'hearts': user_progress.hearts,
-            'points': user_progress.points
+            'points': user_progress.points,
+            'message': 'Hearts refilled successfully (Premium feature)'
         })
 
 
@@ -510,10 +1103,10 @@ class ValidateTextAnswerView(APIView):
         is_practice = existing_progress is not None
         logger.info(f"Text answer validation - Practice mode: {is_practice}")
         
-        # Check hearts for new challenges
-        if user_progress.hearts == 0 and not is_practice:
+        # Check hearts for new challenges (skip for users with unlimited hearts subscription)
+        if user_progress.hearts == 0 and not is_practice and not has_unlimited_hearts(request.user):
             return Response(
-                {'error': 'hearts', 'message': 'No hearts remaining'}, 
+                {'error': 'hearts', 'message': 'No hearts remaining'},
                 status=status_module.HTTP_400_BAD_REQUEST
             )
         
@@ -521,23 +1114,21 @@ class ValidateTextAnswerView(APIView):
         correct_option = challenge.options.filter(is_correct=True).first()
         if not correct_option:
             return Response(
-                {'error': 'No correct answer found for this challenge'}, 
+                {'error': 'No correct answer found for this challenge'},
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
-        # Normalize answers for comparison
-        user_answer_normalized = user_answer.lower().strip()
-        correct_answer_normalized = correct_option.text.lower().strip()
-        
-        # Check if answers match (case-insensitive, whitespace trimmed)
-        is_correct = user_answer_normalized == correct_answer_normalized
-        
-        # Additional flexible matching for fill-blank
-        if not is_correct and challenge.type == 'FILL_BLANK':
-            # Remove extra spaces and check again
-            user_words = user_answer_normalized.split()
-            correct_words = correct_answer_normalized.split()
-            is_correct = user_words == correct_words
+
+        # Use TextValidationService for consistent validation with typo tolerance
+        from apps.practice.services.text_validation import TextValidationService
+
+        is_correct, similarity = TextValidationService.validate(
+            user_answer=user_answer,
+            correct_answer=correct_option.text,
+            tolerance=TextValidationService.DEFAULT_TOLERANCE  # 85%
+        )
+
+        logger.info(f"Text validation: '{user_answer}' vs '{correct_option.text}' "
+                   f"(similarity: {similarity:.2%}, correct: {is_correct})")
         
         if is_correct:
             # Correct answer: mark challenge as completed
@@ -578,9 +1169,11 @@ class ValidateTextAnswerView(APIView):
             }, status=status_module.HTTP_200_OK)
         else:
             # Wrong answer: don't complete challenge, reduce hearts if not practice
-            if not is_practice and user_progress.hearts > 0:
+            # P1 FIX: Check has_unlimited_hearts before reducing hearts
+            user_has_unlimited = has_unlimited_hearts(request.user)
+            if not is_practice and user_progress.hearts > 0 and not user_has_unlimited:
                 user_progress.reduce_hearts()
-            
+
             return Response({
                 'success': True,
                 'correct': False,
@@ -596,42 +1189,101 @@ class ValidateTextAnswerView(APIView):
 class GetAudioUploadUrlView(APIView):
     """
     POST /api/v1/practice/challenges/{challenge_id}/get-audio-upload-url/
-    
+
     Get presigned S3 URL for audio upload in listening challenges.
+
+    Security:
+    - Validates user ownership (must be course teacher or staff)
+    - Validates MIME type (audio only)
+    - Validates file size (max 50MB)
+    - Validates file extension
     """
     permission_classes = [IsAuthenticated]
-    
+
+    # Allowed audio MIME types
+    ALLOWED_AUDIO_TYPES = [
+        'audio/mpeg',
+        'audio/mp3',
+        'audio/wav',
+        'audio/x-wav',
+        'audio/ogg',
+        'audio/webm',
+        'audio/x-m4a',
+        'audio/mp4',
+        'audio/aac',
+    ]
+
+    # Allowed audio extensions
+    ALLOWED_AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'webm', 'm4a', 'aac', 'mp4']
+
+    # Max file size: 50MB
+    MAX_FILE_SIZE = 50 * 1024 * 1024
+
     def post(self, request, challenge_id):
         """Generate presigned URL for audio upload to S3"""
         import boto3
         import uuid
+        import os
         from django.conf import settings
-        
+
         try:
             # Validate request data
             lesson_id = request.data.get('lessonId')
-            file_name = request.data.get('fileName')
-            file_type = request.data.get('fileType')
-            
+            file_name = request.data.get('fileName', '')
+            file_type = request.data.get('fileType', '')
+            file_size = request.data.get('fileSize', 0)
+
             if not all([lesson_id, file_name, file_type]):
                 return Response(
-                    {'error': 'lessonId, fileName, and fileType are required'}, 
+                    {'error': 'lessonId, fileName, and fileType são obrigatórios'},
                     status=status_module.HTTP_400_BAD_REQUEST
                 )
-            
-            # Verify challenge exists
+
+            # Verify challenge exists and get ownership info
             try:
-                challenge = PracticeChallenge.objects.get(id=challenge_id)
+                challenge = PracticeChallenge.objects.select_related(
+                    'lesson__unit__course'
+                ).get(id=challenge_id)
             except PracticeChallenge.DoesNotExist:
                 return Response(
-                    {'error': 'Challenge not found'}, 
+                    {'error': 'Desafio não encontrado'},
                     status=status_module.HTTP_404_NOT_FOUND
                 )
-            
-            # Generate unique file name to avoid conflicts
-            file_extension = file_name.split('.')[-1] if '.' in file_name else 'mp3'
+
+            # SECURITY: Verify user ownership
+            course = challenge.lesson.unit.course
+            if course.teacher != request.user and not request.user.is_staff:
+                return Response(
+                    {'error': 'Não autorizado. Apenas o professor do curso pode fazer upload de áudio.'},
+                    status=status_module.HTTP_403_FORBIDDEN
+                )
+
+            # SECURITY: Validate MIME type
+            if file_type not in self.ALLOWED_AUDIO_TYPES:
+                return Response(
+                    {'error': f'Tipo de arquivo não permitido. Use: MP3, WAV, OGG, WebM, M4A, AAC'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate file extension
+            file_extension = os.path.splitext(file_name)[1].lower().lstrip('.')
+            if not file_extension or file_extension not in self.ALLOWED_AUDIO_EXTENSIONS:
+                return Response(
+                    {'error': f'Extensão de arquivo não permitida. Use: {", ".join(self.ALLOWED_AUDIO_EXTENSIONS)}'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate file size
+            if file_size and int(file_size) > self.MAX_FILE_SIZE:
+                max_mb = self.MAX_FILE_SIZE // (1024 * 1024)
+                return Response(
+                    {'error': f'Arquivo muito grande. Tamanho máximo: {max_mb}MB'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Generate unique file name to avoid conflicts (use validated extension)
             unique_filename = f"audio/{lesson_id}/{challenge_id}/{uuid.uuid4().hex}.{file_extension}"
-            
+
             # Initialize S3 client
             s3_client = boto3.client(
                 's3',
@@ -639,7 +1291,7 @@ class GetAudioUploadUrlView(APIView):
                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                 region_name=settings.AWS_S3_REGION_NAME or 'us-east-1'
             )
-            
+
             # Generate presigned URL for upload
             presigned_url = s3_client.generate_presigned_url(
                 'put_object',
@@ -650,22 +1302,22 @@ class GetAudioUploadUrlView(APIView):
                 },
                 ExpiresIn=3600  # 1 hour
             )
-            
+
             # Construct the final audio URL
             audio_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{unique_filename}"
-            
+
             return Response({
-                'message': 'Audio upload URL generated successfully',
+                'message': 'URL de upload de áudio gerada com sucesso',
                 'data': {
                     'uploadUrl': presigned_url,
                     'audioUrl': audio_url,
                     'fileName': unique_filename
                 }
             }, status=status_module.HTTP_200_OK)
-            
+
         except Exception as e:
             return Response(
-                {'error': f'Failed to generate upload URL: {str(e)}'}, 
+                {'error': f'Falha ao gerar URL de upload: {str(e)}'},
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -673,42 +1325,98 @@ class GetAudioUploadUrlView(APIView):
 class GetImageUploadUrlView(APIView):
     """
     POST /api/v1/practice/challenges/{challenge_id}/get-image-upload-url/
-    
+
     Get presigned S3 URL for image upload in listening challenges.
+
+    Security:
+    - Validates user ownership (must be course teacher or staff)
+    - Validates MIME type (images only)
+    - Validates file size (max 10MB)
+    - Validates file extension
     """
     permission_classes = [IsAuthenticated]
-    
+
+    # Allowed image MIME types
+    ALLOWED_IMAGE_TYPES = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+        'image/svg+xml',
+    ]
+
+    # Allowed image extensions
+    ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']
+
+    # Max file size: 10MB
+    MAX_FILE_SIZE = 10 * 1024 * 1024
+
     def post(self, request, challenge_id):
         """Generate presigned URL for image upload to S3"""
         import boto3
         import uuid
+        import os
         from django.conf import settings
-        
+
         try:
             # Validate request data
             lesson_id = request.data.get('lessonId')
-            file_name = request.data.get('fileName')
-            file_type = request.data.get('fileType')
-            
+            file_name = request.data.get('fileName', '')
+            file_type = request.data.get('fileType', '')
+            file_size = request.data.get('fileSize', 0)
+
             if not all([lesson_id, file_name, file_type]):
                 return Response(
-                    {'error': 'lessonId, fileName, and fileType are required'}, 
+                    {'error': 'lessonId, fileName, and fileType são obrigatórios'},
                     status=status_module.HTTP_400_BAD_REQUEST
                 )
-            
-            # Verify challenge exists
+
+            # Verify challenge exists and get ownership info
             try:
-                challenge = PracticeChallenge.objects.get(id=challenge_id)
+                challenge = PracticeChallenge.objects.select_related(
+                    'lesson__unit__course'
+                ).get(id=challenge_id)
             except PracticeChallenge.DoesNotExist:
                 return Response(
-                    {'error': 'Challenge not found'}, 
+                    {'error': 'Desafio não encontrado'},
                     status=status_module.HTTP_404_NOT_FOUND
                 )
-            
-            # Generate unique file name to avoid conflicts
-            file_extension = file_name.split('.')[-1] if '.' in file_name else 'jpg'
+
+            # SECURITY: Verify user ownership
+            course = challenge.lesson.unit.course
+            if course.teacher != request.user and not request.user.is_staff:
+                return Response(
+                    {'error': 'Não autorizado. Apenas o professor do curso pode fazer upload de imagens.'},
+                    status=status_module.HTTP_403_FORBIDDEN
+                )
+
+            # SECURITY: Validate MIME type
+            if file_type not in self.ALLOWED_IMAGE_TYPES:
+                return Response(
+                    {'error': f'Tipo de arquivo não permitido. Use: JPG, PNG, WebP, GIF, SVG'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate file extension
+            file_extension = os.path.splitext(file_name)[1].lower().lstrip('.')
+            if not file_extension or file_extension not in self.ALLOWED_IMAGE_EXTENSIONS:
+                return Response(
+                    {'error': f'Extensão de arquivo não permitida. Use: {", ".join(self.ALLOWED_IMAGE_EXTENSIONS)}'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate file size
+            if file_size and int(file_size) > self.MAX_FILE_SIZE:
+                max_mb = self.MAX_FILE_SIZE // (1024 * 1024)
+                return Response(
+                    {'error': f'Arquivo muito grande. Tamanho máximo: {max_mb}MB'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Generate unique file name to avoid conflicts (use validated extension)
             unique_filename = f"images/{lesson_id}/{challenge_id}/{uuid.uuid4().hex}.{file_extension}"
-            
+
             # Initialize S3 client
             s3_client = boto3.client(
                 's3',
@@ -716,7 +1424,7 @@ class GetImageUploadUrlView(APIView):
                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                 region_name=settings.AWS_S3_REGION_NAME or 'us-east-1'
             )
-            
+
             # Generate presigned URL for upload
             presigned_url = s3_client.generate_presigned_url(
                 'put_object',
@@ -727,22 +1435,22 @@ class GetImageUploadUrlView(APIView):
                 },
                 ExpiresIn=3600  # 1 hour
             )
-            
+
             # Construct the final image URL
             image_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{unique_filename}"
-            
+
             return Response({
-                'message': 'Image upload URL generated successfully',
+                'message': 'URL de upload de imagem gerada com sucesso',
                 'data': {
                     'uploadUrl': presigned_url,
                     'imageUrl': image_url,
                     'fileName': unique_filename
                 }
             }, status=status_module.HTTP_200_OK)
-            
+
         except Exception as e:
             return Response(
-                {'error': f'Failed to generate upload URL: {str(e)}'}, 
+                {'error': f'Falha ao gerar URL de upload: {str(e)}'},
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -954,27 +1662,52 @@ class PracticeChallengeCreateView(generics.ListCreateAPIView):
     """
     serializer_class = PracticeChallengeSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_queryset(self):
         lesson_id = self.request.GET.get('lesson')
         if lesson_id:
             return PracticeChallenge.objects.filter(lesson_id=lesson_id).order_by('order')
         return PracticeChallenge.objects.all().order_by('order')
-    
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new challenge with options.
+
+        The serializer's create() method handles creating nested options.
+        """
+        logger.info(f"=== CREATE CHALLENGE ===")
+        logger.info(f"Request data: {request.data}")
+        logger.info(f"Options in request: {request.data.get('options', 'NOT FOUND')}")
+
+        serializer = self.get_serializer(data=request.data)
+        logger.info(f"Serializer initial_data: {serializer.initial_data}")
+        logger.info(f"Options in initial_data: {serializer.initial_data.get('options', 'NOT FOUND')}")
+
+        serializer.is_valid(raise_exception=True)
+        challenge = serializer.save()
+
+        # Re-fetch to include created options in response
+        response_serializer = self.get_serializer(challenge)
+
+        logger.info(f"Challenge created: {challenge.id} with {challenge.options.count()} options")
+        logger.info(f"=== END CREATE CHALLENGE ===")
+
+        return Response(response_serializer.data, status=status_module.HTTP_201_CREATED)
+
     def list(self, request, *args, **kwargs):
         # Same format as challenges_list_simple
         lesson_id = request.GET.get('lesson')
         if not lesson_id:
             return Response(
-                {"error": "lesson parameter is required"}, 
+                {"error": "lesson parameter is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         try:
             challenges = PracticeChallenge.objects.filter(
                 lesson_id=lesson_id
             ).order_by('order')
-            
+
             serializer = self.get_serializer(challenges, many=True)
             return Response({
                 "message": "Challenges retrieved successfully",
@@ -982,7 +1715,7 @@ class PracticeChallengeCreateView(generics.ListCreateAPIView):
             })
         except Exception as e:
             return Response(
-                {"error": f"Error fetching challenges: {str(e)}"}, 
+                {"error": f"Error fetching challenges: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -1377,10 +2110,11 @@ def join_competition(request, competition_id):
 class LeaderboardSnapshotCreateView(APIView):
     """
     POST /api/v1/practice/leaderboard/snapshot/
-    
+
     Create a leaderboard snapshot (for automated tasks).
+    Admin only - used by Celery tasks for scheduled snapshots.
     """
-    permission_classes = [IsAuthenticated]  # Should be admin only in production
+    permission_classes = [IsAdminUser]  # SECURITY FIX: Admin only
     
     def post(self, request):
         """Create snapshot of current leaderboard"""
@@ -1446,10 +2180,11 @@ def update_user_streak(request):
 
 
 @api_view(['GET'])
-@permission_classes([])  # No authentication required for testing
+@permission_classes([IsAdminUser])  # SECURITY FIX: Admin only - was public, leaked PII
 def test_leaderboard_data(request):
     """
-    Test endpoint to check leaderboard data without authentication
+    Test endpoint to check leaderboard data (Admin only).
+    WARNING: This endpoint exposes user PII - use only for debugging.
     """
     from django.contrib.auth import get_user_model
     
@@ -1778,10 +2513,11 @@ def check_achievement_progress(user, achievement_type, current_value):
 
 
 @api_view(['GET'])
-@permission_classes([])  # No authentication required for testing
+@permission_classes([IsAdminUser])  # SECURITY FIX: Admin only - was public, wrote to DB
 def test_achievements_data(request):
     """
-    Test endpoint to check achievements data without authentication
+    Test endpoint to check achievements data (Admin only).
+    WARNING: This endpoint creates UserAchievement records - use only for debugging.
     """
     from django.contrib.auth import get_user_model
     
