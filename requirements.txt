@@ -5,6 +5,9 @@ django-cors-headers>=4.0.0
 django-filter>=23.3
 python-decouple>=3.8
 
+# Production Server
+gunicorn>=21.0.0
+
 # Database
 psycopg2-binary>=2.9.7
 dj-database-url>=2.1.0
@@ -19,6 +22,9 @@ google-auth>=2.23.0
 Pillow>=10.0.0
 boto3>=1.34.0
 django-storages[s3]>=1.14.0
+
+# PDF Generation
+reportlab>=4.0.0
 
 # Email (optional - can use Gmail SMTP or Mailgun)
 # django-anymail[mailgun]>=10.0
