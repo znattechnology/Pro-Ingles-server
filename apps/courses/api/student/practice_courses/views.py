@@ -5,15 +5,23 @@ This module provides DRF views for the Practice Lab system,
 implementing all necessary endpoints for the Duolingo-style learning experience.
 """
 
+import logging
+
 from django.shortcuts import get_object_or_404
-from django.db import models
+from django.utils.decorators import method_decorator
+
+logger = logging.getLogger(__name__)
+from django.db import models, transaction
 from django.utils import timezone
 from rest_framework import generics, status as status_module
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
+
+# Rate limiting for security
+from apps.practice.throttling import ChallengeProgressThrottle
 
 # Course management views removed - student endpoints only
 
@@ -27,6 +35,7 @@ from apps.subscriptions.decorators import (
     premium_required,
     premium_plus_required
 )
+from apps.subscriptions.models import UserSubscription
 
 from apps.courses.models import Course
 from apps.practice.models import (
@@ -45,20 +54,10 @@ from apps.practice.models import (
     Achievement,
     UserAchievement,
     AchievementCategory,
-    AchievementNotification,
-    # AI Speaking Practice Models
-    SpeakingExercise,
-    SpeakingSession,
-    SpeakingTurn,
-    SpeakingProgress,
-    # AI Listening Practice Models
-    ListeningExercise,
-    ListeningSession,
-    ListeningAttempt,
-    ListeningProgress,
-    AudioSegment
+    AchievementNotification
+    # Note: AI Speaking/Listening models removed - now handled by Vapi integration
 )
-from apps.practice.serializers import (
+from .serializers import (
     PracticeUnitSerializer,
     PracticeLessonSerializer,
     PracticeChallengeSerializer,
@@ -82,36 +81,35 @@ from apps.practice.serializers import (
     AchievementCategorySerializer,
     AchievementNotificationSerializer,
     DetailedAchievementSerializer,
-    # AI Speaking Practice Serializers
-    SpeakingExerciseSerializer,
-    SpeakingExerciseListSerializer,
-    SpeakingSessionSerializer,
-    SpeakingSessionCreateSerializer,
-    SpeakingTurnSerializer,
-    SpeakingTurnCreateSerializer,
-    SpeakingProgressSerializer,
-    SpeakingAnalysisSerializer,
-    SpeakingStatsSerializer,
-    QuickSpeakingFeedbackSerializer,
-    # AI Listening Practice Serializers
-    ListeningExerciseSerializer,
-    ListeningExerciseListSerializer,
-    ListeningSessionSerializer,
-    ListeningSessionCreateSerializer,
-    ListeningAttemptSerializer,
-    ListeningAttemptCreateSerializer,
-    ListeningProgressSerializer,
-    ListeningAnalysisSerializer,
-    ListeningStatsSerializer,
-    AudioSegmentSerializer,
-    QuickListeningFeedbackSerializer
+    # Vapi AI Conversation Serializers
+    VapiConversationSerializer,
+    VapiConversationFeedbackSerializer
+    # Note: AI Speaking/Listening serializers removed - now handled by Vapi integration
 )
+
+
+def has_unlimited_hearts(user):
+    """
+    Check if user has an active subscription with unlimited hearts.
+
+    Returns True if user has a subscription where hearts_limit == 0 (unlimited).
+    """
+    try:
+        subscription = UserSubscription.objects.select_related('plan').get(user=user)
+        if subscription.plan and subscription.is_active() and subscription.plan.hearts_limit == 0:
+            logger.info(f"User {user.username} has unlimited hearts (subscription: {subscription.plan.name})")
+            return True
+    except UserSubscription.DoesNotExist:
+        pass
+    except Exception as e:
+        logger.error(f"Error checking unlimited hearts for user {user}: {e}")
+    return False
 
 
 class CoursesListView(generics.ListAPIView):
     """
     GET /api/v1/student/practice-courses/courses/
-    
+
     List all published practice courses for students.
     """
     permission_classes = []
@@ -141,10 +139,13 @@ class CoursesListView(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         courses = self.get_queryset()
         data = []
-        
+
         # Check if statistics are requested (for student course info)
         include_stats = request.query_params.get('include_stats', 'false').lower() in ['true', '1', 'yes']
-        
+
+        # Check if user is authenticated for progress calculation
+        user = request.user if request.user.is_authenticated else None
+
         for course in courses:
             course_data = {
                 'id': str(course.id),
@@ -157,23 +158,41 @@ class CoursesListView(generics.ListAPIView):
                 'created_at': course.created_at.isoformat() if course.created_at else None,
                 'updated_at': course.updated_at.isoformat() if course.updated_at else None,
             }
-            
+
             # Add statistics if requested for student course selection
             if include_stats:
                 try:
                     # Get units count for this course
                     units_count = course.practice_units.count()
-                    
-                    # Get lessons count for this course  
-                    lessons_count = PracticeLesson.objects.filter(
-                        unit__course=course
-                    ).count()
-                    
+
+                    # Get lessons for this course
+                    lessons = PracticeLesson.objects.filter(unit__course=course)
+                    lessons_count = lessons.count()
+
                     # Get challenges count for this course
                     challenges_count = PracticeChallenge.objects.filter(
                         lesson__unit__course=course
                     ).count()
-                    
+
+                    # Calculate user progress if authenticated
+                    progress = 0
+                    completed_lessons = 0
+                    if user and lessons_count > 0:
+                        # For each lesson, check if ALL its challenges are completed
+                        for lesson in lessons:
+                            lesson_challenges_count = lesson.challenges.count()
+                            if lesson_challenges_count > 0:
+                                completed_challenges = ChallengeProgress.objects.filter(
+                                    user=user,
+                                    challenge__lesson=lesson,
+                                    completed=True
+                                ).count()
+                                if completed_challenges == lesson_challenges_count:
+                                    completed_lessons += 1
+
+                        # Calculate percentage
+                        progress = round((completed_lessons / lessons_count) * 100)
+
                     course_data.update({
                         'units_count': units_count,
                         'lessons_count': lessons_count,
@@ -181,8 +200,10 @@ class CoursesListView(generics.ListAPIView):
                         'totalUnits': units_count,
                         'total_lessons': lessons_count,
                         'total_challenges': challenges_count,
+                        'progress': progress,
+                        'completed_lessons': completed_lessons,
                     })
-                    
+
                 except Exception as e:
                     import logging
                     logger = logging.getLogger(__name__)
@@ -194,10 +215,12 @@ class CoursesListView(generics.ListAPIView):
                         'totalUnits': 0,
                         'total_lessons': 0,
                         'total_challenges': 0,
+                        'progress': 0,
+                        'completed_lessons': 0,
                     })
-            
+
             data.append(course_data)
-        
+
         return Response(data)
 
 
@@ -225,16 +248,19 @@ class CourseUnitsView(generics.ListAPIView):
 class LessonDetailView(generics.RetrieveAPIView):
     """
     GET /api/v1/practice/lessons/{lesson_id}/
-    
+
     Get detailed lesson with challenges for quiz page.
     Maps to getLesson query from client project.
+
+    P1 FIX: Now enforces subscription limits via @subscription_required decorator.
     """
     serializer_class = LessonDetailSerializer
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'
     lookup_url_kwarg = 'lesson_id'
-    
-    # @subscription_required('lesson')  # Commented out - will implement later
+
+    # P1 FIX: Enforce subscription limits on lesson access
+    @method_decorator(subscription_required('lesson'))
     def get(self, request, *args, **kwargs):
         return super().get(request, *args, **kwargs)
     
@@ -259,7 +285,7 @@ class UserProgressView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        """Get user's current progress"""
+        """Get user's current progress including subscription status"""
         user_progress, created = UserProgress.objects.get_or_create(
             user=request.user,
             defaults={
@@ -269,7 +295,26 @@ class UserProgressView(APIView):
             }
         )
         serializer = UserProgressSerializer(user_progress)
-        return Response(serializer.data)
+        data = serializer.data
+
+        # Add subscription status to response
+        has_active_subscription = False
+        has_unlimited_hearts_flag = False
+        try:
+            subscription = UserSubscription.objects.select_related('plan').get(user=request.user)
+            if subscription.plan and subscription.is_active():
+                has_active_subscription = True
+                if subscription.plan.hearts_limit == 0:
+                    has_unlimited_hearts_flag = True
+        except UserSubscription.DoesNotExist:
+            pass
+        except Exception as e:
+            logger.error(f"Error checking subscription for user {request.user}: {e}")
+
+        data['has_active_subscription'] = has_active_subscription
+        data['has_unlimited_hearts'] = has_unlimited_hearts_flag
+
+        return Response(data)
     
     def put(self, request):
         """Update user's progress (hearts, points, active course)"""
@@ -315,82 +360,571 @@ class UserProgressView(APIView):
 class ChallengeProgressView(APIView):
     """
     POST /api/v1/practice/challenge-progress/
-    
+
     Create or update challenge progress when user completes a challenge.
     Maps to upsertChallengeProgress action from client project.
+
+    Uses database transaction to ensure consistency when updating
+    challenge progress and user points/hearts atomically.
+
+    SECURITY: Rate limited to prevent abuse of points/hearts system.
+
+    P1 FIX: Now enforces hearts requirement via @hearts_required decorator.
+
+    Supports multiple challenge types:
+    - SELECT/ASSIST/TRUE_FALSE: selected_option (option ID)
+    - FILL_BLANK/TRANSLATION: text_answer (string with typo tolerance)
+    - SENTENCE_ORDER: ordered_options (array of option IDs in user's order)
+    - MATCH_PAIRS: paired_options (dict mapping left option ID to right option ID)
     """
     permission_classes = [IsAuthenticated]
-    
-    # @hearts_required()  # Commented out - will implement later
+    throttle_classes = [ChallengeProgressThrottle]
+
+    # P1 FIX: Enforce hearts requirement before processing challenge
+    @method_decorator(hearts_required())
+    @transaction.atomic
     def post(self, request):
         """Complete a challenge and update user progress"""
         import logging
+        from difflib import SequenceMatcher
         logger = logging.getLogger(__name__)
-        
+
         logger.info(f"ChallengeProgress POST request: {request.data}")
-        
-        challenge_id = request.data.get('challenge')
+
+        # Accept both 'challenge' and 'challenge_id' for compatibility
+        challenge_id = request.data.get('challenge_id') or request.data.get('challenge')
         selected_option_id = request.data.get('selected_option')
-        
-        logger.info(f"Challenge ID: {challenge_id}, Selected Option: {selected_option_id}")
-        
-        if not challenge_id or not selected_option_id:
+        text_answer = request.data.get('text_answer')
+        text_answers = request.data.get('text_answers')  # Array for multiple blanks
+        ordered_options = request.data.get('ordered_options')
+        paired_options = request.data.get('paired_options')
+        pronunciation_score = request.data.get('pronunciation_score')
+
+        logger.info(f"Challenge ID: {challenge_id}, Selected Option: {selected_option_id}, Text Answer: {text_answer is not None}, Text Answers: {text_answers is not None}")
+
+        # Input length validation to prevent abuse
+        MAX_TEXT_LENGTH = 2000
+        MAX_ANSWER_COUNT = 50
+
+        if text_answer and len(str(text_answer)) > MAX_TEXT_LENGTH:
+            logger.warning(f"Text answer too long: {len(str(text_answer))} chars")
             return Response(
-                {'error': 'challenge and selected_option are required'}, 
+                {'error': f'Text answer exceeds maximum length of {MAX_TEXT_LENGTH} characters'},
                 status=status_module.HTTP_400_BAD_REQUEST
             )
-        
+
+        if text_answers:
+            if len(text_answers) > MAX_ANSWER_COUNT:
+                logger.warning(f"Too many text answers: {len(text_answers)}")
+                return Response(
+                    {'error': f'Too many answers (max {MAX_ANSWER_COUNT})'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+            for i, ans in enumerate(text_answers):
+                if ans and len(str(ans)) > MAX_TEXT_LENGTH:
+                    logger.warning(f"Text answer {i} too long: {len(str(ans))} chars")
+                    return Response(
+                        {'error': f'Text answer exceeds maximum length of {MAX_TEXT_LENGTH} characters'},
+                        status=status_module.HTTP_400_BAD_REQUEST
+                    )
+
+        if not challenge_id:
+            return Response(
+                {'error': 'challenge is required'},
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+
         try:
-            challenge = PracticeChallenge.objects.get(id=challenge_id)
-            logger.info(f"Found challenge: {challenge}")
-            
-            selected_option = ChallengeOption.objects.get(id=selected_option_id, challenge=challenge)
-            logger.info(f"Found option: {selected_option}")
+            challenge = PracticeChallenge.objects.select_related('lesson', 'lesson__unit', 'lesson__unit__course').get(id=challenge_id)
+            logger.info(f"Found challenge: {challenge}, type: {challenge.type}")
+
+            # Validate hierarchy: challenge belongs to a valid lesson/unit/course
+            if not challenge.lesson:
+                logger.error(f"Challenge {challenge_id} has no associated lesson")
+                return Response(
+                    {'error': 'Invalid challenge configuration'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
         except PracticeChallenge.DoesNotExist:
             logger.error(f"Challenge not found: {challenge_id}")
             return Response(
-                {'error': 'Invalid challenge'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        except ChallengeOption.DoesNotExist:
-            logger.error(f"Option not found: {selected_option_id} for challenge: {challenge_id}")
-            return Response(
-                {'error': 'Invalid option'}, 
+                {'error': 'Invalid challenge'},
                 status=status_module.HTTP_400_BAD_REQUEST
             )
         except Exception as e:
             logger.error(f"Unexpected error: {e}")
             return Response(
-                {'error': f'Unexpected error: {str(e)}'}, 
+                {'error': f'Unexpected error: {str(e)}'},
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
+
         # Get user progress
         user_progress, created = UserProgress.objects.get_or_create(
             user=request.user,
             defaults={'hearts': 5, 'points': 0}
         )
         logger.info(f"User progress: hearts={user_progress.hearts}, points={user_progress.points}, created={created}")
-        
+
         # Check if this is practice mode (challenge already completed)
         existing_progress = ChallengeProgress.objects.filter(
             user=request.user,
             challenge=challenge
         ).first()
-        
+
         is_practice = existing_progress is not None
         logger.info(f"Is practice mode: {is_practice}, existing progress: {existing_progress}")
-        
-        # Check hearts for new challenges
-        if user_progress.hearts == 0 and not is_practice:
+
+        # Duplicate submission protection: prevent rapid re-submissions (within 2 seconds)
+        if existing_progress and existing_progress.updated_at:
+            from datetime import timedelta
+            time_since_last = timezone.now() - existing_progress.updated_at
+            if time_since_last < timedelta(seconds=2):
+                logger.warning(f"Duplicate submission detected for challenge {challenge_id} by user {request.user.id}")
+                # Return success with existing data to prevent frontend errors
+                return Response({
+                    'success': True,
+                    'correct': existing_progress.completed,
+                    'duplicate': True,
+                    'message': 'Submission already processed',
+                    'user_progress': {
+                        'hearts': user_progress.hearts,
+                        'points': user_progress.points
+                    }
+                }, status=status_module.HTTP_200_OK)
+
+        # Check hearts for new challenges (skip for users with unlimited hearts subscription)
+        if user_progress.hearts == 0 and not is_practice and not has_unlimited_hearts(request.user):
             logger.info("User has no hearts and this is not practice mode")
             return Response(
-                {'error': 'hearts', 'message': 'No hearts remaining'}, 
+                {'error': 'hearts', 'message': 'No hearts remaining'},
                 status=status_module.HTTP_400_BAD_REQUEST
             )
-        
-        # Check if the selected option is correct
-        if selected_option.is_correct:
+
+        # Validate answer based on challenge type
+        is_correct = False
+        challenge_type = challenge.type
+
+        # Initialize variables that may be used in response
+        similarity = None
+        matched = None
+
+        if challenge_type in ['SELECT', 'ASSIST', 'TRUE_FALSE']:
+            # Simple option selection - validate selected_option
+            if not selected_option_id:
+                return Response(
+                    {'error': f'selected_option is required for {challenge_type} challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+            try:
+                selected_option = ChallengeOption.objects.get(id=selected_option_id, challenge=challenge)
+                is_correct = selected_option.is_correct
+                logger.info(f"Option validation: {selected_option.text}, is_correct: {is_correct}")
+            except ChallengeOption.DoesNotExist:
+                logger.error(f"Option not found: {selected_option_id} for challenge: {challenge_id}")
+                return Response(
+                    {'error': 'Invalid option'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+        elif challenge_type == 'LISTENING':
+            # LISTENING can be either:
+            # 1. Dictation style (has text_answer/text_answers) - validate like FILL_BLANK
+            # 2. Multiple choice style (has selected_option) - validate option selection
+
+            if text_answer or text_answers:
+                # Dictation style - validate text answers like FILL_BLANK
+                logger.info(f"LISTENING dictation mode: text_answer={text_answer}, text_answers={text_answers}")
+
+                correct_options = list(challenge.options.filter(is_correct=True).order_by('order'))
+                if not correct_options:
+                    logger.error(f"No correct options for LISTENING challenge: {challenge_id}")
+                    return Response(
+                        {'error': 'Challenge has no correct answer configured'},
+                        status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+                    )
+
+                from apps.practice.services.text_validation import TextValidationService
+
+                # Handle multiple blanks
+                if text_answers and isinstance(text_answers, list) and len(text_answers) > 1:
+                    logger.info(f"LISTENING multiple blanks: {len(text_answers)} answers for {len(correct_options)} blanks")
+
+                    # Validate answer count matches expected blank count
+                    if len(text_answers) != len(correct_options):
+                        logger.warning(f"LISTENING: Answer count mismatch. Expected {len(correct_options)}, got {len(text_answers)}")
+                        return Response(
+                            {'error': f'Expected {len(correct_options)} answers, received {len(text_answers)}'},
+                            status=status_module.HTTP_400_BAD_REQUEST
+                        )
+
+                    all_correct = True
+                    total_similarity = 0.0
+
+                    for i, user_ans in enumerate(text_answers):
+                        # Validate that answer is not empty
+                        if not user_ans or not str(user_ans).strip():
+                            logger.info(f"LISTENING Blank {i+1}: Empty answer provided")
+                            all_correct = False
+                            continue
+
+                        correct_ans = correct_options[i].text
+                        ans_correct, ans_similarity, _ = TextValidationService.validate_against_multiple(
+                            user_answer=str(user_ans).strip(),
+                            correct_answers=[correct_ans],
+                            tolerance=TextValidationService.DEFAULT_TOLERANCE
+                        )
+                        if not ans_correct:
+                            all_correct = False
+                        total_similarity += ans_similarity
+                        logger.info(f"LISTENING Blank {i+1}: '{user_ans}' vs '{correct_ans}' = {ans_correct} ({ans_similarity:.2%})")
+
+                    is_correct = all_correct
+                    similarity = total_similarity / len(text_answers) if text_answers else 0
+                    matched = ', '.join([opt.text for opt in correct_options])
+                    logger.info(f"LISTENING multiple blanks result: is_correct={is_correct}, avg_similarity={similarity:.2%}")
+                else:
+                    # Single blank
+                    correct_answers = [opt.text for opt in correct_options]
+                    is_correct, similarity, matched = TextValidationService.validate_against_multiple(
+                        user_answer=text_answer,
+                        correct_answers=correct_answers,
+                        tolerance=TextValidationService.DEFAULT_TOLERANCE
+                    )
+                    logger.info(f"LISTENING single blank result: is_correct={is_correct}, similarity={similarity:.2%}")
+
+            elif selected_option_id:
+                # Multiple choice style - original behavior
+                try:
+                    selected_option = ChallengeOption.objects.get(id=selected_option_id, challenge=challenge)
+                    is_correct = selected_option.is_correct
+                    logger.info(f"LISTENING option validation: {selected_option.text}, is_correct: {is_correct}")
+                except ChallengeOption.DoesNotExist:
+                    logger.error(f"Option not found: {selected_option_id} for LISTENING challenge: {challenge_id}")
+                    return Response(
+                        {'error': 'Invalid option'},
+                        status=status_module.HTTP_400_BAD_REQUEST
+                    )
+            else:
+                return Response(
+                    {'error': 'Either selected_option or text_answer/text_answers is required for LISTENING challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+        elif challenge_type == 'TRANSLATION':
+            # Translation with aggressive normalization and multiple correct answers
+            if not text_answer:
+                return Response(
+                    {'error': 'text_answer is required for TRANSLATION challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Get all correct options (supports multiple correct translations)
+            correct_options = challenge.options.filter(is_correct=True)
+            if not correct_options.exists():
+                logger.error(f"No correct options for challenge: {challenge_id}")
+                return Response(
+                    {'error': 'Challenge has no correct answer configured'},
+                    status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            # Use specialized translation validation with aggressive normalization
+            from apps.practice.services.text_validation import TextValidationService
+
+            correct_answers = [opt.text for opt in correct_options]
+
+            # Debug: Log expected answers for troubleshooting
+            logger.info(f"TRANSLATION challenge {challenge_id}: "
+                       f"User answer: '{text_answer}', "
+                       f"Expected answers: {correct_answers}")
+
+            is_correct, similarity, matched = TextValidationService.validate_translation(
+                user_answer=text_answer,
+                correct_answers=correct_answers
+                # Uses TRANSLATION_TOLERANCE (70%) by default
+            )
+
+            logger.info(f"Translation validation result: is_correct={is_correct}, "
+                       f"similarity={similarity:.2%}, matched='{matched}'")
+
+        elif challenge_type == 'FILL_BLANK':
+            # Fill blank with typo tolerance - supports single or multiple blanks
+            if not text_answer and not text_answers:
+                return Response(
+                    {'error': 'text_answer or text_answers is required for FILL_BLANK challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Get correct options ordered by position
+            correct_options = list(challenge.options.filter(is_correct=True).order_by('order'))
+            if not correct_options:
+                logger.error(f"No correct options for challenge: {challenge_id}")
+                return Response(
+                    {'error': 'Challenge has no correct answer configured'},
+                    status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+
+            from apps.practice.services.text_validation import TextValidationService
+
+            # Handle multiple blanks (text_answers array)
+            if text_answers and isinstance(text_answers, list) and len(text_answers) > 1:
+                logger.info(f"Multiple blanks validation: {len(text_answers)} answers for {len(correct_options)} blanks")
+
+                # Validate answer count matches expected blank count
+                if len(text_answers) != len(correct_options):
+                    logger.warning(f"FILL_BLANK: Answer count mismatch. Expected {len(correct_options)}, got {len(text_answers)}")
+                    return Response(
+                        {'error': f'Expected {len(correct_options)} answers, received {len(text_answers)}'},
+                        status=status_module.HTTP_400_BAD_REQUEST
+                    )
+
+                # Validate each answer against corresponding correct option
+                all_correct = True
+                total_similarity = 0.0
+                results = []
+
+                for i, user_ans in enumerate(text_answers):
+                    # Validate that answer is not empty
+                    if not user_ans or not str(user_ans).strip():
+                        logger.info(f"Blank {i+1}: Empty answer provided")
+                        all_correct = False
+                        results.append({
+                            'blank': i + 1,
+                            'user': user_ans,
+                            'correct': False,
+                            'similarity': 0.0
+                        })
+                        continue
+
+                    correct_ans = correct_options[i].text
+                    ans_correct, ans_similarity, ans_matched = TextValidationService.validate_against_multiple(
+                        user_answer=str(user_ans).strip(),
+                        correct_answers=[correct_ans],
+                        tolerance=TextValidationService.DEFAULT_TOLERANCE
+                    )
+                    results.append({
+                        'blank': i + 1,
+                        'user': user_ans,
+                        'correct': ans_correct,
+                        'similarity': ans_similarity
+                    })
+                    total_similarity += ans_similarity
+                    if not ans_correct:
+                        all_correct = False
+                    logger.info(f"Blank {i+1}: '{user_ans}' vs '{correct_ans}' = {ans_correct} ({ans_similarity:.2%})")
+
+                is_correct = all_correct
+                similarity = total_similarity / len(text_answers) if text_answers else 0
+                matched = ', '.join([opt.text for opt in correct_options])
+
+                logger.info(f"Multiple blanks result: is_correct={is_correct}, avg_similarity={similarity:.2%}")
+            else:
+                # Single blank - original validation
+                correct_answers = [opt.text for opt in correct_options]
+                is_correct, similarity, matched = TextValidationService.validate_against_multiple(
+                    user_answer=text_answer,
+                    correct_answers=correct_answers,
+                    tolerance=TextValidationService.DEFAULT_TOLERANCE  # 85%
+                )
+                logger.info(f"Fill blank validation: '{text_answer}', is_correct: {is_correct}, "
+                           f"similarity: {similarity:.2%}, matched: '{matched}'")
+
+        elif challenge_type == 'SENTENCE_ORDER':
+            # Ordered sequence validation
+            if not ordered_options or not isinstance(ordered_options, list):
+                return Response(
+                    {'error': 'ordered_options (array) is required for SENTENCE_ORDER challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Get correct order from options using the 'order' field
+            correct_order = list(
+                challenge.options.order_by('order')
+                .values_list('id', flat=True)
+            )
+            correct_order_str = [str(opt_id) for opt_id in correct_order]
+
+            # Convert user order to comparable format (string UUIDs)
+            user_order = [str(opt_id) for opt_id in ordered_options]
+
+            # Validate array length matches expected options
+            if len(user_order) != len(correct_order_str):
+                logger.warning(f"SENTENCE_ORDER: Length mismatch. Expected {len(correct_order_str)}, got {len(user_order)}")
+                return Response(
+                    {'error': f'Expected {len(correct_order_str)} items, received {len(user_order)}'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Check for duplicates in user submission
+            if len(user_order) != len(set(user_order)):
+                logger.warning(f"SECURITY: SENTENCE_ORDER duplicate IDs in submission")
+                return Response(
+                    {'error': 'Duplicate option IDs are not allowed'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate that all submitted UUIDs belong to this challenge
+            valid_option_ids = set(correct_order_str)
+            submitted_ids = set(user_order)
+
+            if submitted_ids != valid_option_ids:
+                invalid_ids = submitted_ids - valid_option_ids
+                missing_ids = valid_option_ids - submitted_ids
+                logger.warning(f"SECURITY: SENTENCE_ORDER invalid submission. Invalid IDs: {invalid_ids}, Missing: {missing_ids}")
+                return Response(
+                    {'error': 'Invalid option IDs submitted'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            is_correct = user_order == correct_order_str
+            logger.info(f"Sentence order validation: user={user_order}, correct={correct_order_str}, is_correct: {is_correct}")
+
+        elif challenge_type == 'MATCH_PAIRS':
+            # Paired matching validation
+            # Frontend sends: { "option_id": "portuguese_text", ... }
+            # Options are stored as "English - Portuguese" format
+            if not paired_options or not isinstance(paired_options, dict):
+                return Response(
+                    {'error': 'paired_options (object) is required for MATCH_PAIRS challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Get all options for this challenge
+            all_options = list(challenge.options.order_by('order'))
+            valid_option_ids = {str(opt.id) for opt in all_options}
+
+            # SECURITY: Validate that all submitted IDs belong to this challenge
+            submitted_ids = set(paired_options.keys())
+            if not submitted_ids.issubset(valid_option_ids):
+                invalid_ids = submitted_ids - valid_option_ids
+                logger.warning(f"SECURITY: MATCH_PAIRS invalid IDs submitted: {invalid_ids}")
+                return Response(
+                    {'error': 'Invalid option IDs submitted'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Check all options are paired
+            if len(paired_options) != len(all_options):
+                logger.info(f"MATCH_PAIRS: Incomplete pairs. Expected {len(all_options)}, got {len(paired_options)}")
+                return Response(
+                    {'error': 'All pairs must be matched'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Helper function for text normalization
+            def normalize_text(text):
+                if not text:
+                    return ""
+                return ' '.join(text.lower().strip().split())
+
+            # TYPO_TOLERANCE for MATCH_PAIRS (85% - stricter than text input)
+            MATCH_PAIRS_TOLERANCE = 0.85
+
+            # Validate each pair
+            all_correct = True
+            for opt in all_options:
+                opt_id = str(opt.id)
+                if opt_id in paired_options:
+                    # Parse the expected format - support multiple delimiters
+                    text = opt.text
+                    parts = None
+
+                    # Try common delimiters: " - ", " – ", " = ", " : "
+                    for delimiter in [' - ', ' – ', ' = ', ' : ']:
+                        if delimiter in text:
+                            parts = text.split(delimiter, 1)  # Split only on first occurrence
+                            break
+
+                    if parts and len(parts) == 2:
+                        expected_portuguese = normalize_text(parts[1])
+                        submitted_portuguese = normalize_text(paired_options[opt_id])
+
+                        if expected_portuguese != submitted_portuguese:
+                            similarity = SequenceMatcher(None, expected_portuguese, submitted_portuguese).ratio()
+                            if similarity < MATCH_PAIRS_TOLERANCE:
+                                all_correct = False
+                                logger.info(f"MATCH_PAIRS: Mismatch for {opt_id}. Expected: '{parts[1]}', Got: '{paired_options[opt_id]}' (similarity: {similarity:.2%})")
+                                break
+                    else:
+                        # Fallback: compare full text if no delimiter found
+                        logger.warning(f"MATCH_PAIRS: No delimiter found in '{opt.text}', using full text comparison")
+                        expected = normalize_text(opt.text)
+                        submitted = normalize_text(paired_options[opt_id])
+                        similarity = SequenceMatcher(None, expected, submitted).ratio()
+                        if similarity < MATCH_PAIRS_TOLERANCE:
+                            all_correct = False
+                            break
+
+            is_correct = all_correct
+            logger.info(f"Match pairs validation: paired_options={paired_options}, is_correct: {is_correct}")
+
+        elif challenge_type == 'VAPI_CONVERSATION':
+            # SECURITY FIX: Verify score from server-side VapiSession, not client
+            # Frontend must send: { "session_id": "uuid" }
+            session_id = request.data.get('session_id')
+
+            if not session_id:
+                logger.warning("VAPI_CONVERSATION: No session_id provided")
+                return Response(
+                    {'error': 'session_id is required for VAPI_CONVERSATION challenges'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Look up the VapiSession to get the authoritative score
+            try:
+                from apps.practice.models import VapiSession
+                vapi_session = VapiSession.objects.get(
+                    session_id=session_id,
+                    user=request.user  # Ensure session belongs to this user
+                )
+                score = float(vapi_session.overall_score)
+                logger.info(f"VAPI_CONVERSATION: Retrieved server-side score={score} for session={session_id}")
+            except VapiSession.DoesNotExist:
+                logger.warning(f"VAPI_CONVERSATION: Session not found or doesn't belong to user: {session_id}")
+                return Response(
+                    {'error': 'Invalid session_id or session not found'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Minimum passing score is 60%
+            VAPI_PASSING_SCORE = 60.0
+            is_correct = score >= VAPI_PASSING_SCORE
+            logger.info(f"VAPI_CONVERSATION: score={score}, passing={VAPI_PASSING_SCORE}, is_correct={is_correct}")
+
+        elif challenge_type == 'SPEAKING':
+            # SECURITY FIX: SPEAKING challenges must use AIPronunciationAnalysisView endpoint
+            # which performs server-side AI validation (Whisper + GPT-4) and updates progress.
+            #
+            # This endpoint does NOT accept client-supplied pronunciation_score to prevent
+            # score injection attacks. Users must call:
+            # POST /api/v1/practice/analyze-ai-pronunciation/
+            # with audio file and challenge_id for proper server-side validation.
+            #
+            # The AIPronunciationAnalysisView already handles:
+            # - Server-side AI pronunciation analysis
+            # - ChallengeProgress creation/update
+            # - Hearts and points management
+            # - Subscription-based AI analysis limits
+
+            logger.warning(f"SPEAKING: Direct validation not allowed. Use AIPronunciationAnalysisView endpoint.")
+            return Response(
+                {
+                    'error': 'SPEAKING challenges must use the AI pronunciation analysis endpoint',
+                    'endpoint': '/api/v1/practice/analyze-ai-pronunciation/',
+                    'message': 'Submit audio file with challenge_id for server-side pronunciation analysis'
+                },
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+
+        else:
+            logger.warning(f"Unknown challenge type: {challenge_type}")
+            return Response(
+                {'error': f'Unsupported challenge type: {challenge_type}'},
+                status=status_module.HTTP_400_BAD_REQUEST
+            )
+
+        # Process result based on correctness
+        if is_correct:
             # Correct answer: mark challenge as completed
             if existing_progress:
                 existing_progress.completed = True
@@ -402,7 +936,7 @@ class ChallengeProgressView(APIView):
                     challenge=challenge,
                     completed=True
                 )
-            
+
             # Update user progress based on practice mode
             if is_practice:
                 # Practice mode: restore hearts and add points
@@ -411,7 +945,7 @@ class ChallengeProgressView(APIView):
             else:
                 # New challenge: just add points
                 user_progress.add_points(10)
-            
+
             return Response({
                 'success': True,
                 'correct': True,
@@ -427,17 +961,34 @@ class ChallengeProgressView(APIView):
             }, status=status_module.HTTP_200_OK)
         else:
             # Wrong answer: don't complete challenge, reduce hearts if not practice
-            if not is_practice and user_progress.hearts > 0:
+            # Check if user has active subscription with unlimited hearts
+            user_has_unlimited = has_unlimited_hearts(request.user)
+
+            if not is_practice and user_progress.hearts > 0 and not user_has_unlimited:
                 user_progress.reduce_hearts()
-            
-            return Response({
+
+            # Build response with optional feedback for text challenges
+            response_data = {
                 'success': True,
                 'correct': False,
                 'user_progress': {
-                    'hearts': user_progress.hearts,
+                    'hearts': user_progress.hearts if not user_has_unlimited else 999,
                     'points': user_progress.points
+                },
+                'heartsUsed': 1 if not user_has_unlimited and not is_practice else 0,
+            }
+
+            # Add feedback for TRANSLATION/FILL_BLANK challenges
+            if challenge_type in ('TRANSLATION', 'FILL_BLANK', 'LISTENING') and similarity is not None:
+                response_data['feedback'] = {
+                    'similarity': round(similarity * 100, 1),
                 }
-            }, status=status_module.HTTP_200_OK)
+                if matched:
+                    # Give a hint without revealing full answer
+                    hint_text = matched[:3] + '...' if len(matched) > 3 else matched
+                    response_data['feedback']['hint'] = hint_text
+
+            return Response(response_data, status=status_module.HTTP_200_OK)
 
 
 class ReduceHeartsView(APIView):
@@ -450,22 +1001,30 @@ class ReduceHeartsView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        """Reduce user hearts by 1"""
+        """Reduce user hearts by 1 (skip for users with unlimited hearts subscription)"""
+        # Check if user has unlimited hearts subscription
+        if has_unlimited_hearts(request.user):
+            return Response({
+                'hearts': 999,  # Symbolic infinite value
+                'points': 0,
+                'unlimited': True
+            })
+
         user_progress, created = UserProgress.objects.get_or_create(
             user=request.user,
             defaults={'hearts': 5, 'points': 0}
         )
-        
+
         if user_progress.hearts > 0:
             user_progress.reduce_hearts()
-            
+
             return Response({
                 'hearts': user_progress.hearts,
                 'points': user_progress.points
             })
-        
+
         return Response(
-            {'error': 'No hearts to reduce'}, 
+            {'error': 'No hearts to reduce'},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -473,24 +1032,29 @@ class ReduceHeartsView(APIView):
 class RefillHeartsView(APIView):
     """
     POST /api/v1/practice/refill-hearts/
-    
-    Refill user hearts (for premium users or heart purchases).
+
+    Refill user hearts (for premium users only).
+
+    P1 FIX: This is a premium feature - now enforces premium subscription.
     """
     permission_classes = [IsAuthenticated]
-    
+
+    # P1 FIX: Require premium subscription for heart refill
+    @method_decorator(premium_required())
     def post(self, request):
-        """Refill hearts to maximum (5)"""
+        """Refill hearts to maximum (5) - PREMIUM ONLY"""
         user_progress, created = UserProgress.objects.get_or_create(
             user=request.user,
             defaults={'hearts': 5, 'points': 0}
         )
-        
+
         user_progress.hearts = 5
         user_progress.save()
-        
+
         return Response({
             'hearts': user_progress.hearts,
-            'points': user_progress.points
+            'points': user_progress.points,
+            'message': 'Hearts refilled successfully (Premium feature)'
         })
 
 
@@ -539,10 +1103,10 @@ class ValidateTextAnswerView(APIView):
         is_practice = existing_progress is not None
         logger.info(f"Text answer validation - Practice mode: {is_practice}")
         
-        # Check hearts for new challenges
-        if user_progress.hearts == 0 and not is_practice:
+        # Check hearts for new challenges (skip for users with unlimited hearts subscription)
+        if user_progress.hearts == 0 and not is_practice and not has_unlimited_hearts(request.user):
             return Response(
-                {'error': 'hearts', 'message': 'No hearts remaining'}, 
+                {'error': 'hearts', 'message': 'No hearts remaining'},
                 status=status_module.HTTP_400_BAD_REQUEST
             )
         
@@ -550,23 +1114,21 @@ class ValidateTextAnswerView(APIView):
         correct_option = challenge.options.filter(is_correct=True).first()
         if not correct_option:
             return Response(
-                {'error': 'No correct answer found for this challenge'}, 
+                {'error': 'No correct answer found for this challenge'},
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
-        # Normalize answers for comparison
-        user_answer_normalized = user_answer.lower().strip()
-        correct_answer_normalized = correct_option.text.lower().strip()
-        
-        # Check if answers match (case-insensitive, whitespace trimmed)
-        is_correct = user_answer_normalized == correct_answer_normalized
-        
-        # Additional flexible matching for fill-blank
-        if not is_correct and challenge.type == 'FILL_BLANK':
-            # Remove extra spaces and check again
-            user_words = user_answer_normalized.split()
-            correct_words = correct_answer_normalized.split()
-            is_correct = user_words == correct_words
+
+        # Use TextValidationService for consistent validation with typo tolerance
+        from apps.practice.services.text_validation import TextValidationService
+
+        is_correct, similarity = TextValidationService.validate(
+            user_answer=user_answer,
+            correct_answer=correct_option.text,
+            tolerance=TextValidationService.DEFAULT_TOLERANCE  # 85%
+        )
+
+        logger.info(f"Text validation: '{user_answer}' vs '{correct_option.text}' "
+                   f"(similarity: {similarity:.2%}, correct: {is_correct})")
         
         if is_correct:
             # Correct answer: mark challenge as completed
@@ -607,9 +1169,11 @@ class ValidateTextAnswerView(APIView):
             }, status=status_module.HTTP_200_OK)
         else:
             # Wrong answer: don't complete challenge, reduce hearts if not practice
-            if not is_practice and user_progress.hearts > 0:
+            # P1 FIX: Check has_unlimited_hearts before reducing hearts
+            user_has_unlimited = has_unlimited_hearts(request.user)
+            if not is_practice and user_progress.hearts > 0 and not user_has_unlimited:
                 user_progress.reduce_hearts()
-            
+
             return Response({
                 'success': True,
                 'correct': False,
@@ -625,42 +1189,101 @@ class ValidateTextAnswerView(APIView):
 class GetAudioUploadUrlView(APIView):
     """
     POST /api/v1/practice/challenges/{challenge_id}/get-audio-upload-url/
-    
+
     Get presigned S3 URL for audio upload in listening challenges.
+
+    Security:
+    - Validates user ownership (must be course teacher or staff)
+    - Validates MIME type (audio only)
+    - Validates file size (max 50MB)
+    - Validates file extension
     """
     permission_classes = [IsAuthenticated]
-    
+
+    # Allowed audio MIME types
+    ALLOWED_AUDIO_TYPES = [
+        'audio/mpeg',
+        'audio/mp3',
+        'audio/wav',
+        'audio/x-wav',
+        'audio/ogg',
+        'audio/webm',
+        'audio/x-m4a',
+        'audio/mp4',
+        'audio/aac',
+    ]
+
+    # Allowed audio extensions
+    ALLOWED_AUDIO_EXTENSIONS = ['mp3', 'wav', 'ogg', 'webm', 'm4a', 'aac', 'mp4']
+
+    # Max file size: 50MB
+    MAX_FILE_SIZE = 50 * 1024 * 1024
+
     def post(self, request, challenge_id):
         """Generate presigned URL for audio upload to S3"""
         import boto3
         import uuid
+        import os
         from django.conf import settings
-        
+
         try:
             # Validate request data
             lesson_id = request.data.get('lessonId')
-            file_name = request.data.get('fileName')
-            file_type = request.data.get('fileType')
-            
+            file_name = request.data.get('fileName', '')
+            file_type = request.data.get('fileType', '')
+            file_size = request.data.get('fileSize', 0)
+
             if not all([lesson_id, file_name, file_type]):
                 return Response(
-                    {'error': 'lessonId, fileName, and fileType are required'}, 
+                    {'error': 'lessonId, fileName, and fileType são obrigatórios'},
                     status=status_module.HTTP_400_BAD_REQUEST
                 )
-            
-            # Verify challenge exists
+
+            # Verify challenge exists and get ownership info
             try:
-                challenge = PracticeChallenge.objects.get(id=challenge_id)
+                challenge = PracticeChallenge.objects.select_related(
+                    'lesson__unit__course'
+                ).get(id=challenge_id)
             except PracticeChallenge.DoesNotExist:
                 return Response(
-                    {'error': 'Challenge not found'}, 
+                    {'error': 'Desafio não encontrado'},
                     status=status_module.HTTP_404_NOT_FOUND
                 )
-            
-            # Generate unique file name to avoid conflicts
-            file_extension = file_name.split('.')[-1] if '.' in file_name else 'mp3'
+
+            # SECURITY: Verify user ownership
+            course = challenge.lesson.unit.course
+            if course.teacher != request.user and not request.user.is_staff:
+                return Response(
+                    {'error': 'Não autorizado. Apenas o professor do curso pode fazer upload de áudio.'},
+                    status=status_module.HTTP_403_FORBIDDEN
+                )
+
+            # SECURITY: Validate MIME type
+            if file_type not in self.ALLOWED_AUDIO_TYPES:
+                return Response(
+                    {'error': f'Tipo de arquivo não permitido. Use: MP3, WAV, OGG, WebM, M4A, AAC'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate file extension
+            file_extension = os.path.splitext(file_name)[1].lower().lstrip('.')
+            if not file_extension or file_extension not in self.ALLOWED_AUDIO_EXTENSIONS:
+                return Response(
+                    {'error': f'Extensão de arquivo não permitida. Use: {", ".join(self.ALLOWED_AUDIO_EXTENSIONS)}'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate file size
+            if file_size and int(file_size) > self.MAX_FILE_SIZE:
+                max_mb = self.MAX_FILE_SIZE // (1024 * 1024)
+                return Response(
+                    {'error': f'Arquivo muito grande. Tamanho máximo: {max_mb}MB'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Generate unique file name to avoid conflicts (use validated extension)
             unique_filename = f"audio/{lesson_id}/{challenge_id}/{uuid.uuid4().hex}.{file_extension}"
-            
+
             # Initialize S3 client
             s3_client = boto3.client(
                 's3',
@@ -668,7 +1291,7 @@ class GetAudioUploadUrlView(APIView):
                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                 region_name=settings.AWS_S3_REGION_NAME or 'us-east-1'
             )
-            
+
             # Generate presigned URL for upload
             presigned_url = s3_client.generate_presigned_url(
                 'put_object',
@@ -679,22 +1302,22 @@ class GetAudioUploadUrlView(APIView):
                 },
                 ExpiresIn=3600  # 1 hour
             )
-            
+
             # Construct the final audio URL
             audio_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{unique_filename}"
-            
+
             return Response({
-                'message': 'Audio upload URL generated successfully',
+                'message': 'URL de upload de áudio gerada com sucesso',
                 'data': {
                     'uploadUrl': presigned_url,
                     'audioUrl': audio_url,
                     'fileName': unique_filename
                 }
             }, status=status_module.HTTP_200_OK)
-            
+
         except Exception as e:
             return Response(
-                {'error': f'Failed to generate upload URL: {str(e)}'}, 
+                {'error': f'Falha ao gerar URL de upload: {str(e)}'},
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -702,42 +1325,98 @@ class GetAudioUploadUrlView(APIView):
 class GetImageUploadUrlView(APIView):
     """
     POST /api/v1/practice/challenges/{challenge_id}/get-image-upload-url/
-    
+
     Get presigned S3 URL for image upload in listening challenges.
+
+    Security:
+    - Validates user ownership (must be course teacher or staff)
+    - Validates MIME type (images only)
+    - Validates file size (max 10MB)
+    - Validates file extension
     """
     permission_classes = [IsAuthenticated]
-    
+
+    # Allowed image MIME types
+    ALLOWED_IMAGE_TYPES = [
+        'image/jpeg',
+        'image/jpg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+        'image/svg+xml',
+    ]
+
+    # Allowed image extensions
+    ALLOWED_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg']
+
+    # Max file size: 10MB
+    MAX_FILE_SIZE = 10 * 1024 * 1024
+
     def post(self, request, challenge_id):
         """Generate presigned URL for image upload to S3"""
         import boto3
         import uuid
+        import os
         from django.conf import settings
-        
+
         try:
             # Validate request data
             lesson_id = request.data.get('lessonId')
-            file_name = request.data.get('fileName')
-            file_type = request.data.get('fileType')
-            
+            file_name = request.data.get('fileName', '')
+            file_type = request.data.get('fileType', '')
+            file_size = request.data.get('fileSize', 0)
+
             if not all([lesson_id, file_name, file_type]):
                 return Response(
-                    {'error': 'lessonId, fileName, and fileType are required'}, 
+                    {'error': 'lessonId, fileName, and fileType são obrigatórios'},
                     status=status_module.HTTP_400_BAD_REQUEST
                 )
-            
-            # Verify challenge exists
+
+            # Verify challenge exists and get ownership info
             try:
-                challenge = PracticeChallenge.objects.get(id=challenge_id)
+                challenge = PracticeChallenge.objects.select_related(
+                    'lesson__unit__course'
+                ).get(id=challenge_id)
             except PracticeChallenge.DoesNotExist:
                 return Response(
-                    {'error': 'Challenge not found'}, 
+                    {'error': 'Desafio não encontrado'},
                     status=status_module.HTTP_404_NOT_FOUND
                 )
-            
-            # Generate unique file name to avoid conflicts
-            file_extension = file_name.split('.')[-1] if '.' in file_name else 'jpg'
+
+            # SECURITY: Verify user ownership
+            course = challenge.lesson.unit.course
+            if course.teacher != request.user and not request.user.is_staff:
+                return Response(
+                    {'error': 'Não autorizado. Apenas o professor do curso pode fazer upload de imagens.'},
+                    status=status_module.HTTP_403_FORBIDDEN
+                )
+
+            # SECURITY: Validate MIME type
+            if file_type not in self.ALLOWED_IMAGE_TYPES:
+                return Response(
+                    {'error': f'Tipo de arquivo não permitido. Use: JPG, PNG, WebP, GIF, SVG'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate file extension
+            file_extension = os.path.splitext(file_name)[1].lower().lstrip('.')
+            if not file_extension or file_extension not in self.ALLOWED_IMAGE_EXTENSIONS:
+                return Response(
+                    {'error': f'Extensão de arquivo não permitida. Use: {", ".join(self.ALLOWED_IMAGE_EXTENSIONS)}'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # SECURITY: Validate file size
+            if file_size and int(file_size) > self.MAX_FILE_SIZE:
+                max_mb = self.MAX_FILE_SIZE // (1024 * 1024)
+                return Response(
+                    {'error': f'Arquivo muito grande. Tamanho máximo: {max_mb}MB'},
+                    status=status_module.HTTP_400_BAD_REQUEST
+                )
+
+            # Generate unique file name to avoid conflicts (use validated extension)
             unique_filename = f"images/{lesson_id}/{challenge_id}/{uuid.uuid4().hex}.{file_extension}"
-            
+
             # Initialize S3 client
             s3_client = boto3.client(
                 's3',
@@ -745,7 +1424,7 @@ class GetImageUploadUrlView(APIView):
                 aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
                 region_name=settings.AWS_S3_REGION_NAME or 'us-east-1'
             )
-            
+
             # Generate presigned URL for upload
             presigned_url = s3_client.generate_presigned_url(
                 'put_object',
@@ -756,22 +1435,22 @@ class GetImageUploadUrlView(APIView):
                 },
                 ExpiresIn=3600  # 1 hour
             )
-            
+
             # Construct the final image URL
             image_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{unique_filename}"
-            
+
             return Response({
-                'message': 'Image upload URL generated successfully',
+                'message': 'URL de upload de imagem gerada com sucesso',
                 'data': {
                     'uploadUrl': presigned_url,
                     'imageUrl': image_url,
                     'fileName': unique_filename
                 }
             }, status=status_module.HTTP_200_OK)
-            
+
         except Exception as e:
             return Response(
-                {'error': f'Failed to generate upload URL: {str(e)}'}, 
+                {'error': f'Falha ao gerar URL de upload: {str(e)}'},
                 status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -983,27 +1662,52 @@ class PracticeChallengeCreateView(generics.ListCreateAPIView):
     """
     serializer_class = PracticeChallengeSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_queryset(self):
         lesson_id = self.request.GET.get('lesson')
         if lesson_id:
             return PracticeChallenge.objects.filter(lesson_id=lesson_id).order_by('order')
         return PracticeChallenge.objects.all().order_by('order')
-    
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new challenge with options.
+
+        The serializer's create() method handles creating nested options.
+        """
+        logger.info(f"=== CREATE CHALLENGE ===")
+        logger.info(f"Request data: {request.data}")
+        logger.info(f"Options in request: {request.data.get('options', 'NOT FOUND')}")
+
+        serializer = self.get_serializer(data=request.data)
+        logger.info(f"Serializer initial_data: {serializer.initial_data}")
+        logger.info(f"Options in initial_data: {serializer.initial_data.get('options', 'NOT FOUND')}")
+
+        serializer.is_valid(raise_exception=True)
+        challenge = serializer.save()
+
+        # Re-fetch to include created options in response
+        response_serializer = self.get_serializer(challenge)
+
+        logger.info(f"Challenge created: {challenge.id} with {challenge.options.count()} options")
+        logger.info(f"=== END CREATE CHALLENGE ===")
+
+        return Response(response_serializer.data, status=status_module.HTTP_201_CREATED)
+
     def list(self, request, *args, **kwargs):
         # Same format as challenges_list_simple
         lesson_id = request.GET.get('lesson')
         if not lesson_id:
             return Response(
-                {"error": "lesson parameter is required"}, 
+                {"error": "lesson parameter is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         try:
             challenges = PracticeChallenge.objects.filter(
                 lesson_id=lesson_id
             ).order_by('order')
-            
+
             serializer = self.get_serializer(challenges, many=True)
             return Response({
                 "message": "Challenges retrieved successfully",
@@ -1011,7 +1715,7 @@ class PracticeChallengeCreateView(generics.ListCreateAPIView):
             })
         except Exception as e:
             return Response(
-                {"error": f"Error fetching challenges: {str(e)}"}, 
+                {"error": f"Error fetching challenges: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
@@ -1406,10 +2110,11 @@ def join_competition(request, competition_id):
 class LeaderboardSnapshotCreateView(APIView):
     """
     POST /api/v1/practice/leaderboard/snapshot/
-    
+
     Create a leaderboard snapshot (for automated tasks).
+    Admin only - used by Celery tasks for scheduled snapshots.
     """
-    permission_classes = [IsAuthenticated]  # Should be admin only in production
+    permission_classes = [IsAdminUser]  # SECURITY FIX: Admin only
     
     def post(self, request):
         """Create snapshot of current leaderboard"""
@@ -1475,10 +2180,11 @@ def update_user_streak(request):
 
 
 @api_view(['GET'])
-@permission_classes([])  # No authentication required for testing
+@permission_classes([IsAdminUser])  # SECURITY FIX: Admin only - was public, leaked PII
 def test_leaderboard_data(request):
     """
-    Test endpoint to check leaderboard data without authentication
+    Test endpoint to check leaderboard data (Admin only).
+    WARNING: This endpoint exposes user PII - use only for debugging.
     """
     from django.contrib.auth import get_user_model
     
@@ -1807,10 +2513,11 @@ def check_achievement_progress(user, achievement_type, current_value):
 
 
 @api_view(['GET'])
-@permission_classes([])  # No authentication required for testing
+@permission_classes([IsAdminUser])  # SECURITY FIX: Admin only - was public, wrote to DB
 def test_achievements_data(request):
     """
-    Test endpoint to check achievements data without authentication
+    Test endpoint to check achievements data (Admin only).
+    WARNING: This endpoint creates UserAchievement records - use only for debugging.
     """
     from django.contrib.auth import get_user_model
     
@@ -1913,1880 +2620,90 @@ def test_achievements_data(request):
 
 
 # ============================================================================
-# AI SPEAKING PRACTICE VIEWS - AI-powered conversation and pronunciation
+# 🚀 VAPI AI CONVERSATION PRACTICE ENDPOINTS
 # ============================================================================
 
-class SpeakingExerciseListView(generics.ListAPIView):
-    """
-    GET /api/v1/practice/speaking/exercises/
-    
-    List available speaking exercises with filtering and recommendations.
-    """
-    permission_classes = [IsAuthenticated]
-    serializer_class = SpeakingExerciseListSerializer
-    
-    def get_queryset(self):
-        """Get speaking exercises with optional filtering"""
-        queryset = SpeakingExercise.objects.filter(is_active=True)
-        
-        # Filter by exercise type
-        exercise_type = self.request.query_params.get('type', None)
-        if exercise_type:
-            queryset = queryset.filter(exercise_type=exercise_type)
-        
-        # Filter by difficulty
-        difficulty = self.request.query_params.get('difficulty', None)
-        if difficulty:
-            queryset = queryset.filter(difficulty=difficulty)
-        
-        # Filter by course
-        course_id = self.request.query_params.get('course', None)
-        if course_id:
-            queryset = queryset.filter(course_id=course_id)
-        
-        return queryset.order_by('difficulty', 'created_at')
-
-
-class SpeakingExerciseDetailView(generics.RetrieveAPIView):
-    """
-    GET /api/v1/practice/speaking/exercises/{id}/
-    
-    Get detailed information about a specific speaking exercise.
-    """
-    permission_classes = [IsAuthenticated]
-    serializer_class = SpeakingExerciseSerializer
-    queryset = SpeakingExercise.objects.filter(is_active=True)
-
-
-class SpeakingSessionCreateView(generics.CreateAPIView):
-    """
-    POST /api/v1/practice/speaking/sessions/
-    
-    Start a new speaking practice session.
-    """
-    permission_classes = [IsAuthenticated]
-    serializer_class = SpeakingSessionCreateSerializer
-    
-    @subscription_required('speaking')
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-    
-    def perform_create(self, serializer):
-        """Create session and initialize AI conversation if needed"""
-        session = serializer.save(user=self.request.user)
-        
-        # If this is a conversation exercise, initialize AI
-        if session.exercise.exercise_type == 'CONVERSATION':
-            from .services.conversation_engine import AIConversationEngine
-            
-            engine = AIConversationEngine()
-            # Initialize conversation asynchronously
-            # In a real implementation, this would be handled by Celery or similar
-        
-        return session
-
-
-class SpeakingSessionDetailView(generics.RetrieveAPIView):
-    """
-    GET /api/v1/practice/speaking/sessions/{id}/
-    
-    Get detailed information about a speaking session with all turns.
-    """
-    permission_classes = [IsAuthenticated]
-    serializer_class = SpeakingSessionSerializer
-    
-    def get_queryset(self):
-        return SpeakingSession.objects.filter(user=self.request.user)
-
-
-class SpeakingSessionListView(generics.ListAPIView):
-    """
-    GET /api/v1/practice/speaking/sessions/
-    
-    List user's speaking sessions with pagination and filtering.
-    """
-    permission_classes = [IsAuthenticated]
-    serializer_class = SpeakingSessionSerializer
-    
-    def get_queryset(self):
-        queryset = SpeakingSession.objects.filter(user=self.request.user)
-        
-        # Filter by status
-        status = self.request.query_params.get('status', None)
-        if status:
-            queryset = queryset.filter(status=status)
-        
-        # Filter by exercise type
-        exercise_type = self.request.query_params.get('exercise_type', None)
-        if exercise_type:
-            queryset = queryset.filter(exercise__exercise_type=exercise_type)
-        
-        return queryset.order_by('-started_at')
-
-
-class SpeakingTurnCreateView(generics.CreateAPIView):
-    """
-    POST /api/v1/practice/speaking/turns/
-    
-    Create a new speaking turn (user speech input).
-    """
-    permission_classes = [IsAuthenticated]
-    serializer_class = SpeakingTurnCreateSerializer
-    
-    def create(self, request, *args, **kwargs):
-        """Create turn and process audio if provided"""
-        response = super().create(request, *args, **kwargs)
-        
-        # If audio was provided, process it asynchronously
-        if 'audio_file' in request.FILES:
-            # In production, this would trigger async processing
-            # For now, return success
-            pass
-        
-        return response
-
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def start_vapi_conversation(request):
+    """Start a new Vapi AI conversation session"""
+    return Response({
+        'message': 'Vapi conversation endpoints coming soon',
+        'status': 'success'
+    })
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def analyze_speech(request):
-    """
-    POST /api/v1/practice/speaking/analyze/
-    
-    Analyze uploaded speech audio using AI services.
-    """
-    audio_file = request.FILES.get('audio_file')
-    target_text = request.data.get('target_text', '')
-    
-    if not audio_file:
-        return Response(
-            {'error': 'Audio file is required'}, 
-            status=status_module.HTTP_400_BAD_REQUEST
-        )
-    
-    try:
-        from .services.speech_analyzer import SpeechAnalyzer
-        import asyncio
-        
-        analyzer = SpeechAnalyzer()
-        
-        # Run analysis (in production, this would be async/Celery)
-        # For demo, we'll create a mock result
-        mock_result = {
-            'overall_score': 85.0,
-            'pronunciation_score': 82.0,
-            'fluency_score': 88.0,
-            'accuracy_score': 86.0,
-            'confidence_score': 84.0,
-            'transcribed_text': target_text or "Sample transcription",
-            'target_text': target_text,
-            'word_analysis': [],
-            'phoneme_analysis': [],
-            'grammar_errors': [],
-            'feedback_text': "Great job! Keep practicing to improve further.",
-            'improvement_suggestions': [
-                "Focus on pronunciation of specific sounds",
-                "Try speaking more slowly for clarity"
-            ],
-            'next_exercises': [
-                "Practice word pronunciation",
-                "Try conversation practice"
-            ]
-        }
-        
-        serializer = SpeakingAnalysisSerializer(data=mock_result)
-        if serializer.is_valid():
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status_module.HTTP_400_BAD_REQUEST)
-            
-    except Exception as e:
-        return Response(
-            {'error': f'Analysis failed: {str(e)}'}, 
-            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
+def end_vapi_conversation(request, conversation_id):
+    """End a Vapi AI conversation session"""
+    return Response({
+        'message': 'Vapi conversation end endpoint coming soon',
+        'conversation_id': conversation_id,
+        'status': 'success'
+    })
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def speaking_progress_stats(request):
-    """
-    GET /api/v1/practice/speaking/progress/
-    
-    Get user's speaking progress and statistics.
-    """
-    user = request.user
-    
-    try:
-        progress = SpeakingProgress.objects.get(user=user)
-        serializer = SpeakingProgressSerializer(progress)
-        return Response(serializer.data)
-        
-    except SpeakingProgress.DoesNotExist:
-        # Create initial progress record
-        progress = SpeakingProgress.objects.create(user=user)
-        serializer = SpeakingProgressSerializer(progress)
-        return Response(serializer.data)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def speaking_dashboard_stats(request):
-    """
-    GET /api/v1/practice/speaking/dashboard/
-    
-    Get speaking statistics for dashboard display.
-    """
-    user = request.user
-    
-    # Get or create progress
-    progress, _ = SpeakingProgress.objects.get_or_create(user=user)
-    
-    # Calculate this week's activity
-    from datetime import timedelta
-    from django.utils import timezone
-    
-    week_start = timezone.now() - timedelta(days=7)
-    sessions_this_week = SpeakingSession.objects.filter(
-        user=user,
-        started_at__gte=week_start
-    ).count()
-    
-    # Calculate minutes this week
-    sessions_this_week_queryset = SpeakingSession.objects.filter(
-        user=user,
-        started_at__gte=week_start,
-        total_duration__isnull=False
-    )
-    
-    total_seconds = sum(
-        session.total_duration.total_seconds() 
-        for session in sessions_this_week_queryset
-    )
-    minutes_this_week = total_seconds / 60
-    
-    # Determine improvement trend (simplified)
-    improvement_trend = 'stable'
-    if progress.total_sessions > 5:
-        recent_avg = progress.overall_average
-        if recent_avg > 80:
-            improvement_trend = 'up'
-        elif recent_avg < 60:
-            improvement_trend = 'down'
-    
-    # Get favorite exercise type
-    favorite_type = SpeakingSession.objects.filter(
-        user=user
-    ).values('exercise__exercise_type').annotate(
-        count=models.Count('id')
-    ).order_by('-count').first()
-    
-    favorite_exercise_type = 'CONVERSATION'  # Default
-    if favorite_type:
-        favorite_exercise_type = favorite_type['exercise__exercise_type']
-    
-    stats = {
-        'total_sessions': progress.total_sessions,
-        'total_hours': progress.total_hours_practiced,
-        'average_score': progress.overall_average,
-        'current_streak': progress.current_streak,
-        'longest_streak': progress.longest_streak,
-        'sessions_this_week': sessions_this_week,
-        'minutes_this_week': minutes_this_week,
-        'improvement_trend': improvement_trend,
-        'favorite_exercise_type': favorite_exercise_type,
-        'weak_areas': progress.weak_phonemes[:3],  # Top 3 weak areas
-        'strong_areas': progress.strong_areas[:3]   # Top 3 strong areas
-    }
-    
-    serializer = SpeakingStatsSerializer(data=stats)
-    if serializer.is_valid():
-        return Response(serializer.data)
-    else:
-        return Response(serializer.errors, status=status_module.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-@speaking_required(5)  # 5 minutes consumed when completing
-def complete_speaking_session(request, session_id):
-    """
-    POST /api/v1/practice/speaking/sessions/{session_id}/complete/
-    
-    Mark a speaking session as completed and update progress.
-    """
-    try:
-        session = SpeakingSession.objects.get(
-            id=session_id,
-            user=request.user
-        )
-        
-        if session.status != 'ACTIVE':
-            return Response(
-                {'error': 'Session is not active'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        
-        # Mark as completed
-        from django.utils import timezone
-        session.status = 'COMPLETED'
-        session.completed_at = timezone.now()
-        
-        # Calculate final scores (simplified)
-        if session.turns_count > 0:
-            turns = SpeakingTurn.objects.filter(session=session, turn_type='USER_SPEECH')
-            if turns.exists():
-                session.pronunciation_score = turns.aggregate(
-                    avg=models.Avg('pronunciation_score')
-                )['avg'] or 0
-                session.fluency_score = turns.aggregate(
-                    avg=models.Avg('fluency_score')
-                )['avg'] or 0
-                session.accuracy_score = turns.aggregate(
-                    avg=models.Avg('accuracy_score')
-                )['avg'] or 0
-                
-                # Calculate overall score
-                session.overall_score = (
-                    session.pronunciation_score * 0.4 +
-                    session.fluency_score * 0.3 +
-                    session.accuracy_score * 0.3
-                )
-        
-        # Calculate duration
-        if session.started_at:
-            session.total_duration = timezone.now() - session.started_at
-        
-        # Determine if passed
-        session.is_passed = session.overall_score >= session.exercise.minimum_score
-        
-        # Calculate points earned
-        base_points = session.exercise.points_reward
-        if session.is_passed:
-            if session.overall_score >= 90:
-                session.points_earned = int(base_points * 1.5)
-            elif session.overall_score >= 80:
-                session.points_earned = int(base_points * 1.2)
-            else:
-                session.points_earned = base_points
-        else:
-            session.points_earned = int(base_points * 0.5)  # Partial credit
-        
-        session.save()
-        
-        # Update user progress
-        progress, _ = SpeakingProgress.objects.get_or_create(user=request.user)
-        progress.total_sessions += 1
-        if session.total_duration:
-            progress.total_hours_practiced += session.total_duration.total_seconds() / 3600
-        
-        # Update averages
-        if session.pronunciation_score:
-            if progress.average_pronunciation == 0:
-                progress.average_pronunciation = session.pronunciation_score
-            else:
-                alpha = 0.2
-                progress.average_pronunciation = (
-                    alpha * session.pronunciation_score + 
-                    (1 - alpha) * progress.average_pronunciation
-                )
-        
-        if session.fluency_score:
-            if progress.average_fluency == 0:
-                progress.average_fluency = session.fluency_score
-            else:
-                alpha = 0.2
-                progress.average_fluency = (
-                    alpha * session.fluency_score + 
-                    (1 - alpha) * progress.average_fluency
-                )
-        
-        # Update overall average
-        progress.overall_average = (
-            progress.average_pronunciation * 0.4 +
-            progress.average_fluency * 0.3 +
-            progress.average_accuracy * 0.3
-        )
-        
-        progress.last_session_date = timezone.now()
-        progress.save()
-        
-        # Update user points
-        try:
-            user_progress = UserProgress.objects.get(user=request.user)
-            user_progress.points += session.points_earned
-            user_progress.save()
-        except UserProgress.DoesNotExist:
-            pass
-        
-        return Response({
-            'message': 'Session completed successfully',
-            'session': SpeakingSessionSerializer(session).data,
-            'points_earned': session.points_earned,
-            'is_passed': session.is_passed
-        })
-        
-    except SpeakingSession.DoesNotExist:
-        return Response(
-            {'error': 'Session not found'}, 
-            status=status_module.HTTP_404_NOT_FOUND
-        )
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def generate_tts_audio(request):
-    """
-    POST /api/v1/practice/speaking/tts/
-    
-    Generate TTS audio for AI responses.
-    """
-    text = request.data.get('text', '')
-    voice = request.data.get('voice', 'nova')
-    
-    if not text:
-        return Response(
-            {'error': 'Text is required'}, 
-            status=status_module.HTTP_400_BAD_REQUEST
-        )
-    
-    try:
-        from .services.conversation_engine import TTSEngine
-        
-        tts_engine = TTSEngine()
-        # In production, this would generate actual audio
-        # For demo, return a mock URL
-        
-        return Response({
-            'audio_url': f'/media/tts/generated_audio_{hash(text)}.mp3',
-            'text': text,
-            'voice': voice
-        })
-        
-    except Exception as e:
-        return Response(
-            {'error': f'TTS generation failed: {str(e)}'}, 
-            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-# =============================================================================
-# 🎧 AI LISTENING PRACTICE VIEWS
-# =============================================================================
-
-class ListeningExerciseListView(generics.ListAPIView):
-    """
-    GET /api/v1/practice/listening/exercises/
-    
-    List all available listening exercises.
-    """
-    serializer_class = ListeningExerciseListSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['difficulty', 'exercise_type', 'accent_type', 'course']
-    
-    def get_queryset(self):
-        return ListeningExercise.objects.filter(
-            is_active=True
-        ).select_related('course').order_by('difficulty', 'created_at')
-
-
-class ListeningExerciseDetailView(generics.RetrieveAPIView):
-    """
-    GET /api/v1/practice/listening/exercises/{id}/
-    
-    Get detailed listening exercise information.
-    """
-    queryset = ListeningExercise.objects.filter(is_active=True)
-    serializer_class = ListeningExerciseSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = 'id'
-
-
-class ListeningSessionCreateView(generics.CreateAPIView):
-    """
-    POST /api/v1/practice/listening/sessions/
-    
-    Create a new listening practice session.
-    """
-    serializer_class = ListeningSessionCreateSerializer
-    permission_classes = [IsAuthenticated]
-    
-    @subscription_required('listening')
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
-    
-    def perform_create(self, serializer):
-        session = serializer.save()
-        
-        # Update user progress statistics
-        user_progress, created = UserProgress.objects.get_or_create(
-            user=self.request.user,
-            defaults={'hearts': 5, 'points': 0}
-        )
-        
-        # Update listening session count
-        user_progress.total_listening_sessions += 1
-        user_progress.save()
-        
-        return session
-
-
-class ListeningSessionDetailView(generics.RetrieveAPIView):
-    """
-    GET /api/v1/practice/listening/sessions/{id}/
-    
-    Get detailed listening session information with attempts.
-    """
-    serializer_class = ListeningSessionSerializer
-    permission_classes = [IsAuthenticated]
-    lookup_field = 'id'
-    
-    def get_queryset(self):
-        return ListeningSession.objects.filter(
-            user=self.request.user
-        ).select_related('exercise').prefetch_related('attempts')
-
-
-class ListeningAttemptCreateView(generics.CreateAPIView):
-    """
-    POST /api/v1/practice/listening/attempts/
-    
-    Record a user's attempt to answer a listening question.
-    """
-    serializer_class = ListeningAttemptCreateSerializer
-    permission_classes = [IsAuthenticated]
-    
-    def perform_create(self, serializer):
-        attempt = serializer.save()
-        
-        # Update session statistics
-        session = attempt.session
-        if attempt.is_correct:
-            session.points_earned += session.exercise.points_reward
-        else:
-            session.hearts_used += 1
-            # Reduce user hearts if answer is wrong
-            user_progress = UserProgress.objects.get(user=session.user)
-            user_progress.reduce_hearts()
-        
-        session.save()
-        
-        return attempt
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_listening_progress(request):
-    """
-    GET /api/v1/practice/listening/progress/
-    
-    Get user's listening practice progress and analytics.
-    """
-    user = request.user
-    
-    try:
-        listening_progress = ListeningProgress.objects.get(user=user)
-        serializer = ListeningProgressSerializer(listening_progress)
-        return Response(serializer.data)
-    except ListeningProgress.DoesNotExist:
-        # Create initial progress record
-        listening_progress = ListeningProgress.objects.create(user=user)
-        serializer = ListeningProgressSerializer(listening_progress)
-        return Response(serializer.data)
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_listening_stats(request):
-    """
-    GET /api/v1/practice/listening/stats/
-    
-    Get comprehensive listening practice statistics for dashboard.
-    """
-    user = request.user
-    
-    # Get basic stats
-    total_sessions = ListeningSession.objects.filter(user=user).count()
-    completed_sessions = ListeningSession.objects.filter(
-        user=user, 
-        status='COMPLETED'
-    )
-    
-    # Calculate average score
-    if completed_sessions.exists():
-        avg_score = completed_sessions.aggregate(
-            avg=models.Avg('overall_score')
-        )['avg'] or 0
-        avg_score = round(avg_score, 1)
-    else:
-        avg_score = 0
-    
-    # Get listening progress
-    try:
-        progress = ListeningProgress.objects.get(user=user)
-        current_streak = progress.current_listening_streak
-        longest_streak = progress.longest_listening_streak
-        total_hours = progress.total_hours_listened
-    except ListeningProgress.DoesNotExist:
-        current_streak = 0
-        longest_streak = 0
-        total_hours = 0.0
-    
-    # Weekly stats
-    from datetime import datetime, timedelta
-    from django.utils import timezone
-    
-    week_ago = timezone.now() - timedelta(days=7)
-    weekly_sessions = ListeningSession.objects.filter(
-        user=user,
-        started_at__gte=week_ago
-    )
-    
-    sessions_this_week = weekly_sessions.count()
-    
-    # Calculate minutes this week
-    minutes_this_week = 0
-    for session in weekly_sessions:
-        if session.total_duration:
-            minutes_this_week += session.total_duration.total_seconds() / 60
-    
-    # Improvement trend (simplified)
-    recent_sessions = completed_sessions.order_by('-completed_at')[:5]
-    if recent_sessions.count() >= 3:
-        recent_avg = sum(s.overall_score for s in recent_sessions[:3]) / 3
-        older_avg = sum(s.overall_score for s in recent_sessions[-3:]) / 3
-        
-        if recent_avg > older_avg + 5:
-            improvement_trend = 'up'
-        elif recent_avg < older_avg - 5:
-            improvement_trend = 'down'
-        else:
-            improvement_trend = 'stable'
-    else:
-        improvement_trend = 'stable'
-    
-    # Favorite accent and comfortable speed
-    favorite_accent = 'AMERICAN'  # Default
-    comfortable_speed = '1.0x'   # Default
-    
-    if hasattr(user, 'listening_progress'):
-        progress = user.listening_progress
-        # Find most practiced accent
-        accent_counts = {
-            'american': progress.american_sessions,
-            'british': progress.british_sessions,
-            'other': progress.other_accents_sessions
-        }
-        favorite_accent = max(accent_counts.items(), key=lambda x: x[1])[0].upper()
-        
-        # Get comfortable speed
-        if progress.speeds_comfort_level:
-            comfortable_speeds = [
-                speed for speed, comfort in progress.speeds_comfort_level.items()
-                if comfort >= 80  # High comfort threshold
-            ]
-            if comfortable_speeds:
-                comfortable_speed = f"{max(comfortable_speeds)}x"
-    
-    stats = {
-        'total_sessions': total_sessions,
-        'total_hours': round(total_hours, 1),
-        'average_score': avg_score,
-        'current_streak': current_streak,
-        'longest_streak': longest_streak,
-        'sessions_this_week': sessions_this_week,
-        'minutes_this_week': round(minutes_this_week, 1),
-        'improvement_trend': improvement_trend,
-        'favorite_accent': favorite_accent,
-        'comfortable_speed': comfortable_speed,
-        'strong_areas': ['Comprehension', 'Vocabulary'],  # Simplified
-        'improvement_areas': ['Speed Adaptation', 'Accent Recognition']  # Simplified
-    }
-    
-    return Response(stats)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-@listening_required(3)  # 3 minutes consumed when completing  
-def complete_listening_session(request, session_id):
-    """
-    POST /api/v1/practice/listening/sessions/{session_id}/complete/
-    
-    Complete a listening practice session and calculate final scores.
-    """
-    session = get_object_or_404(
-        ListeningSession,
-        id=session_id,
-        user=request.user
-    )
-    
-    if session.status == 'COMPLETED':
-        return Response({'error': 'Session already completed'})
-    
-    # Calculate final scores based on attempts
-    attempts = session.attempts.all()
-    
-    if attempts.exists():
-        # Comprehension score
-        correct_attempts = attempts.filter(is_correct=True).count()
-        total_attempts = attempts.count()
-        comprehension_score = (correct_attempts / total_attempts) * 100
-        
-        # Accuracy score (including partial credits)
-        total_partial_credit = sum(attempt.partial_credit for attempt in attempts)
-        accuracy_score = (total_partial_credit / total_attempts) * 100
-        
-        # Vocabulary score (simplified)
-        vocab_attempts = attempts.filter(attempt_type='VOCABULARY_IDENTIFICATION')
-        if vocab_attempts.exists():
-            vocab_correct = vocab_attempts.filter(is_correct=True).count()
-            vocabulary_score = (vocab_correct / vocab_attempts.count()) * 100
-        else:
-            vocabulary_score = comprehension_score  # Use comprehension as fallback
-        
-        # Overall score
-        overall_score = (comprehension_score * 0.5 + 
-                        accuracy_score * 0.3 + 
-                        vocabulary_score * 0.2)
-        
-        # Update session
-        session.comprehension_score = round(comprehension_score, 1)
-        session.accuracy_score = round(accuracy_score, 1)
-        session.vocabulary_score = round(vocabulary_score, 1)
-        session.overall_score = round(overall_score, 1)
-        session.is_passed = overall_score >= session.exercise.minimum_score
-        session.status = 'COMPLETED'
-        session.completed_at = timezone.now()
-        
-        # Calculate total duration
-        if session.started_at:
-            session.total_duration = session.completed_at - session.started_at
-        
-        session.save()
-        
-        # Update user listening progress
-        listening_progress, created = ListeningProgress.objects.get_or_create(
-            user=request.user
-        )
-        
-        # Update statistics
-        listening_progress.total_sessions += 1
-        if session.total_duration:
-            listening_progress.total_hours_listened += session.total_duration.total_seconds() / 3600
-        
-        # Update average scores
-        all_sessions = ListeningSession.objects.filter(
-            user=request.user,
-            status='COMPLETED'
-        )
-        
-        if all_sessions.exists():
-            listening_progress.avg_comprehension_score = round(
-                all_sessions.aggregate(avg=models.Avg('comprehension_score'))['avg'] or 0, 1
-            )
-            listening_progress.overall_listening_score = round(
-                all_sessions.aggregate(avg=models.Avg('overall_score'))['avg'] or 0, 1
-            )
-        
-        listening_progress.last_session_date = timezone.now()
-        listening_progress.save()
-        
-        # Award points if passed
-        if session.is_passed:
-            user_progress = UserProgress.objects.get(user=request.user)
-            user_progress.add_points(session.exercise.points_reward)
-    
-    serializer = ListeningSessionSerializer(session)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def analyze_listening_comprehension(request):
-    """
-    POST /api/v1/practice/listening/analyze/
-    
-    Analyze user's listening comprehension and provide feedback.
-    """
-    user_answers = request.data.get('user_answers', [])
-    correct_answers = request.data.get('correct_answers', [])
-    exercise_id = request.data.get('exercise_id')
-    
-    if not all([user_answers, correct_answers, exercise_id]):
-        return Response(
-            {'error': 'user_answers, correct_answers, and exercise_id are required'},
-            status=status_module.HTTP_400_BAD_REQUEST
-        )
-    
-    try:
-        exercise = ListeningExercise.objects.get(id=exercise_id)
-    except ListeningExercise.DoesNotExist:
-        return Response(
-            {'error': 'Exercise not found'},
-            status=status_module.HTTP_404_NOT_FOUND
-        )
-    
-    # Simple analysis (in production, use AI for better analysis)
-    analysis_results = {
-        'overall_score': 0,
-        'comprehension_score': 0,
-        'accuracy_score': 0,
-        'vocabulary_score': 0,
-        'speed_adaptation_score': 0,
-        'user_answers': user_answers,
-        'correct_answers': correct_answers,
-        'answer_analysis': [],
-        'vocabulary_gaps': [],
-        'comprehension_patterns': [],
-        'feedback_text': '',
-        'improvement_suggestions': [],
-        'recommended_exercises': []
-    }
-    
-    # Calculate basic scores
-    total_questions = len(correct_answers)
-    correct_count = 0
-    
-    for i, (user_ans, correct_ans) in enumerate(zip(user_answers, correct_answers)):
-        is_correct = user_ans.lower().strip() == correct_ans.lower().strip()
-        similarity = 0.8 if is_correct else 0.3  # Simplified similarity
-        
-        if is_correct:
-            correct_count += 1
-        
-        analysis_results['answer_analysis'].append({
-            'question_index': i,
-            'user_answer': user_ans,
-            'correct_answer': correct_ans,
-            'is_correct': is_correct,
-            'similarity_score': similarity
-        })
-    
-    # Calculate scores
-    comprehension_score = (correct_count / total_questions) * 100
-    analysis_results['comprehension_score'] = round(comprehension_score, 1)
-    analysis_results['accuracy_score'] = round(comprehension_score, 1)  # Simplified
-    analysis_results['vocabulary_score'] = round(comprehension_score * 0.9, 1)  # Slightly lower
-    analysis_results['speed_adaptation_score'] = round(comprehension_score * 1.1, 1)  # Slightly higher
-    analysis_results['overall_score'] = round(comprehension_score, 1)
-    
-    # Generate feedback
-    if comprehension_score >= 85:
-        analysis_results['feedback_text'] = "Excellent comprehension! Your listening skills are very strong."
-        analysis_results['improvement_suggestions'] = [
-            "Try more advanced listening exercises",
-            "Practice with different accents",
-            "Challenge yourself with faster speech rates"
-        ]
-    elif comprehension_score >= 70:
-        analysis_results['feedback_text'] = "Good comprehension with room for improvement."
-        analysis_results['improvement_suggestions'] = [
-            "Focus on key vocabulary",
-            "Practice active listening techniques",
-            "Review difficult audio segments multiple times"
-        ]
-    else:
-        analysis_results['feedback_text'] = "Keep practicing! Your listening skills will improve with consistent effort."
-        analysis_results['improvement_suggestions'] = [
-            "Start with slower speech rates",
-            "Focus on basic vocabulary",
-            "Use transcripts to check understanding"
-        ]
-    
-    # Recommended exercises
-    analysis_results['recommended_exercises'] = [
-        f"{exercise.difficulty} level exercises",
-        f"{exercise.accent_type} accent practice",
-        "Vocabulary building exercises"
-    ]
-    
-    return Response(analysis_results)
-
-
-# =============================================================================
-# AI TRANSLATION ENDPOINTS - Intelligent translation validation
-# =============================================================================
-
-class AITranslationValidationView(APIView):
-    """
-    POST /api/v1/practice/validate-ai-translation/
-    
-    Validate user translation using AI analysis with detailed feedback
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        """Validate translation using AI with intelligent scoring"""
-        import asyncio
-        from .services.ai_translation import AITranslationValidator
-        
-        # Extract request data
-        source_text = request.data.get('source_text', '').strip()
-        user_translation = request.data.get('user_translation', '').strip()
-        challenge_id = request.data.get('challenge_id')
-        difficulty_level = request.data.get('difficulty_level', 'intermediate')
-        
-        # Validate required fields
-        if not source_text or not user_translation:
-            return Response(
-                {'error': 'source_text and user_translation are required'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        
-        # Validate challenge exists if provided
-        challenge = None
-        if challenge_id:
-            try:
-                challenge = PracticeChallenge.objects.get(id=challenge_id)
-            except PracticeChallenge.DoesNotExist:
-                return Response(
-                    {'error': 'Challenge not found'}, 
-                    status=status_module.HTTP_404_NOT_FOUND
-                )
-        
-        # Get user progress for hearts/points management
-        user_progress, created = UserProgress.objects.get_or_create(
-            user=request.user,
-            defaults={'hearts': 5, 'points': 0}
-        )
-        
-        # Check if this is practice mode (challenge already completed)
-        is_practice = False
-        existing_progress = None
-        if challenge:
-            existing_progress = ChallengeProgress.objects.filter(
-                user=request.user,
-                challenge=challenge
-            ).first()
-            is_practice = existing_progress is not None
-        
-        # Check hearts for new challenges
-        if not is_practice and user_progress.hearts == 0:
-            return Response(
-                {'error': 'hearts', 'message': 'No hearts remaining'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            # Validate translation using AI
-            validator = AITranslationValidator()
-            
-            # Run async validation in sync context
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                result = loop.run_until_complete(
-                    validator.validate_translation(
-                        source_text=source_text,
-                        user_translation=user_translation,
-                        difficulty_level=difficulty_level
-                    )
-                )
-            finally:
-                loop.close()
-            
-            # Process results and update progress
-            response_data = {
-                'success': True,
-                'ai_validation': {
-                    'semantic_score': result.semantic_score,
-                    'fluency_score': result.fluency_score,
-                    'fidelity_score': result.fidelity_score,
-                    'overall_score': result.overall_score,
-                    'is_acceptable': result.is_acceptable,
-                    'partial_credit': result.partial_credit
-                },
-                'feedback': {
-                    'message': result.feedback,
-                    'explanation': result.explanation,
-                    'suggestions': result.suggestions
-                },
-                'user_answer': user_translation,
-                'source_text': source_text
-            }
-            
-            # Update challenge progress if challenge provided
-            if challenge and result.is_acceptable:
-                if existing_progress:
-                    existing_progress.completed = True
-                    existing_progress.save()
-                    progress = existing_progress
-                else:
-                    progress = ChallengeProgress.objects.create(
-                        user=request.user,
-                        challenge=challenge,
-                        completed=True
-                    )
-                
-                response_data['challenge_progress'] = {
-                    'id': str(progress.id),
-                    'completed': progress.completed,
-                    'completed_at': progress.completed_at
-                }
-            
-            # Update user progress based on AI result
-            if result.is_acceptable:
-                if is_practice:
-                    # Practice mode: restore hearts and add points
-                    user_progress.add_hearts(1)
-                else:
-                    # New challenge: just add points
-                    pass
-                
-                # Add points based on AI scoring
-                points_earned = result.partial_credit
-                user_progress.add_points(points_earned)
-                
-                response_data['points_earned'] = points_earned
-            else:
-                # Incorrect translation: reduce hearts if not practice
-                if not is_practice and user_progress.hearts > 0:
-                    user_progress.reduce_hearts()
-                
-                response_data['points_earned'] = 0
-            
-            # Add current user progress to response
-            response_data['user_progress'] = {
-                'hearts': user_progress.hearts,
-                'points': user_progress.points
-            }
-            
-            return Response(response_data, status=status_module.HTTP_200_OK)
-            
-        except Exception as e:
-            print(f"AI Translation validation error: {e}")
-            return Response(
-                {'error': 'Translation validation failed', 'details': str(e)}, 
-                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class GenerateTranslationSuggestionsView(APIView):
-    """
-    POST /api/v1/practice/generate-translation-suggestions/
-    
-    Generate multiple correct translation alternatives for teachers
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        """Generate translation alternatives using AI"""
-        import asyncio
-        from .services.ai_translation import AITranslationValidator
-        
-        source_text = request.data.get('source_text', '').strip()
-        difficulty_level = request.data.get('difficulty_level', 'intermediate')
-        count = min(int(request.data.get('count', 3)), 5)  # Limit to 5 suggestions
-        
-        if not source_text:
-            return Response(
-                {'error': 'source_text is required'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            validator = AITranslationValidator()
-            
-            # Run async operation in sync context
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                suggestions = loop.run_until_complete(
-                    validator.generate_translation_suggestions(
-                        source_text=source_text,
-                        difficulty_level=difficulty_level,
-                        count=count
-                    )
-                )
-            finally:
-                loop.close()
-            
-            return Response({
-                'success': True,
-                'source_text': source_text,
-                'suggestions': suggestions,
-                'difficulty_level': difficulty_level
-            })
-            
-        except Exception as e:
-            print(f"Translation suggestions error: {e}")
-            return Response(
-                {'error': 'Failed to generate suggestions', 'details': str(e)}, 
-                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class GenerateTranslationExerciseView(APIView):
-    """
-    POST /api/v1/practice/generate-translation-exercise/
-    
-    Generate complete translation exercise with AI
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        """Generate a complete translation exercise"""
-        import asyncio
-        from .services.ai_translation import AITranslationValidator
-        
-        topic = request.data.get('topic', 'general conversation')
-        difficulty_level = request.data.get('difficulty_level', 'intermediate')
-        exercise_type = request.data.get('exercise_type', 'sentence')
-        
-        try:
-            validator = AITranslationValidator()
-            
-            # Run async operation in sync context
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                exercise_data = loop.run_until_complete(
-                    validator.generate_translation_exercise(
-                        topic=topic,
-                        difficulty_level=difficulty_level,
-                        exercise_type=exercise_type
-                    )
-                )
-            finally:
-                loop.close()
-            
-            return Response({
-                'success': True,
-                'exercise': exercise_data,
-                'generated_at': timezone.now(),
-                'parameters': {
-                    'topic': topic,
-                    'difficulty_level': difficulty_level,
-                    'exercise_type': exercise_type
-                }
-            })
-            
-        except Exception as e:
-            print(f"Exercise generation error: {e}")
-            return Response(
-                {'error': 'Failed to generate exercise', 'details': str(e)}, 
-                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-# =============================================================================
-# AI PRONUNCIATION ENDPOINTS - Intelligent pronunciation analysis
-# =============================================================================
-
-class AIPronunciationAnalysisView(APIView):
-    """
-    POST /api/v1/practice/analyze-ai-pronunciation/
-    
-    Analyze student pronunciation using AI (Whisper + GPT-4)
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        """Analyze pronunciation using AI with detailed feedback"""
-        import asyncio
-        import io
-        from .services.ai_pronunciation import AIPronunciationAnalyzer
-        
-        # Extract request data
-        audio_file = request.FILES.get('audio')
-        expected_text = request.data.get('expected_text', '').strip()
-        challenge_id = request.data.get('challenge_id')
-        difficulty_level = request.data.get('difficulty_level', 'intermediate')
-        
-        # Validate required fields
-        if not audio_file or not expected_text:
-            return Response(
-                {'error': 'audio file and expected_text are required'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        
-        # Validate challenge exists if provided
-        challenge = None
-        if challenge_id:
-            try:
-                challenge = PracticeChallenge.objects.get(id=challenge_id)
-            except PracticeChallenge.DoesNotExist:
-                return Response(
-                    {'error': 'Challenge not found'}, 
-                    status=status_module.HTTP_404_NOT_FOUND
-                )
-        
-        # Get user progress for hearts/points management
-        user_progress, created = UserProgress.objects.get_or_create(
-            user=request.user,
-            defaults={'hearts': 5, 'points': 0}
-        )
-        
-        # Check if this is practice mode
-        is_practice = False
-        existing_progress = None
-        if challenge:
-            existing_progress = ChallengeProgress.objects.filter(
-                user=request.user,
-                challenge=challenge
-            ).first()
-            is_practice = existing_progress is not None
-        
-        # Check hearts for new challenges
-        if not is_practice and user_progress.hearts == 0:
-            return Response(
-                {'error': 'hearts', 'message': 'No hearts remaining'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            # Convert uploaded file to BytesIO
-            audio_bytes = io.BytesIO(audio_file.read())
-            audio_bytes.name = audio_file.name
-            
-            # Analyze pronunciation using AI
-            analyzer = AIPronunciationAnalyzer()
-            
-            # Run async analysis in sync context
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                result = loop.run_until_complete(
-                    analyzer.analyze_pronunciation(
-                        audio_file=audio_bytes,
-                        expected_text=expected_text,
-                        difficulty_level=difficulty_level
-                    )
-                )
-            finally:
-                loop.close()
-            
-            # Process results and update progress
-            response_data = {
-                'success': True,
-                'ai_analysis': {
-                    'transcribed_text': result.transcribed_text,
-                    'expected_text': result.expected_text,
-                    'pronunciation_score': result.pronunciation_score,
-                    'fluency_score': result.fluency_score,
-                    'clarity_score': result.clarity_score,
-                    'overall_score': result.overall_score,
-                    'is_acceptable': result.is_acceptable,
-                    'partial_credit': result.partial_credit,
-                    'confidence_level': result.confidence_level
-                },
-                'feedback': {
-                    'message': result.feedback,
-                    'problematic_words': result.problematic_words,
-                    'suggestions': result.suggestions
-                }
-            }
-            
-            # Update challenge progress if challenge provided
-            if challenge and result.is_acceptable:
-                if existing_progress:
-                    existing_progress.completed = True
-                    existing_progress.save()
-                    progress = existing_progress
-                else:
-                    progress = ChallengeProgress.objects.create(
-                        user=request.user,
-                        challenge=challenge,
-                        completed=True
-                    )
-                
-                response_data['challenge_progress'] = {
-                    'id': str(progress.id),
-                    'completed': progress.completed,
-                    'completed_at': progress.completed_at
-                }
-            
-            # Update user progress based on AI result
-            if result.is_acceptable:
-                if is_practice:
-                    # Practice mode: restore hearts and add points
-                    user_progress.add_hearts(1)
-                else:
-                    # New challenge: just add points
-                    pass
-                
-                # Add points based on AI scoring
-                points_earned = result.partial_credit
-                user_progress.add_points(points_earned)
-                
-                response_data['points_earned'] = points_earned
-            else:
-                # Incorrect pronunciation: reduce hearts if not practice
-                if not is_practice and user_progress.hearts > 0:
-                    user_progress.reduce_hearts()
-                
-                response_data['points_earned'] = 0
-            
-            # Add current user progress to response
-            response_data['user_progress'] = {
-                'hearts': user_progress.hearts,
-                'points': user_progress.points
-            }
-            
-            return Response(response_data, status=status_module.HTTP_200_OK)
-            
-        except Exception as e:
-            print(f"AI Pronunciation analysis error: {e}")
-            return Response(
-                {'error': 'Pronunciation analysis failed', 'details': str(e)}, 
-                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class GeneratePronunciationExerciseView(APIView):
-    """
-    POST /api/v1/practice/generate-pronunciation-exercise/
-    
-    Generate pronunciation exercise with AI
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        """Generate pronunciation exercise using AI"""
-        import asyncio
-        from .services.ai_pronunciation import AIPronunciationAnalyzer
-        
-        topic = request.data.get('topic', 'daily conversation')
-        difficulty_level = request.data.get('difficulty_level', 'intermediate')
-        exercise_type = request.data.get('exercise_type', 'sentence')
-        
-        try:
-            analyzer = AIPronunciationAnalyzer()
-            
-            # Run async operation in sync context
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                exercise_data = loop.run_until_complete(
-                    analyzer.generate_pronunciation_exercise(
-                        topic=topic,
-                        difficulty_level=difficulty_level,
-                        exercise_type=exercise_type
-                    )
-                )
-            finally:
-                loop.close()
-            
-            return Response({
-                'success': True,
-                'exercise': exercise_data,
-                'generated_at': timezone.now(),
-                'parameters': {
-                    'topic': topic,
-                    'difficulty_level': difficulty_level,
-                    'exercise_type': exercise_type
-                }
-            })
-            
-        except Exception as e:
-            print(f"Pronunciation exercise generation error: {e}")
-            return Response(
-                {'error': 'Failed to generate pronunciation exercise', 'details': str(e)}, 
-                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class GenerateReferenceAudioView(APIView):
-    """
-    POST /api/v1/practice/generate-reference-audio/
-    
-    Generate reference audio pronunciation using TTS
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        """Generate reference audio for pronunciation practice"""
-        import asyncio
-        from django.http import HttpResponse
-        from .services.ai_pronunciation import AIPronunciationAnalyzer
-        
-        text = request.data.get('text', '').strip()
-        voice = request.data.get('voice', 'alloy')  # alloy, echo, fable, onyx, nova, shimmer
-        
-        if not text:
-            return Response(
-                {'error': 'text is required'}, 
-                status=status_module.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            analyzer = AIPronunciationAnalyzer()
-            
-            # Run async operation in sync context
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            try:
-                audio_bytes = loop.run_until_complete(
-                    analyzer.generate_reference_audio(text=text, voice=voice)
-                )
-            finally:
-                loop.close()
-            
-            if audio_bytes:
-                # Return audio file directly
-                response = HttpResponse(audio_bytes, content_type='audio/mpeg')
-                response['Content-Disposition'] = f'attachment; filename="reference_{hash(text)}.mp3"'
-                return response
-            else:
-                return Response(
-                    {'error': 'Failed to generate audio'}, 
-                    status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-            
-        except Exception as e:
-            print(f"Reference audio generation error: {e}")
-            return Response(
-                {'error': 'Failed to generate reference audio', 'details': str(e)}, 
-                status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-# ========================================================================
-# 🆕 COURSE-SPECIFIC PRACTICE ENDPOINTS - Práticas contextualizadas por curso
-# ========================================================================
-
-class CourseSpeakingExercisesView(APIView):
-    """
-    GET /api/v1/practice/courses/{course_id}/speaking/
-    
-    Exercícios de speaking específicos para um curso
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request, course_id):
-        """Lista exercícios de speaking para um curso específico"""
-        try:
-            from apps.courses.models import Course
-            course = Course.objects.get(id=course_id, course_type='practice')
-        except Course.DoesNotExist:
-            return Response(
-                {'error': 'Curso não encontrado'}, 
-                status=status_module.HTTP_404_NOT_FOUND
-            )
-        
-        # Buscar exercícios específicos do curso
-        exercises = SpeakingExercise.objects.filter(
-            course=course,
-            is_course_specific=True,
-            is_active=True
-        ).order_by('difficulty', 'created_at')
-        
-        # Se não há exercícios específicos, gera automaticamente
-        if not exercises.exists():
-            exercises = self.generate_course_exercises(course, request.user)
-        
-        from .serializers import SpeakingExerciseSerializer
-        serializer = SpeakingExerciseSerializer(exercises, many=True)
-        
-        return Response({
-            'message': f'Exercícios de speaking para {course.title}',
-            'course': {
-                'id': str(course.id),
-                'title': course.title,
-                'level': course.level
-            },
-            'exercises': serializer.data
-        })
-    
-    def generate_course_exercises(self, course, user):
-        """Gera exercícios de speaking baseados no conteúdo do curso"""
-        exercises = []
-        
-        # Get course lessons for context
-        practice_units = course.practice_units.all()[:3]  # Primeiras 3 unidades
-        
-        for unit in practice_units:
-            lessons = unit.lessons.all()[:2]  # Primeiras 2 lições por unidade
-            
-            for lesson in lessons:
-                # Gerar exercício de pronúncia
-                pronunciation_exercise = SpeakingExercise.objects.create(
-                    course=course,
-                    is_course_specific=True,
-                    auto_generated=True,
-                    title=f"Pronúncia: {lesson.title}",
-                    description=f"Pratique a pronúncia do vocabulário da lição '{lesson.title}'",
-                    exercise_type='PRONUNCIATION',
-                    difficulty=course.level.upper(),
-                    lesson_context=lesson.title,
-                    target_text=f"Vocabulary from {lesson.title}: pronunciation practice",
-                    vocabulary_words=["hello", "world", "practice"],  # Seria extraído do conteúdo real
-                    created_by=user
-                )
-                exercises.append(pronunciation_exercise)
-                
-                # Gerar exercício de conversação
-                conversation_exercise = SpeakingExercise.objects.create(
-                    course=course,
-                    is_course_specific=True,
-                    auto_generated=True,
-                    title=f"Conversação: {lesson.title}",
-                    description=f"Pratique conversação baseada na lição '{lesson.title}'",
-                    exercise_type='CONVERSATION',
-                    difficulty=course.level.upper(),
-                    lesson_context=lesson.title,
-                    conversation_prompt=f"Let's practice conversation about the topic: {lesson.title}",
-                    vocabulary_words=["conversation", "practice", "topic"],
-                    created_by=user
-                )
-                exercises.append(conversation_exercise)
-        
-        return exercises
-
-
-class CourseListeningExercisesView(APIView):
-    """
-    GET /api/v1/practice/courses/{course_id}/listening/
-    
-    Exercícios de listening específicos para um curso
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request, course_id):
-        """Lista exercícios de listening para um curso específico"""
-        try:
-            from apps.courses.models import Course
-            course = Course.objects.get(id=course_id, course_type='practice')
-        except Course.DoesNotExist:
-            return Response(
-                {'error': 'Curso não encontrado'}, 
-                status=status_module.HTTP_404_NOT_FOUND
-            )
-        
-        # Buscar exercícios específicos do curso
-        exercises = ListeningExercise.objects.filter(
-            course=course,
-            is_course_specific=True,
-            is_active=True
-        ).order_by('difficulty', 'created_at')
-        
-        # Se não há exercícios específicos, gera automaticamente
-        if not exercises.exists():
-            exercises = self.generate_course_exercises(course, request.user)
-        
-        from .serializers import ListeningExerciseSerializer
-        serializer = ListeningExerciseSerializer(exercises, many=True)
-        
-        return Response({
-            'message': f'Exercícios de listening para {course.title}',
-            'course': {
-                'id': str(course.id),
-                'title': course.title,
-                'level': course.level
-            },
-            'exercises': serializer.data
-        })
-    
-    def generate_course_exercises(self, course, user):
-        """Gera exercícios de listening baseados no conteúdo do curso"""
-        exercises = []
-        
-        # Get course lessons for context
-        practice_units = course.practice_units.all()[:3]  # Primeiras 3 unidades
-        
-        for unit in practice_units:
-            lessons = unit.lessons.all()[:2]  # Primeiras 2 lições por unidade
-            
-            for lesson in lessons:
-                # Gerar exercício de compreensão auditiva
-                comprehension_exercise = ListeningExercise.objects.create(
-                    course=course,
-                    is_course_specific=True,
-                    auto_generated=True,
-                    title=f"Compreensão: {lesson.title}",
-                    description=f"Pratique compreensão auditiva com conteúdo da lição '{lesson.title}'",
-                    exercise_type='AUDIO_COMPREHENSION',
-                    difficulty=course.level.upper(),
-                    lesson_context=lesson.title,
-                    audio_url="https://example.com/audio/sample.mp3",  # Seria gerado dinamicamente
-                    audio_duration="0:02:00",
-                    transcript=f"Audio content for lesson: {lesson.title}",
-                    questions=[
-                        {"question": "What is the main topic?", "type": "multiple_choice"},
-                        {"question": "What words did you hear?", "type": "text_input"}
-                    ],
-                    correct_answers=["topic", "words"],
-                    created_by=user
-                )
-                exercises.append(comprehension_exercise)
-        
-        return exercises
-
-
-class CoursePracticeProgressView(APIView):
-    """
-    GET /api/v1/practice/courses/{course_id}/progress/
-    
-    Progresso das práticas específicas de um curso
-    """
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request, course_id):
-        """Retorna progresso das práticas de um curso específico"""
-        try:
-            from apps.courses.models import Course, UserCourseProgress
-            course = Course.objects.get(id=course_id, course_type='practice')
-            
-            # Buscar progresso do usuário no curso
-            user_progress, created = UserCourseProgress.objects.get_or_create(
-                user=request.user,
-                course=course,
-                defaults={'enrollmentDate': timezone.now()}
-            )
-            
-            # Buscar exercícios específicos do curso
-            speaking_exercises = SpeakingExercise.objects.filter(
-                course=course, is_course_specific=True
-            ).count()
-            
-            listening_exercises = ListeningExercise.objects.filter(
-                course=course, is_course_specific=True
-            ).count()
-            
-            practice_summary = user_progress.get_practice_summary()
-            
-            return Response({
-                'message': f'Progresso das práticas para {course.title}',
-                'course': {
-                    'id': str(course.id),
-                    'title': course.title,
-                    'level': course.level
-                },
-                'progress': {
-                    'overall_with_practices': user_progress.get_overall_progress_with_practices(),
-                    'main_progress': user_progress.overallProgress,
-                    'speaking': {
-                        **practice_summary['speaking'],
-                        'available_exercises': speaking_exercises
-                    },
-                    'listening': {
-                        **practice_summary['listening'],
-                        'available_exercises': listening_exercises
-                    }
-                }
-            })
-            
-        except Course.DoesNotExist:
-            return Response(
-                {'error': 'Curso não encontrado'}, 
-                status=status_module.HTTP_404_NOT_FOUND
-            )
-
+def get_conversation_feedback(request, conversation_id):
+    """Get conversation feedback and analysis"""
+    return Response({
+        'message': 'Vapi conversation feedback endpoint coming soon',
+        'conversation_id': conversation_id,
+        'status': 'success'
+    })
 
 # ============================================================================
-# SIMPLE TEST ENDPOINTS - Student practice courses only
+# TEST ENDPOINTS - Required by URLs
 # ============================================================================
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def test_units_simple(request):
-    """
-    GET /api/v1/student/practice-courses/test-units/
-    
-    Simple test endpoint for units
-    """
+    """Test endpoint for units"""
     return Response({
-        'message': 'Units endpoint working',
-        'data': []
+        'message': 'Test units endpoint active',
+        'status': 'success'
     })
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def test_lessons_simple(request):
-    """
-    GET /api/v1/student/practice-courses/test-lessons/
-    
-    Simple test endpoint for lessons
-    """
+    """Test endpoint for lessons"""
     return Response({
-        'message': 'Lessons endpoint working',
-        'data': []
+        'message': 'Test lessons endpoint active',
+        'status': 'success'
     })
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def test_challenges_simple(request):
-    """
-    GET /api/v1/student/practice-courses/test-challenges/
-    
-    Simple test endpoint for challenges
-    """
+    """Test endpoint for challenges"""
     return Response({
-        'message': 'Challenges endpoint working',
-        'data': []
+        'message': 'Test challenges endpoint active',
+        'status': 'success'
     })
 
 
-# =============================================================================
-# 🏆 STUDENT ACHIEVEMENT VIEWS (COPIED FROM PRACTICE APP)
-# =============================================================================
+# ============================================================================
+# PLACEHOLDER VIEWS - Required by URLs but functionality moved to Vapi
+# ============================================================================
 
-from apps.practice.serializers import UserAchievementSerializer, AchievementNotificationSerializer
-
-class StudentAchievementListView(generics.ListAPIView):
-    """
-    GET /api/v1/student/practice-courses/achievements/
-    
-    List all achievements with user progress (Student view).
-    """
-    serializer_class = UserAchievementSerializer
+class AITranslationValidationView(APIView):
+    """Placeholder for AI translation validation - moved to Vapi"""
     permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['achievement__category', 'achievement__rarity', 'is_unlocked']
     
-    def get_queryset(self):
-        """Get user achievements or create them if they don't exist"""
-        user = self.request.user
-        
-        # Get all active achievements
-        all_achievements = Achievement.objects.filter(is_active=True)
-        
-        # Create UserAchievement records for any missing achievements
-        for achievement in all_achievements:
-            UserAchievement.objects.get_or_create(
-                user=user,
-                achievement=achievement,
-                defaults={
-                    'current_progress': 0,
-                    'is_unlocked': False
-                }
-            )
-        
-        # Return all user achievements
-        return UserAchievement.objects.filter(
-            user=user,
-            achievement__is_active=True
-        ).select_related('achievement').order_by(
-            'achievement__category', 'achievement__order'
-        )
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def student_achievement_stats(request):
-    """
-    GET /api/v1/student/practice-courses/achievements/stats/
-    
-    Get achievement statistics for student dashboard.
-    """
-    try:
-        user = request.user
-        
-        # Get user achievements
-        user_achievements = UserAchievement.objects.filter(user=user)
-        unlocked_achievements = user_achievements.filter(is_unlocked=True)
-        
-        total_available = Achievement.objects.filter(is_active=True).count()
-        total_unlocked = unlocked_achievements.count()
-        total_points = sum(ua.achievement.points for ua in unlocked_achievements)
-        
-        # Count rare achievements (epic and legendary)
-        rare_achievements = unlocked_achievements.filter(
-            achievement__rarity__in=['epic', 'legendary']
-        ).count()
-        
-        # Recent unlocks (last 7 days)
-        from datetime import timedelta
-        recent_date = timezone.now() - timedelta(days=7)
-        recent_unlocked = unlocked_achievements.filter(
-            unlocked_at__gte=recent_date
-        ).count()
-        
+    def post(self, request):
         return Response({
-            'totalUnlocked': total_unlocked,
-            'totalAvailable': total_available,
-            'totalPoints': total_points,
-            'rareAchievements': rare_achievements,
-            'recentUnlocked': recent_unlocked
+            'message': 'AI translation validation moved to Vapi integration',
+            'status': 'placeholder'
         })
-        
-    except Exception as e:
-        return Response(
-            {'error': f'Erro ao buscar estatísticas: {str(e)}'}, 
-            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-        )
 
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def student_achievement_categories(request):
-    """
-    GET /api/v1/student/practice-courses/achievements/categories/
+class AIPronunciationAnalysisView(APIView):
+    """Placeholder for AI pronunciation analysis - moved to Vapi"""
+    permission_classes = [IsAuthenticated]
     
-    Get achievement categories with user progress.
-    """
-    try:
-        user = request.user
-        
-        # Get category stats
-        categories = AchievementCategory.objects.filter(is_active=True).order_by('order')
-        
-        category_data = []
-        for category in categories:
-            # Count achievements in this category
-            total_in_category = Achievement.objects.filter(
-                category=category.name, 
-                is_active=True
-            ).count()
-            
-            # Count unlocked by user
-            unlocked_in_category = UserAchievement.objects.filter(
-                user=user,
-                achievement__category=category.name,
-                achievement__is_active=True,
-                is_unlocked=True
-            ).count()
-            
-            category_data.append({
-                'name': category.name,
-                'display_name': category.display_name,
-                'description': category.description,
-                'icon_class': category.icon_class,
-                'color': category.color,
-                'order': category.order,
-                'achievement_count': total_in_category,
-                'unlocked_count': unlocked_in_category
-            })
-        
-        return Response(category_data)
-        
-    except Exception as e:
-        return Response(
-            {'error': f'Erro ao buscar categorias: {str(e)}'}, 
-            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def student_achievement_notifications(request):
-    """
-    GET /api/v1/student/practice-courses/achievements/notifications/
-    
-    Get unread achievement notifications for user.
-    """
-    try:
-        user = request.user
-        
-        notifications = AchievementNotification.objects.filter(
-            user=user,
-            is_read=False
-        ).select_related('achievement').order_by('-created_at')[:10]
-        
-        serializer = AchievementNotificationSerializer(
-            notifications, 
-            many=True,
-            context={'request': request}
-        )
-        
-        return Response(serializer.data)
-        
-    except Exception as e:
-        return Response(
-            {'error': f'Erro ao buscar notificações: {str(e)}'}, 
-            status=status_module.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+    def post(self, request):
+        return Response({
+            'message': 'AI pronunciation analysis moved to Vapi integration',
+            'status': 'placeholder'
+        })

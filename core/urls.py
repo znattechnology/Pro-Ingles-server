@@ -40,7 +40,7 @@ urlpatterns = [
     
     # Legacy endpoints (for backward compatibility)
     path('api/v1/courses/', include('apps.courses.urls')),
-    path('api/v1/practice/', include('apps.practice.urls')),
+    path('api/v1/practice/', include('apps.practice.urls_minimal')),
     
     # Other endpoints
     path('api/v1/subscriptions/', include('apps.subscriptions.urls')),

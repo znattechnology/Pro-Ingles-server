@@ -61,11 +61,11 @@ class User(AbstractUser):
         ],
         help_text="Número de telefone no formato internacional (ex: +244912345678 para Angola)"
     )
-    avatar = models.ImageField(
-        upload_to='avatars/%Y/%m/',
+    avatar = models.URLField(
+        max_length=500,
         blank=True,
         null=True,
-        help_text="User's profile picture"
+        help_text="User's profile picture URL (S3/CloudFront)"
     )
     
     # Role and status

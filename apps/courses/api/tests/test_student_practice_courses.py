@@ -164,21 +164,22 @@ class StudentPracticeCoursesAPITest(APITestCase):
             self.assertNotEqual(response.status_code, status.HTTP_404_NOT_FOUND,
                               f"Hearts endpoint {url} should exist")
     
-    def test_ai_features_endpoints_exist(self):
-        """Test that AI speaking and listening endpoints exist."""
+    def test_vapi_conversation_endpoints_exist(self):
+        """Test that Vapi AI conversation endpoints exist."""
         self.authenticate_as_student()
         
-        ai_endpoints = [
-            '/api/v1/student/practice-courses/speaking/exercises/',
-            '/api/v1/student/practice-courses/listening/exercises/',
+        vapi_endpoints = [
+            '/api/v1/student/practice-courses/conversations/start/',
+            '/api/v1/student/practice-courses/validate-ai-translation/',
+            '/api/v1/student/practice-courses/analyze-ai-pronunciation/',
             '/api/v1/student/practice-courses/achievements/'
         ]
         
-        for url in ai_endpoints:
-            response = self.client.get(url)
+        for url in vapi_endpoints:
+            response = self.client.get(url) if 'achievements' in url else self.client.post(url, {})
             # Should exist (not 404)
             self.assertNotEqual(response.status_code, status.HTTP_404_NOT_FOUND,
-                              f"AI endpoint {url} should exist")
+                              f"Vapi endpoint {url} should exist")
 
 
 @pytest.mark.django_db
@@ -201,7 +202,7 @@ class TestPracticeCoursesPermissions(APITestCase):
             '/api/v1/student/practice-courses/courses/',
             '/api/v1/student/practice-courses/user-progress/',
             '/api/v1/student/practice-courses/challenge-progress/',
-            '/api/v1/student/practice-courses/speaking/exercises/',
+            '/api/v1/student/practice-courses/conversations/start/',
             '/api/v1/student/practice-courses/achievements/'
         ]
         

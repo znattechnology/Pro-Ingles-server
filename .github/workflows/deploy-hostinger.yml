@@ -1,0 +1,131 @@
+name: Deploy to Hostinger VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force rebuild containers'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  VPS_HOST: 72.61.190.180
+  VPS_USER: root
+  PROJECT_PATH: /opt/tuwi-backend
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          python manage.py test --settings=core.settings --verbosity=2
+        env:
+          DEBUG: 'True'
+          SECRET_KEY: 'test-secret-key-for-ci'
+          DATABASE_URL: 'sqlite:///db.sqlite3'
+          USE_POSTGRESQL: 'False'
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.VPS_HOST }}
+          username: ${{ env.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script_stop: true
+          script: |
+            set -e
+
+            echo "=========================================="
+            echo "    TUWI BACKEND - DEPLOY HOSTINGER"
+            echo "=========================================="
+
+            # Check if first deploy (setup directories)
+            if [ ! -d "${{ env.PROJECT_PATH }}" ]; then
+              echo "First deploy - setting up directories..."
+              mkdir -p ${{ env.PROJECT_PATH }}
+              cd ${{ env.PROJECT_PATH }}
+              git clone https://github.com/${{ github.repository }}.git .
+            else
+              cd ${{ env.PROJECT_PATH }}
+              echo "Updating code from Git..."
+              git fetch origin
+              git reset --hard origin/main
+            fi
+
+            # Create SSL directory and self-signed cert if not exists
+            if [ ! -f "${{ env.PROJECT_PATH }}/nginx/ssl/fullchain.pem" ]; then
+              echo "Creating SSL certificates..."
+              mkdir -p ${{ env.PROJECT_PATH }}/nginx/ssl
+              openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+                -keyout ${{ env.PROJECT_PATH }}/nginx/ssl/privkey.pem \
+                -out ${{ env.PROJECT_PATH }}/nginx/ssl/fullchain.pem \
+                -subj '/CN=${{ env.VPS_HOST }}/O=TuwiBackend/C=PT'
+            fi
+
+            # Create certbot directories
+            mkdir -p ${{ env.PROJECT_PATH }}/nginx/certbot/conf
+            mkdir -p ${{ env.PROJECT_PATH }}/nginx/certbot/www
+
+            # Check if .env exists, if not copy from production template
+            if [ ! -f "${{ env.PROJECT_PATH }}/.env" ]; then
+              echo "ERROR: .env file not found!"
+              echo "Please create .env file on the server with production values"
+              exit 1
+            fi
+
+            # Docker operations
+            cd ${{ env.PROJECT_PATH }}
+
+            echo "Stopping existing containers..."
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+
+            echo "Building and starting containers..."
+            if [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
+              docker compose -f docker-compose.prod.yml build --no-cache
+            else
+              docker compose -f docker-compose.prod.yml build
+            fi
+
+            docker compose -f docker-compose.prod.yml up -d
+
+            echo "Waiting for services to start..."
+            sleep 20
+
+            echo "Running database migrations..."
+            docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput
+
+            echo "Collecting static files..."
+            docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput
+
+            echo "Checking container status..."
+            docker compose -f docker-compose.prod.yml ps
+
+            echo "Health check..."
+            curl -sf http://localhost:8000/api/health/ && echo "Backend OK" || echo "Backend health check failed"
+
+            echo "=========================================="
+            echo "    DEPLOY COMPLETED SUCCESSFULLY!"
+            echo "=========================================="

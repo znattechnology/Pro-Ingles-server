@@ -33,6 +33,7 @@ from .serializers import (
     SubscriptionStatsSerializer
 )
 from .utils import get_subscription_analytics
+from apps.core.permissions import IsAdmin
 
 User = get_user_model()
 
@@ -309,7 +310,7 @@ class AdminSubscriptionPlansListView(generics.ListCreateAPIView):
     """
     queryset = SubscriptionPlan.objects.all().order_by('sort_order')
     serializer_class = SubscriptionPlanSerializer
-    permission_classes = [permissions.IsAuthenticated]  # TODO: Add IsAdmin permission
+    permission_classes = [IsAdmin]
     
     def get_queryset(self):
         """Admins veem todos os planos, incluindo inativos"""
@@ -322,7 +323,7 @@ class AdminSubscriptionPlanDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = SubscriptionPlan.objects.all()
     serializer_class = SubscriptionPlanSerializer
-    permission_classes = [permissions.IsAuthenticated]  # TODO: Add IsAdmin permission
+    permission_classes = [IsAdmin]
 
 
 class AdminUserSubscriptionsListView(generics.ListAPIView):
@@ -331,7 +332,7 @@ class AdminUserSubscriptionsListView(generics.ListAPIView):
     """
     queryset = UserSubscription.objects.select_related('user', 'plan').order_by('-created_at')
     serializer_class = UserSubscriptionSerializer
-    permission_classes = [permissions.IsAuthenticated]  # TODO: Add IsAdmin permission
+    permission_classes = [IsAdmin]
     
     def get_queryset(self):
         """Permite filtros por status, plano, etc"""
@@ -351,7 +352,7 @@ class AdminUserSubscriptionsListView(generics.ListAPIView):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])  # TODO: Add IsAdmin permission
+@permission_classes([IsAdmin])
 def admin_subscription_stats(request):
     """
     Retorna estatísticas gerais de assinatura para o dashboard admin
@@ -450,7 +451,7 @@ class AdminPromotionalCodesListView(generics.ListCreateAPIView):
     """
     queryset = PromotionalCode.objects.all().order_by('-created_at')
     serializer_class = PromotionalCodeSerializer
-    permission_classes = [permissions.IsAuthenticated]  # TODO: Add IsAdmin permission
+    permission_classes = [IsAdmin]
 
 
 class AdminPromotionalCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -459,7 +460,7 @@ class AdminPromotionalCodeDetailView(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = PromotionalCode.objects.all()
     serializer_class = PromotionalCodeSerializer
-    permission_classes = [permissions.IsAuthenticated]  # TODO: Add IsAdmin permission
+    permission_classes = [IsAdmin]
 
 
 class AdminPromoCodeUsageListView(generics.ListAPIView):
@@ -468,7 +469,7 @@ class AdminPromoCodeUsageListView(generics.ListAPIView):
     """
     queryset = PromoCodeUsage.objects.select_related('user', 'promo_code').order_by('-used_at')
     serializer_class = PromoCodeUsageSerializer
-    permission_classes = [permissions.IsAuthenticated]  # TODO: Add IsAdmin permission
+    permission_classes = [IsAdmin]
 
 
 # ========================================================================

@@ -19,6 +19,7 @@ urlpatterns = [
     
     # Profile management
     path('profile/', views.UserProfileView.as_view(), name='profile'),
+    path('get-avatar-upload-url/', views.get_avatar_upload_url, name='get_avatar_upload_url'),
     path('change-password/', views.PasswordChangeView.as_view(), name='change_password'),
     
     # Addresses

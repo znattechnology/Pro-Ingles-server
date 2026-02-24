@@ -3,6 +3,7 @@ Views for user authentication and profile management.
 """
 
 import secrets
+import uuid
 from datetime import datetime, timedelta
 from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view, permission_classes
@@ -18,6 +19,14 @@ from django.urls import reverse
 from django.db import models
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
+
+# S3 imports for avatar upload
+try:
+    import boto3
+    from botocore.exceptions import ClientError
+    S3_AVAILABLE = True
+except ImportError:
+    S3_AVAILABLE = False
 
 from apps.cms.views import AdminWritePermissionMixin
 from .models import User, UserAddress, NotificationSettings, EmailVerification
@@ -109,9 +118,143 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
     """
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_object(self):
         return self.request.user
+
+    def update(self, request, *args, **kwargs):
+        """Override update to add detailed logging for avatar uploads."""
+        print("\n" + "="*80)
+        print("📸 USER PROFILE UPDATE REQUEST")
+        print("="*80)
+        print(f"Method: {request.method}")
+        print(f"User: {request.user.email}")
+        print(f"Content-Type: {request.content_type}")
+        print(f"Request DATA keys: {request.data.keys()}")
+        print(f"Request FILES keys: {request.FILES.keys()}")
+
+        if 'avatar' in request.FILES:
+            avatar_file = request.FILES['avatar']
+            print(f"\n✅ Avatar file detected:")
+            print(f"  - Name: {avatar_file.name}")
+            print(f"  - Size: {avatar_file.size} bytes")
+            print(f"  - Content-Type: {avatar_file.content_type}")
+        else:
+            print("\n❌ No avatar file in request.FILES")
+
+        if 'avatar' in request.data:
+            print(f"✅ Avatar in request.data: {type(request.data['avatar'])}")
+
+        print("="*80 + "\n")
+
+        return super().update(request, *args, **kwargs)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def get_avatar_upload_url(request):
+    """
+    Generate presigned URL for user avatar upload to S3.
+
+    POST /api/v1/users/get-avatar-upload-url/
+
+    Request body:
+    {
+        "fileName": "profile.jpg",
+        "fileType": "image/jpeg"
+    }
+
+    Response:
+    {
+        "message": "URL de upload de avatar gerado com sucesso",
+        "data": {
+            "uploadUrl": "https://s3.amazonaws.com/...",
+            "avatarUrl": "https://cloudfront.net/avatars/..."
+        }
+    }
+    """
+    print(f"🖼️ Avatar upload URL request for user: {request.user.email}")
+
+    fileName = request.data.get('fileName')
+    fileType = request.data.get('fileType')
+
+    if not fileName or not fileType:
+        return Response({
+            'message': 'O nome e o tipo do ficheiro são obrigatórios'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Validate image file type
+    allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if fileType not in allowed_types:
+        return Response({
+            'message': 'Tipo de arquivo não suportado. Use JPG, PNG ou WebP.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        if not S3_AVAILABLE:
+            return Response({
+                'error': 'Biblioteca boto3 não instalada'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if not all([settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, settings.AWS_STORAGE_BUCKET_NAME]):
+            return Response({
+                'error': 'Configuração S3 incompleta'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Create S3 client
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+
+        # Generate unique filename and S3 key
+        file_extension = fileName.split('.')[-1].lower()
+        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        s3_key = f'avatars/{request.user.id}/{unique_filename}'
+
+        print(f"📁 Generating presigned URL for: {s3_key}")
+
+        # Generate presigned URL for PUT operation
+        upload_url = s3_client.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                'Key': s3_key,
+                'ContentType': fileType,
+                'CacheControl': 'max-age=86400'
+            },
+            ExpiresIn=3600  # 1 hour expiration
+        )
+
+        # Generate final avatar URL (using CloudFront if available)
+        if getattr(settings, 'AWS_CLOUDFRONT_DOMAIN', ''):
+            avatar_url = f"{settings.AWS_CLOUDFRONT_DOMAIN}/avatars/{request.user.id}/{unique_filename}"
+        else:
+            avatar_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/avatars/{request.user.id}/{unique_filename}"
+
+        print(f"✅ Presigned URL generated successfully")
+        print(f"📸 Avatar URL: {avatar_url}")
+
+        return Response({
+            'message': 'URL de upload de avatar gerado com sucesso',
+            'data': {
+                'uploadUrl': upload_url,
+                'avatarUrl': avatar_url
+            }
+        })
+
+    except ClientError as e:
+        print(f"❌ S3 Error: {str(e)}")
+        return Response({
+            'error': f'Erro S3: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        print(f"❌ Unexpected error: {str(e)}")
+        return Response({
+            'error': f'Erro inesperado: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class PasswordChangeView(generics.GenericAPIView):
@@ -324,7 +467,7 @@ class EmailVerificationView(generics.GenericAPIView):
                     'email': user.email,
                     'name': user.name,
                     'role': user.role,
-                    'avatar': user.avatar.url if user.avatar else None,
+                    'avatar': user.avatar or None,
                     'email_verified': user.email_verified,
                 },
                 'access': str(access),
@@ -456,7 +599,7 @@ class AdminUsersListView(generics.ListAPIView):
                 'email_verified': user.email_verified,
                 'date_joined': user.date_joined.isoformat(),
                 'last_login': user.last_login.isoformat() if user.last_login else None,
-                'avatar': user.avatar.url if user.avatar else None,
+                'avatar': user.avatar or None,
             })
         
         # Calculate stats for dashboard
@@ -512,7 +655,7 @@ class AdminUserDetailView(generics.RetrieveAPIView):
                 'email_verified': user.email_verified,
                 'date_joined': user.date_joined.isoformat(),
                 'last_login': user.last_login.isoformat() if user.last_login else None,
-                'avatar': user.avatar.url if user.avatar else None,
+                'avatar': user.avatar or None,
                 'google_id': user.google_id if hasattr(user, 'google_id') else None,
             }
             
@@ -597,7 +740,7 @@ class AdminUserUpdateView(generics.UpdateAPIView):
                 'email_verified': user.email_verified,
                 'date_joined': user.date_joined.isoformat(),
                 'last_login': user.last_login.isoformat() if user.last_login else None,
-                'avatar': user.avatar.url if user.avatar else None,
+                'avatar': user.avatar or None,
             }
             
             return Response({

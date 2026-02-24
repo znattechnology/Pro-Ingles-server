@@ -6,8 +6,9 @@ import factory
 from factory.django import DjangoModelFactory
 
 from apps.practice.models import (
-    PracticeLesson, PracticeExercise, SpeakingExercise,
-    ListeningExercise, UserStreak, Achievement
+    PracticeLesson, PracticeUnit, PracticeChallenge,
+    UserStreak, Achievement
+    # Note: SpeakingExercise and ListeningExercise removed - now handled by Vapi integration
 )
 from .user_factories import StudentFactory, TeacherFactory
 
@@ -47,42 +48,9 @@ class PracticeExerciseFactory(DjangoModelFactory):
     is_active = True
 
 
-class SpeakingExerciseFactory(DjangoModelFactory):
-    """Factory for creating SpeakingExercise instances."""
-    
-    class Meta:
-        model = SpeakingExercise
-        django_get_or_create = ('practice_lesson',)
-    
-    practice_lesson = factory.SubFactory(PracticeLessonFactory)
-    prompt_text = factory.Faker('paragraph', nb_sentences=2)
-    target_pronunciation = factory.Faker('word')
-    difficulty_level = factory.Iterator(['beginner', 'intermediate', 'advanced'])
-    max_attempts = factory.Faker('random_int', min=3, max=10)
-    passing_score = factory.Faker('random_int', min=70, max=95)
-    is_active = True
-
-
-class ListeningExerciseFactory(DjangoModelFactory):
-    """Factory for creating ListeningExercise instances."""
-    
-    class Meta:
-        model = ListeningExercise
-        django_get_or_create = ('practice_lesson',)
-    
-    practice_lesson = factory.SubFactory(PracticeLessonFactory)
-    audio_file = factory.Faker('url')
-    transcript = factory.Faker('paragraph', nb_sentences=3)
-    questions = factory.LazyFunction(lambda: [
-        {
-            'question': 'What is the main topic?',
-            'options': ['Topic A', 'Topic B', 'Topic C'],
-            'correct': 0
-        }
-    ])
-    duration_seconds = factory.Faker('random_int', min=30, max=300)
-    difficulty_level = factory.Iterator(['beginner', 'intermediate', 'advanced'])
-    is_active = True
+# Note: SpeakingExerciseFactory and ListeningExerciseFactory have been removed
+# as they are now handled by Vapi AI conversation practice integration
+# For conversation practice testing, use Vapi SDK test factories instead
 
 
 class UserStreakFactory(DjangoModelFactory):

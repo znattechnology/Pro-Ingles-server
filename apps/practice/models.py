@@ -6,7 +6,8 @@ providing a gamified learning experience similar to Duolingo.
 """
 
 import uuid
-from django.db import models
+from django.db import models, transaction
+from django.db.models import F
 from django.contrib.auth import get_user_model
 from apps.courses.models import Course
 
@@ -26,8 +27,13 @@ class PracticeUnit(models.Model):
         on_delete=models.CASCADE, 
         related_name='practice_units'
     )
-    title = models.CharField(max_length=200)
-    description = models.TextField()
+    title = models.CharField(
+        max_length=500,  # ✅ CATEGORIA 2: Título com limite generoso sincronizado (era 200)
+        help_text="Unit title"
+    )
+    description = models.TextField(
+        help_text="Unit description - sem limite para conteúdo rico"  # ✅ CATEGORIA 1: Sem limite
+    )
     order = models.PositiveIntegerField(help_text="Display order within the course")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -53,7 +59,10 @@ class PracticeLesson(models.Model):
         on_delete=models.CASCADE, 
         related_name='lessons'
     )
-    title = models.CharField(max_length=200)
+    title = models.CharField(
+        max_length=500,  # ✅ CATEGORIA 2: Título com limite generoso sincronizado (era 200)
+        help_text="Lesson title"
+    )
     order = models.PositiveIntegerField(help_text="Display order within the unit")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -78,24 +87,14 @@ class PracticeChallenge(models.Model):
         ('ASSIST', 'Assist - Translation/Help'),
         ('FILL_BLANK', 'Fill in the Blank'),
         ('TRANSLATION', 'Translation'),
-        ('LISTENING', 'Listening Comprehension'),
-        ('SPEAKING', 'Speaking/Pronunciation'),
         ('MATCH_PAIRS', 'Match Pairs'),
         ('SENTENCE_ORDER', 'Sentence Order'),
         ('TRUE_FALSE', 'True/False Questions'),
-        
-        # 🆕 AI SPEAKING CHALLENGE TYPES
-        ('PRONUNCIATION', 'Pronunciation Practice'),
-        ('CONVERSATION', 'AI Conversation'),
-        ('READING_ALOUD', 'Reading Aloud'),
-        ('VOCABULARY_SPEAKING', 'Vocabulary Speaking'),
-        
-        # 🆕 AI LISTENING CHALLENGE TYPES
-        ('AUDIO_COMPREHENSION', 'Audio Comprehension'),
-        ('DICTATION', 'Dictation Practice'),
-        ('CONVERSATION_LISTENING', 'Conversation Listening'),
-        ('ACCENT_RECOGNITION', 'Accent Recognition'),
-        ('SPEED_LISTENING', 'Speed Listening'),
+        ('LISTENING', 'Listening Comprehension'),
+        ('SPEAKING', 'Speaking Practice'),
+
+        # 🚀 VAPI AI CONVERSATION TYPES
+        ('VAPI_CONVERSATION', 'AI Conversation Practice'),
     ]
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -110,52 +109,40 @@ class PracticeChallenge(models.Model):
         help_text="Type of challenge exercise"
     )
     question = models.TextField(help_text="The question or prompt for the user")
+    instruction = models.TextField(
+        blank=True,
+        null=True,
+        help_text="General instruction for the exercise (e.g., 'Complete using I/You/am/are')"
+    )
     order = models.PositiveIntegerField(help_text="Display order within the lesson")
-    
-    # 🆕 SPEAKING CHALLENGE FIELDS
-    speaking_exercise = models.ForeignKey(
-        'SpeakingExercise', 
-        on_delete=models.CASCADE, 
-        null=True, 
+    hint = models.TextField(
         blank=True,
-        related_name='practice_challenges'
+        null=True,
+        help_text="Optional hint to help the student (shown on request)"
     )
-    target_pronunciation = models.TextField(
+    explanation = models.TextField(
         blank=True,
-        help_text="Texto alvo para exercícios de pronúncia"
+        null=True,
+        help_text="Explanation shown after the challenge is answered"
     )
+
+    # 🎤 SPEAKING CHALLENGE FIELDS
+    reference_audio_url = models.URLField(
+        blank=True,
+        null=True,
+        help_text="URL of the reference audio for pronunciation practice (TTS generated)"
+    )
+
+    # 🚀 VAPI CONVERSATION CHALLENGE FIELDS
+    # Note: Traditional separate speaking/listening fields removed.
+    # All conversation practice now handled through Vapi integration.
     conversation_context = models.JSONField(
         default=dict,
-        help_text="Contexto e cenário para conversação"
+        help_text="Contexto e cenário para conversação com Vapi AI"
     )
-    minimum_speaking_score = models.FloatField(
+    minimum_conversation_score = models.FloatField(
         default=70.0,
-        help_text="Pontuação mínima para passar no speaking"
-    )
-    
-    # 🆕 LISTENING CHALLENGE FIELDS
-    listening_exercise = models.ForeignKey(
-        'ListeningExercise', 
-        on_delete=models.CASCADE, 
-        null=True, 
-        blank=True,
-        related_name='practice_challenges'
-    )
-    audio_content_url = models.URLField(
-        blank=True,
-        help_text="URL do áudio para exercícios de listening"
-    )
-    audio_transcript = models.TextField(
-        blank=True,
-        help_text="Transcrição do áudio para exercícios de listening"
-    )
-    listening_questions = models.JSONField(
-        default=list,
-        help_text="Perguntas de compreensão auditiva"
-    )
-    minimum_listening_score = models.FloatField(
-        default=65.0,
-        help_text="Pontuação mínima para passar no listening"
+        help_text="Pontuação mínima para passar na conversação"
     )
     
     created_at = models.DateTimeField(auto_now_add=True)
@@ -182,7 +169,10 @@ class ChallengeOption(models.Model):
         on_delete=models.CASCADE, 
         related_name='options'
     )
-    text = models.CharField(max_length=200, help_text="Option text/answer")
+    text = models.CharField(
+        max_length=300,  # ✅ CATEGORIA 3: Campo curto aumentado (era 200)
+        help_text="Option text/answer"
+    )
     is_correct = models.BooleanField(
         default=False,
         help_text="Whether this option is the correct answer"
@@ -211,25 +201,32 @@ class ChallengeOption(models.Model):
 class UserProgress(models.Model):
     """
     User Progress - Tracks overall user progress and gamification stats.
-    
+
     Maps to Drizzle 'userProgress' table from the client project.
     Manages hearts, points, active course, and profile information.
+
+    P2 UNIFIED: Hearts are now managed through UserSubscription.current_hearts
+    to ensure consistency across the system. The hearts field here is kept
+    for backward compatibility but delegates to the subscription system.
     """
     user = models.OneToOneField(
-        User, 
-        on_delete=models.CASCADE, 
+        User,
+        on_delete=models.CASCADE,
         related_name='practice_progress'
     )
     active_course = models.ForeignKey(
-        Course, 
-        on_delete=models.SET_NULL, 
-        null=True, 
+        Course,
+        on_delete=models.SET_NULL,
+        null=True,
         blank=True,
         help_text="Currently selected course for practice"
     )
-    hearts = models.PositiveIntegerField(
+    # DEPRECATED: Use subscription.current_hearts instead
+    # Kept for migration compatibility, but hearts property reads from subscription
+    _hearts_legacy = models.PositiveIntegerField(
         default=5,
-        help_text="Lives/hearts (max 5, lose 1 per wrong answer)"
+        db_column='hearts',
+        help_text="DEPRECATED: Use subscription.current_hearts instead"
     )
     points = models.PositiveIntegerField(
         default=0,
@@ -239,51 +236,114 @@ class UserProgress(models.Model):
         default="/mascot.jpg",
         help_text="Profile image URL"
     )
-    
-    # 🆕 SPEAKING PRACTICE FIELDS
-    total_speaking_sessions = models.IntegerField(default=0)
-    total_speaking_minutes = models.FloatField(default=0.0)
-    average_pronunciation_score = models.FloatField(default=0.0)
-    average_fluency_score = models.FloatField(default=0.0)
-    speaking_streak_days = models.IntegerField(default=0)
-    last_speaking_session = models.DateTimeField(null=True, blank=True)
-    
-    # 🆕 LISTENING PRACTICE FIELDS
-    total_listening_sessions = models.IntegerField(default=0)
-    total_listening_minutes = models.FloatField(default=0.0)
-    average_comprehension_score = models.FloatField(default=0.0)
-    average_dictation_score = models.FloatField(default=0.0)
-    listening_streak_days = models.IntegerField(default=0)
-    last_listening_session = models.DateTimeField(null=True, blank=True)
-    
+
+    # 🚀 VAPI CONVERSATION PRACTICE FIELDS
+    total_conversation_sessions = models.IntegerField(default=0)
+    total_conversation_minutes = models.FloatField(default=0.0)
+    average_conversation_score = models.FloatField(default=0.0)
+    conversation_streak_days = models.IntegerField(default=0)
+    last_conversation_session = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
+    @property
+    def hearts(self):
+        """
+        Get hearts from the unified subscription system.
+        Falls back to legacy field if no subscription exists.
+        """
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.select_related('plan').get(user=self.user)
+            # Trigger automatic heart recharge
+            subscription.recharge_hearts_if_needed()
+            return subscription.current_hearts
+        except Exception:
+            # Fallback to legacy field if subscription doesn't exist
+            return self._hearts_legacy
+
+    @hearts.setter
+    def hearts(self, value):
+        """
+        Set hearts in both subscription and legacy field for compatibility.
+        """
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.get(user=self.user)
+            max_hearts = subscription.plan.hearts_limit if subscription.plan.hearts_limit > 0 else 5
+            subscription.current_hearts = min(value, max_hearts)
+            subscription.save(update_fields=['current_hearts'])
+        except Exception:
+            pass
+        # Also update legacy field for compatibility
+        self._hearts_legacy = value
+
     def __str__(self):
         return f"{self.user.name} - {self.points} pts, {self.hearts} hearts"
-    
+
+    @transaction.atomic
     def reduce_hearts(self):
-        """Reduce hearts by 1 (minimum 0)"""
-        self.hearts = max(0, self.hearts - 1)
-        self.save()
-    
+        """
+        Reduce hearts by 1 (minimum 0) in a thread-safe manner.
+
+        UNIFIED: Now delegates to UserSubscription.use_heart() for consistency.
+        """
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.get(user=self.user)
+            subscription.use_heart()
+        except Exception:
+            # Fallback to legacy behavior if no subscription
+            locked_progress = UserProgress.objects.select_for_update().get(pk=self.pk)
+            if locked_progress._hearts_legacy > 0:
+                UserProgress.objects.filter(pk=self.pk).update(
+                    _hearts_legacy=F('_hearts_legacy') - 1
+                )
+                self.refresh_from_db()
+
+    @transaction.atomic
     def add_hearts(self, amount=1):
-        """Add hearts (maximum 5)"""
-        self.hearts = min(5, self.hearts + amount)
-        self.save()
-    
+        """
+        Add hearts (up to plan limit) in a thread-safe manner.
+
+        UNIFIED: Now updates UserSubscription.current_hearts for consistency.
+        """
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.select_for_update().get(user=self.user)
+            max_hearts = subscription.plan.hearts_limit if subscription.plan.hearts_limit > 0 else 5
+            new_hearts = min(max_hearts, subscription.current_hearts + amount)
+            UserSubscription.objects.filter(pk=subscription.pk).update(
+                current_hearts=new_hearts
+            )
+        except Exception:
+            # Fallback to legacy behavior if no subscription
+            locked_progress = UserProgress.objects.select_for_update().get(pk=self.pk)
+            new_hearts = min(5, locked_progress._hearts_legacy + amount)
+            UserProgress.objects.filter(pk=self.pk).update(_hearts_legacy=new_hearts)
+            self.refresh_from_db()
+
+    @transaction.atomic
     def add_points(self, amount=10, check_achievements=True):
-        """Add points for correct answers"""
-        self.points += amount
-        self.save()
-        
+        """
+        Add points for correct answers in a thread-safe manner.
+
+        Uses F() expression for atomic increment to prevent race conditions.
+        """
+        # Use F() expression for atomic increment
+        UserProgress.objects.filter(pk=self.pk).update(
+            points=F('points') + amount
+        )
+        self.refresh_from_db()
+
         # Trigger achievement progress check (unless disabled to prevent recursion)
         if check_achievements:
             self._check_achievements_for_points()
     
     def _check_achievements_for_points(self):
         """Check and update achievements related to points"""
-        from .views import check_achievement_progress
+        from .achievement_utils import check_achievement_progress
         check_achievement_progress(self.user, 'points_earned', self.points)
 
 
@@ -330,7 +390,7 @@ class ChallengeProgress(models.Model):
     
     def _check_achievements_for_completion(self):
         """Check and update achievements related to challenge completions"""
-        from .views import check_achievement_progress
+        from .achievement_utils import check_achievement_progress
         
         # Count total challenges completed by this user
         total_completed = ChallengeProgress.objects.filter(
@@ -639,7 +699,7 @@ class UserStreak(models.Model):
     
     def _check_achievements_for_streak(self):
         """Check and update achievements related to streaks"""
-        from .views import check_achievement_progress
+        from .achievement_utils import check_achievement_progress
         check_achievement_progress(self.user, 'streak_days', self.current_streak)
     
     def __str__(self):
@@ -866,588 +926,177 @@ class AchievementNotification(models.Model):
 
 
 # =============================================================================
-# 🎙️ AI SPEAKING PRACTICE MODELS
+# 🚀 VAPI AI CONVERSATION PRACTICE MODELS
+# =============================================================================
+# 
+# Note: Traditional speaking/listening models removed in favor of unified
+# Vapi-based conversation practice which handles both speaking and listening
+# in a single, superior AI conversation experience.
+#
+# All speaking/listening functionality is now handled through:
+# - apps/practice/services/vapi_client.py
+# - apps/practice/services/conversation_ai.py  
+# - apps/practice/views/vapi_views.py
 # =============================================================================
 
-class SpeakingExercise(models.Model):
-    """
-    Exercícios de conversação baseados em capítulos/lições
-    """
-    DIFFICULTY_CHOICES = [
-        ('BEGINNER', 'Beginner'),
-        ('INTERMEDIATE', 'Intermediate'), 
-        ('ADVANCED', 'Advanced'),
-    ]
-    
-    EXERCISE_TYPES = [
-        ('PRONUNCIATION', 'Pronunciation Practice'),
-        ('CONVERSATION', 'AI Conversation'),
-        ('READING_ALOUD', 'Reading Aloud'),
-        ('ROLE_PLAY', 'Role Playing'),
-        ('STORY_TELLING', 'Story Telling'),
-        ('VOCABULARY_PRACTICE', 'Vocabulary Practice'),
-    ]
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+class VapiSession(models.Model):
+    """
+    Vapi Conversation Session - Historical progress tracking
     
-    # Relacionamentos
-    practice_lesson = models.ForeignKey(
-        PracticeLesson, 
-        on_delete=models.CASCADE, 
-        related_name='speaking_exercises', 
-        null=True, 
-        blank=True
-    )
-    course = models.ForeignKey(
-        'courses.Course', 
-        on_delete=models.CASCADE, 
-        related_name='speaking_exercises',
-        null=True,
-        blank=True,
-        help_text="Curso específico para exercício contextualizado (opcional para exercícios genéricos)"
-    )
+    Focused model for continuous progress analysis and daily improvement tracking.
+    Stores essential metrics for long-term progress visualization.
+    """
     
-    # Configurações do exercício
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    exercise_type = models.CharField(max_length=20, choices=EXERCISE_TYPES)
-    difficulty = models.CharField(max_length=15, choices=DIFFICULTY_CHOICES)
+    # Core Identification
+    session_id = models.CharField(max_length=100, unique=True, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='vapi_sessions')
     
-    # 🆕 CONTEXTUALIZAÇÃO POR CURSO
-    is_course_specific = models.BooleanField(
-        default=False, 
-        help_text="Indica se o exercício é específico para um curso ou genérico"
-    )
-    lesson_context = models.CharField(
-        max_length=200,
-        blank=True,
-        help_text="Contexto da lição específica (ex: 'Business Meetings', 'Family Vocabulary')"
-    )
-    auto_generated = models.BooleanField(
-        default=False,
-        help_text="Indica se o exercício foi gerado automaticamente baseado no conteúdo do curso"
-    )
+    # Session Context
+    level = models.CharField(max_length=10)  # A1, A2, B1, B2, C1, C2
+    domain = models.CharField(max_length=50)  # general, petroleum, IT, business
+    duration_minutes = models.PositiveIntegerField()
     
-    # Conteúdo do exercício
-    target_text = models.TextField(help_text="Texto alvo para leitura/repetição")
-    conversation_prompt = models.TextField(blank=True, help_text="Prompt inicial para conversação")
-    vocabulary_words = models.JSONField(default=list, help_text="Lista de palavras-chave para praticar")
+    # Core Scores (0-100) - Essential for progress tracking
+    fluency_score = models.PositiveIntegerField(default=0)
+    pronunciation_score = models.PositiveIntegerField(default=0)
+    grammar_score = models.PositiveIntegerField(default=0)
+    vocabulary_score = models.PositiveIntegerField(default=0)
+    overall_score = models.PositiveIntegerField(default=0)
     
-    # Configurações de avaliação
-    pronunciation_weight = models.FloatField(default=0.4, help_text="Peso da pronúncia na nota (0-1)")
-    fluency_weight = models.FloatField(default=0.3, help_text="Peso da fluência na nota (0-1)")
-    accuracy_weight = models.FloatField(default=0.3, help_text="Peso da precisão na nota (0-1)")
+    # Speaking Performance Metrics
+    total_words = models.PositiveIntegerField(default=0)
+    words_per_minute = models.PositiveIntegerField(default=0)
+    corrections_count = models.PositiveIntegerField(default=0)
     
-    # Gamificação
-    points_reward = models.IntegerField(default=25)
-    hearts_cost = models.IntegerField(default=1)
-    minimum_score = models.FloatField(default=70.0, help_text="Pontuação mínima para passar (%)")
+    # Progress Indicators
+    improvement_from_last = models.FloatField(default=0, help_text="Score improvement from last session")
+    streak_days = models.PositiveIntegerField(default=0)
     
-    # Metadados
-    is_active = models.BooleanField(default=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_speaking_exercises')
+    # Rich Data (for detailed analysis)
+    full_session_data = models.JSONField(default=dict, help_text="Complete session data including corrections, phrases, etc.")
+    
+    # Timestamps for Progress Tracking
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    date = models.DateField(auto_now_add=True)  # For daily grouping
     
     class Meta:
-        ordering = ['difficulty', 'created_at']
+        ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['course', 'is_course_specific']),
-            models.Index(fields=['is_course_specific', 'exercise_type']),
+            models.Index(fields=['user', '-date']),
+            models.Index(fields=['user', 'level', '-date']),
+            models.Index(fields=['date']),
         ]
     
     def __str__(self):
-        return f"{self.title} ({self.get_exercise_type_display()})"
+        return f"{self.user.username} - {self.session_id} ({self.overall_score}%)"
+    
+    def calculate_improvement(self):
+        """Calculate improvement from previous session"""
+        previous_session = VapiSession.objects.filter(
+            user=self.user,
+            created_at__lt=self.created_at
+        ).first()
+        
+        if previous_session:
+            self.improvement_from_last = self.overall_score - previous_session.overall_score
+        else:
+            self.improvement_from_last = 0
+    
+    def update_streak(self):
+        """Update daily practice streak"""
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        yesterday = timezone.now().date() - timedelta(days=1)
+        
+        # Check if user practiced yesterday
+        if VapiSession.objects.filter(user=self.user, date=yesterday).exists():
+            # Get the latest streak count and increment
+            latest = VapiSession.objects.filter(user=self.user).exclude(pk=self.pk).first()
+            self.streak_days = (latest.streak_days if latest else 0) + 1
+        else:
+            # Reset streak if gap in practice
+            self.streak_days = 1
+    
+    def save(self, *args, **kwargs):
+        """Auto-calculate metrics on save"""
+        if not self.pk:  # Only on creation
+            self.calculate_improvement()
+            self.update_streak()
+        super().save(*args, **kwargs)
 
 
-class SpeakingSession(models.Model):
+class DailyProgressSummary(models.Model):
     """
-    Sessão de prática de conversação individual
+    Daily aggregated progress data for quick dashboard queries
     """
-    SESSION_STATUS = [
-        ('ACTIVE', 'Active'),
-        ('COMPLETED', 'Completed'),
-        ('PAUSED', 'Paused'),
-        ('ABANDONED', 'Abandoned'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='daily_progress')
+    date = models.DateField()
     
-    # Relacionamentos
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='speaking_sessions')
-    exercise = models.ForeignKey(SpeakingExercise, on_delete=models.CASCADE, related_name='sessions')
+    # Daily Aggregates
+    sessions_count = models.PositiveIntegerField(default=0)
+    total_practice_minutes = models.PositiveIntegerField(default=0)
+    average_score = models.FloatField(default=0)
+    best_score = models.PositiveIntegerField(default=0)
+    total_words = models.PositiveIntegerField(default=0)
+    total_corrections = models.PositiveIntegerField(default=0)
     
-    # Status da sessão
-    status = models.CharField(max_length=15, choices=SESSION_STATUS, default='ACTIVE')
-    started_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
+    # Progress Metrics
+    score_improvement = models.FloatField(default=0)
+    current_streak = models.PositiveIntegerField(default=0)
     
-    # Métricas da sessão
-    total_duration = models.DurationField(null=True, blank=True)
-    turns_count = models.IntegerField(default=0, help_text="Número de falas do usuário")
-    
-    # Pontuações finais
-    overall_score = models.FloatField(null=True, blank=True)
-    pronunciation_score = models.FloatField(null=True, blank=True)
-    fluency_score = models.FloatField(null=True, blank=True)
-    accuracy_score = models.FloatField(null=True, blank=True)
-    
-    # Gamificação
-    points_earned = models.IntegerField(default=0)
-    hearts_used = models.IntegerField(default=0)
-    is_passed = models.BooleanField(default=False)
-    
-    # Feedback da IA
-    ai_feedback = models.TextField(blank=True)
-    improvement_suggestions = models.JSONField(default=list)
+    # Achievements
+    new_level_reached = models.BooleanField(default=False)
+    personal_best = models.BooleanField(default=False)
     
     class Meta:
-        ordering = ['-started_at']
-    
-    def __str__(self):
-        return f"{self.user.name} - {self.exercise.title} ({self.status})"
-
-
-class SpeakingTurn(models.Model):
-    """
-    Individual speaking turn within a session
-    """
-    TURN_TYPES = [
-        ('USER_SPEECH', 'User Speech'),
-        ('AI_RESPONSE', 'AI Response'),
-        ('SYSTEM_PROMPT', 'System Prompt'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Relacionamentos
-    session = models.ForeignKey(SpeakingSession, on_delete=models.CASCADE, related_name='turns')
-    
-    # Configurações da vez
-    turn_number = models.IntegerField()
-    turn_type = models.CharField(max_length=15, choices=TURN_TYPES)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    
-    # Conteúdo
-    audio_url = models.URLField(blank=True, help_text="URL do arquivo de áudio gravado")
-    transcribed_text = models.TextField(blank=True, help_text="Texto transcrito da fala")
-    target_text = models.TextField(blank=True, help_text="Texto alvo para comparação")
-    ai_response_text = models.TextField(blank=True, help_text="Resposta da IA")
-    
-    # Análise da fala (apenas para USER_SPEECH)
-    pronunciation_score = models.FloatField(null=True, blank=True)
-    fluency_score = models.FloatField(null=True, blank=True)
-    accuracy_score = models.FloatField(null=True, blank=True)
-    confidence_score = models.FloatField(null=True, blank=True)
-    
-    # Detalhes da análise
-    words_analysis = models.JSONField(default=dict, help_text="Análise palavra por palavra")
-    pronunciation_errors = models.JSONField(default=list)
-    grammar_errors = models.JSONField(default=list)
-    
-    # Duração
-    duration = models.DurationField(null=True, blank=True)
-    
-    class Meta:
-        ordering = ['turn_number']
-        unique_together = ['session', 'turn_number']
-    
-    def __str__(self):
-        return f"Turn {self.turn_number} - {self.get_turn_type_display()}"
-
-
-class SpeakingProgress(models.Model):
-    """
-    Progresso geral do usuário em speaking practice
-    """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Relacionamento
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='speaking_progress')
-    
-    # Estatísticas gerais
-    total_sessions = models.IntegerField(default=0)
-    total_hours_practiced = models.FloatField(default=0.0)
-    total_words_spoken = models.IntegerField(default=0)
-    
-    # Pontuações médias
-    average_pronunciation = models.FloatField(default=0.0)
-    average_fluency = models.FloatField(default=0.0)
-    average_accuracy = models.FloatField(default=0.0)
-    overall_average = models.FloatField(default=0.0)
-    
-    # Progressão por dificuldade
-    beginner_sessions = models.IntegerField(default=0)
-    intermediate_sessions = models.IntegerField(default=0)
-    advanced_sessions = models.IntegerField(default=0)
-    
-    # Conquistas
-    current_streak = models.IntegerField(default=0)
-    longest_streak = models.IntegerField(default=0)
-    
-    # Áreas de melhoria
-    weak_phonemes = models.JSONField(default=list)
-    strong_areas = models.JSONField(default=list)
-    practice_recommendations = models.JSONField(default=list)
-    
-    # Metadados
-    last_session_date = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return f"{self.user.name} - Speaking Progress"
-
-
-# =============================================================================
-# 🎧 AI LISTENING PRACTICE MODELS
-# =============================================================================
-
-class ListeningExercise(models.Model):
-    """
-    Exercícios de compreensão auditiva baseados em conteúdo de áudio
-    """
-    DIFFICULTY_CHOICES = [
-        ('BEGINNER', 'Beginner'),
-        ('INTERMEDIATE', 'Intermediate'), 
-        ('ADVANCED', 'Advanced'),
-    ]
-    
-    EXERCISE_TYPES = [
-        ('AUDIO_COMPREHENSION', 'Audio Comprehension'),
-        ('DICTATION', 'Dictation Practice'),
-        ('CONVERSATION_LISTENING', 'Conversation Listening'),
-        ('ACCENT_RECOGNITION', 'Accent Recognition'),
-        ('SPEED_LISTENING', 'Speed Listening'),
-        ('STORY_LISTENING', 'Story Listening'),
-        ('NEWS_LISTENING', 'News Listening'),
-    ]
-    
-    ACCENT_TYPES = [
-        ('AMERICAN', 'American English'),
-        ('BRITISH', 'British English'),
-        ('CANADIAN', 'Canadian English'),
-        ('AUSTRALIAN', 'Australian English'),
-        ('NEUTRAL', 'Neutral/International'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Relacionamentos
-    practice_lesson = models.ForeignKey(
-        PracticeLesson, 
-        on_delete=models.CASCADE, 
-        related_name='listening_exercises', 
-        null=True, 
-        blank=True
-    )
-    course = models.ForeignKey(
-        'courses.Course', 
-        on_delete=models.CASCADE, 
-        related_name='listening_exercises',
-        null=True,
-        blank=True,
-        help_text="Curso específico para exercício contextualizado (opcional para exercícios genéricos)"
-    )
-    
-    # Configurações do exercício
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    exercise_type = models.CharField(max_length=25, choices=EXERCISE_TYPES)
-    difficulty = models.CharField(max_length=15, choices=DIFFICULTY_CHOICES)
-    accent_type = models.CharField(max_length=15, choices=ACCENT_TYPES, default='NEUTRAL')
-    
-    # 🆕 CONTEXTUALIZAÇÃO POR CURSO
-    is_course_specific = models.BooleanField(
-        default=False, 
-        help_text="Indica se o exercício é específico para um curso ou genérico"
-    )
-    lesson_context = models.CharField(
-        max_length=200,
-        blank=True,
-        help_text="Contexto da lição específica (ex: 'Business Meetings', 'Family Vocabulary')"
-    )
-    auto_generated = models.BooleanField(
-        default=False,
-        help_text="Indica se o exercício foi gerado automaticamente baseado no conteúdo do curso"
-    )
-    
-    # Conteúdo de áudio
-    audio_url = models.URLField(help_text="URL do arquivo de áudio principal")
-    audio_duration = models.DurationField(help_text="Duração do áudio em segundos")
-    transcript = models.TextField(help_text="Transcrição completa do áudio")
-    
-    # Configurações de reprodução
-    allow_replay = models.BooleanField(default=True)
-    max_replays = models.IntegerField(default=3, help_text="Máximo de reproduções (-1 para ilimitado)")
-    playback_speeds = models.JSONField(
-        default=list,
-        help_text="Velocidades disponíveis: [0.5, 0.75, 1.0, 1.25, 1.5]"
-    )
-    
-    # Perguntas e respostas
-    questions = models.JSONField(
-        default=list,
-        help_text="Lista de perguntas de compreensão"
-    )
-    correct_answers = models.JSONField(
-        default=list,
-        help_text="Respostas corretas correspondentes"
-    )
-    
-    # Vocabulário focado
-    key_vocabulary = models.JSONField(
-        default=list, 
-        help_text="Palavras-chave presentes no áudio"
-    )
-    vocabulary_definitions = models.JSONField(
-        default=dict,
-        help_text="Definições das palavras-chave"
-    )
-    
-    # Gamificação
-    points_reward = models.IntegerField(default=20)
-    hearts_cost = models.IntegerField(default=1)
-    minimum_score = models.FloatField(default=65.0, help_text="Pontuação mínima para passar (%)")
-    
-    # Metadados
-    is_active = models.BooleanField(default=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_listening_exercises')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        ordering = ['difficulty', 'created_at']
+        unique_together = ['user', 'date']
+        ordering = ['-date']
         indexes = [
-            models.Index(fields=['course', 'is_course_specific']),
-            models.Index(fields=['is_course_specific', 'exercise_type']),
+            models.Index(fields=['user', '-date']),
         ]
     
     def __str__(self):
-        return f"{self.title} ({self.get_exercise_type_display()})"
+        return f"{self.user.username} - {self.date} ({self.sessions_count} sessions)"
+    
+    @classmethod
+    def update_for_user_date(cls, user, date):
+        """Update daily summary for a specific user and date"""
+        sessions = VapiSession.objects.filter(user=user, date=date)
+        
+        if not sessions.exists():
+            return None
+        
+        summary, created = cls.objects.get_or_create(
+            user=user,
+            date=date,
+            defaults={
+                'sessions_count': 0,
+                'total_practice_minutes': 0,
+                'average_score': 0,
+                'best_score': 0,
+                'total_words': 0,
+                'total_corrections': 0,
+            }
+        )
+        
+        # Calculate aggregates
+        summary.sessions_count = sessions.count()
+        summary.total_practice_minutes = sum(s.duration_minutes for s in sessions)
+        summary.average_score = sum(s.overall_score for s in sessions) / summary.sessions_count
+        summary.best_score = max(s.overall_score for s in sessions)
+        summary.total_words = sum(s.total_words for s in sessions)
+        summary.total_corrections = sum(s.corrections_count for s in sessions)
+        summary.current_streak = sessions.last().streak_days if sessions.last() else 0
+        
+        # Check for achievements
+        previous_best = cls.objects.filter(user=user, date__lt=date).aggregate(
+            max_score=models.Max('best_score')
+        )['max_score'] or 0
+        
+        summary.personal_best = summary.best_score > previous_best
 
+        summary.save()
+        return summary
 
-class ListeningSession(models.Model):
-    """
-    Sessão individual de prática de compreensão auditiva
-    """
-    SESSION_STATUS = [
-        ('ACTIVE', 'Active'),
-        ('COMPLETED', 'Completed'),
-        ('PAUSED', 'Paused'),
-        ('ABANDONED', 'Abandoned'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Relacionamentos
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listening_sessions')
-    exercise = models.ForeignKey(ListeningExercise, on_delete=models.CASCADE, related_name='sessions')
-    
-    # Status da sessão
-    status = models.CharField(max_length=15, choices=SESSION_STATUS, default='ACTIVE')
-    started_at = models.DateTimeField(auto_now_add=True)
-    completed_at = models.DateTimeField(null=True, blank=True)
-    
-    # Métricas da sessão
-    total_duration = models.DurationField(null=True, blank=True)
-    audio_replays_used = models.IntegerField(default=0)
-    playback_speed_used = models.FloatField(default=1.0)
-    
-    # Respostas do usuário
-    user_answers = models.JSONField(default=list)
-    dictation_attempts = models.JSONField(default=list)
-    
-    # Pontuações
-    comprehension_score = models.FloatField(null=True, blank=True)
-    accuracy_score = models.FloatField(null=True, blank=True)
-    vocabulary_score = models.FloatField(null=True, blank=True)
-    overall_score = models.FloatField(null=True, blank=True)
-    
-    # Gamificação
-    points_earned = models.IntegerField(default=0)
-    hearts_used = models.IntegerField(default=0)
-    is_passed = models.BooleanField(default=False)
-    
-    # Feedback e análise
-    detailed_feedback = models.JSONField(default=dict)
-    improvement_areas = models.JSONField(default=list)
-    
-    class Meta:
-        ordering = ['-started_at']
-    
-    def __str__(self):
-        return f"{self.user.name} - {self.exercise.title} ({self.status})"
-
-
-class ListeningAttempt(models.Model):
-    """
-    Tentativa individual de resposta dentro de uma sessão de listening
-    """
-    ATTEMPT_TYPES = [
-        ('COMPREHENSION_QUESTION', 'Comprehension Question'),
-        ('DICTATION_SENTENCE', 'Dictation Sentence'),
-        ('VOCABULARY_IDENTIFICATION', 'Vocabulary Identification'),
-        ('AUDIO_SEGMENT_REPLAY', 'Audio Segment Replay'),
-    ]
-
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Relacionamentos
-    session = models.ForeignKey(ListeningSession, on_delete=models.CASCADE, related_name='attempts')
-    
-    # Configurações da tentativa
-    attempt_number = models.IntegerField()
-    attempt_type = models.CharField(max_length=25, choices=ATTEMPT_TYPES)
-    timestamp = models.DateTimeField(auto_now_add=True)
-    
-    # Pergunta e resposta
-    question_text = models.TextField()
-    question_index = models.IntegerField(help_text="Índice da pergunta no exercício")
-    user_answer = models.TextField()
-    correct_answer = models.TextField()
-    
-    # Análise da resposta
-    is_correct = models.BooleanField(default=False)
-    partial_credit = models.FloatField(default=0.0, help_text="Crédito parcial (0.0-1.0)")
-    similarity_score = models.FloatField(null=True, blank=True, help_text="Similaridade semântica")
-    
-    # Tempo de resposta
-    time_to_answer = models.DurationField(null=True, blank=True)
-    audio_replays_before_answer = models.IntegerField(default=0)
-    
-    # Feedback específico
-    feedback_text = models.TextField(blank=True)
-    hints_used = models.JSONField(default=list)
-    
-    class Meta:
-        ordering = ['attempt_number']
-        unique_together = ['session', 'attempt_number']
-    
-    def __str__(self):
-        return f"Attempt {self.attempt_number} - {self.get_attempt_type_display()}"
-
-
-class ListeningProgress(models.Model):
-    """
-    Progresso geral do usuário em listening practice
-    """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Relacionamento
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='listening_progress')
-    
-    # Estatísticas gerais
-    total_sessions = models.IntegerField(default=0)
-    total_hours_listened = models.FloatField(default=0.0)
-    total_audio_content = models.IntegerField(default=0, help_text="Total de conteúdo de áudio em minutos")
-    
-    # Pontuações médias por tipo de exercício
-    avg_comprehension_score = models.FloatField(default=0.0)
-    avg_dictation_score = models.FloatField(default=0.0)
-    avg_vocabulary_score = models.FloatField(default=0.0)
-    overall_listening_score = models.FloatField(default=0.0)
-    
-    # Progressão por dificuldade
-    beginner_sessions = models.IntegerField(default=0)
-    intermediate_sessions = models.IntegerField(default=0)
-    advanced_sessions = models.IntegerField(default=0)
-    
-    # Estatísticas por sotaque
-    american_sessions = models.IntegerField(default=0)
-    british_sessions = models.IntegerField(default=0)
-    other_accents_sessions = models.IntegerField(default=0)
-    
-    # Velocidades de áudio preferidas
-    preferred_speed = models.FloatField(default=1.0)
-    speeds_comfort_level = models.JSONField(
-        default=dict,
-        help_text="Nível de conforto por velocidade: {0.5: 95, 1.0: 80, 1.5: 45}"
-    )
-    
-    # Áreas de força e fraqueza
-    strong_exercise_types = models.JSONField(default=list)
-    weak_exercise_types = models.JSONField(default=list)
-    difficult_vocabulary = models.JSONField(default=list)
-    mastered_vocabulary = models.JSONField(default=list)
-    
-    # Recomendações personalizadas
-    recommended_exercises = models.JSONField(default=list)
-    suggested_focus_areas = models.JSONField(default=list)
-    
-    # Conquistas de listening
-    current_listening_streak = models.IntegerField(default=0)
-    longest_listening_streak = models.IntegerField(default=0)
-    perfect_comprehension_count = models.IntegerField(default=0)
-    
-    # Metadados
-    last_session_date = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    def __str__(self):
-        return f"{self.user.name} - Listening Progress"
-
-
-class AudioSegment(models.Model):
-    """
-    Segmentos específicos de áudio para práticas focalizadas
-    """
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    
-    # Relacionamento
-    listening_exercise = models.ForeignKey(
-        ListeningExercise,
-        on_delete=models.CASCADE,
-        related_name='audio_segments'
-    )
-    
-    # Configurações do segmento
-    title = models.CharField(max_length=100)
-    start_time = models.DurationField(help_text="Tempo de início no áudio principal")
-    end_time = models.DurationField(help_text="Tempo de fim no áudio principal")
-    segment_transcript = models.TextField()
-    
-    # Dificuldade específica do segmento
-    difficulty_rating = models.FloatField(
-        default=1.0,
-        help_text="Rating de dificuldade (1.0-5.0)"
-    )
-    speech_rate = models.FloatField(
-        null=True,
-        blank=True,
-        help_text="Palavras por minuto neste segmento"
-    )
-    
-    # Características linguísticas
-    vocabulary_complexity = models.CharField(
-        max_length=20,
-        choices=[
-            ('BASIC', 'Basic'),
-            ('INTERMEDIATE', 'Intermediate'),
-            ('ADVANCED', 'Advanced'),
-            ('SPECIALIZED', 'Specialized'),
-        ],
-        default='BASIC'
-    )
-    
-    # Elementos focais
-    focused_grammar_points = models.JSONField(default=list)
-    key_phrases = models.JSONField(default=list)
-    cultural_context = models.TextField(blank=True)
-    
-    # Metadados
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    
-    class Meta:
-        ordering = ['start_time']
-    
-    def __str__(self):
-        return f"{self.listening_exercise.title} - {self.title}"
-    
-    def get_duration(self):
-        """Retorna a duração do segmento"""
-        if self.start_time and self.end_time:
-            return self.end_time - self.start_time
-        return None
