@@ -37,120 +37,52 @@ jobs:
           command_timeout: 30m
           debug: true
           script: |
-            set -e
+            echo "=== TUWI BACKEND DEPLOY ==="
+            echo "Step 1: Setup"
+            cd /opt/tuwi-backend || mkdir -p /opt/tuwi-backend && cd /opt/tuwi-backend
 
-            echo "=========================================="
-            echo "    TUWI BACKEND - DEPLOY HOSTINGER"
-            echo "=========================================="
+            echo "Step 2: Backup .env"
+            test -f .env && cp .env /tmp/.env.backup
 
-            echo "DEBUG: Starting deployment script..."
-            echo "DEBUG: Current user: $(whoami)"
-            echo "DEBUG: Current directory: $(pwd)"
-
-            echo "DEBUG: Creating project directory..."
-            mkdir -p /opt/tuwi-backend
-            echo "DEBUG: mkdir completed"
-
-            echo "DEBUG: Changing to project directory..."
-            cd /opt/tuwi-backend
-            echo "DEBUG: Now in $(pwd)"
-
-            echo "DEBUG: Checking for .env backup..."
-            # Backup .env before git operations
-            if [ -f ".env" ]; then
-              echo "DEBUG: .env exists, backing up..."
-              cp .env /tmp/.env.backup
-            else
-              echo "DEBUG: No .env file to backup"
-            fi
-
-            echo "DEBUG: Checking git repository..."
-            echo "DEBUG: git version: $(git --version 2>&1 || echo 'git not found')"
-            echo "DEBUG: ls -la .git: $(ls -la .git 2>&1 || echo 'No .git dir')"
-            echo "DEBUG: GH_TOKEN length: ${#GH_TOKEN}"
-
+            echo "Step 3: Git setup"
             if [ ! -d ".git" ]; then
-              echo "First deploy - initializing repository..."
-              git init || { echo "ERROR: git init failed with code $?"; exit 1; }
-              echo "DEBUG: git init succeeded"
-              git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git" || { echo "ERROR: git remote add failed with code $?"; exit 1; }
-              echo "DEBUG: git remote add succeeded"
+              git init
+              git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git"
             else
-              echo "Updating repository... (.git directory exists)"
-              echo "DEBUG: Current remotes:"
-              git remote -v || echo "No remotes"
-              git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git" || { echo "ERROR: git remote set-url failed with code $?"; exit 1; }
-              echo "DEBUG: git remote set-url succeeded"
+              git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git"
             fi
 
-            echo "DEBUG: Fetching from origin..."
-            git fetch origin || { echo "ERROR: git fetch failed with code $?"; exit 1; }
-            echo "DEBUG: git fetch succeeded"
+            echo "Step 4: Git pull"
+            git fetch origin
+            git reset --hard origin/main
 
-            echo "DEBUG: Resetting to origin/main..."
-            git reset --hard origin/main || { echo "ERROR: git reset failed with code $?"; exit 1; }
-            echo "DEBUG: Git operations complete"
+            echo "Step 5: Restore .env"
+            test -f /tmp/.env.backup && cp /tmp/.env.backup .env && rm /tmp/.env.backup
 
-            # Restore .env after git operations
-            if [ -f "/tmp/.env.backup" ]; then
-              echo "DEBUG: Restoring .env from backup..."
-              cp /tmp/.env.backup .env
-              rm /tmp/.env.backup
+            echo "Step 6: SSL setup"
+            if [ ! -f "nginx/ssl/fullchain.pem" ]; then
+              mkdir -p nginx/ssl
+              openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/privkey.pem -out nginx/ssl/fullchain.pem -subj "/CN=72.61.190.180/O=TuwiBackend/C=PT"
             fi
+            mkdir -p nginx/certbot/conf nginx/certbot/www
 
-            # Create SSL directory and self-signed cert if not exists
-            if [ ! -f "/opt/tuwi-backend/nginx/ssl/fullchain.pem" ]; then
-              echo "Creating SSL certificates..."
-              mkdir -p /opt/tuwi-backend/nginx/ssl
-              openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-                -keyout /opt/tuwi-backend/nginx/ssl/privkey.pem \
-                -out /opt/tuwi-backend/nginx/ssl/fullchain.pem \
-                -subj "/CN=72.61.190.180/O=TuwiBackend/C=PT"
-            fi
+            echo "Step 7: Check .env"
+            test -f .env || { echo "ERROR: .env not found"; exit 1; }
 
-            # Create certbot directories
-            mkdir -p /opt/tuwi-backend/nginx/certbot/conf
-            mkdir -p /opt/tuwi-backend/nginx/certbot/www
-
-            # Check if .env exists, if not error
-            if [ ! -f "/opt/tuwi-backend/.env" ]; then
-              echo "ERROR: .env file not found!"
-              echo "Please create .env file on the server with production values"
-              exit 1
-            fi
-
-            echo "DEBUG: .env file exists, continuing..."
-
-            # Docker operations
-            cd /opt/tuwi-backend
-
-            echo "Stopping existing containers..."
+            echo "Step 8: Docker"
             docker compose -f docker-compose.prod.yml down --remove-orphans || true
-
-            echo "Building and starting containers..."
-            if [ "${{ github.event.inputs.force_rebuild }}" = "true" ]; then
-              docker compose -f docker-compose.prod.yml build --no-cache
-            else
-              docker compose -f docker-compose.prod.yml build
-            fi
-
+            docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d
 
-            echo "Waiting for services to start..."
+            echo "Step 9: Wait for startup"
             sleep 20
 
-            echo "Running database migrations..."
+            echo "Step 10: Migrations"
             docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput
-
-            echo "Collecting static files..."
             docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput
 
-            echo "Checking container status..."
+            echo "Step 11: Status"
             docker compose -f docker-compose.prod.yml ps
+            curl -sf http://localhost:8000/api/health/ && echo "Backend OK" || echo "Backend check failed"
 
-            echo "Health check..."
-            curl -sf http://localhost:8000/api/health/ && echo "Backend OK" || echo "Backend health check failed"
-
-            echo "=========================================="
-            echo "    DEPLOY COMPLETED SUCCESSFULLY!"
-            echo "=========================================="
+            echo "=== DEPLOY COMPLETE ==="
