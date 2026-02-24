@@ -40,27 +40,21 @@ jobs:
             echo "    TUWI BACKEND - DEPLOY HOSTINGER"
             echo "=========================================="
 
-            # Check if first deploy (check for .git directory)
-            if [ ! -d "${{ env.PROJECT_PATH }}/.git" ]; then
-              echo "First deploy - cloning repository..."
-              mkdir -p ${{ env.PROJECT_PATH }}
-              cd ${{ env.PROJECT_PATH }}
-              # Backup .env if exists
-              if [ -f ".env" ]; then
-                cp .env /tmp/.env.backup
-              fi
-              git clone https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git .
-              # Restore .env if backed up
-              if [ -f "/tmp/.env.backup" ]; then
-                cp /tmp/.env.backup .env
-              fi
+            # Setup git repository
+            mkdir -p ${{ env.PROJECT_PATH }}
+            cd ${{ env.PROJECT_PATH }}
+
+            if [ ! -d ".git" ]; then
+              echo "First deploy - initializing repository..."
+              git init
+              git remote add origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
             else
-              cd ${{ env.PROJECT_PATH }}
-              echo "Updating code from Git..."
+              echo "Updating repository..."
               git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
-              git fetch origin
-              git reset --hard origin/main
             fi
+
+            git fetch origin
+            git reset --hard origin/main
 
             # Create SSL directory and self-signed cert if not exists
             if [ ! -f "${{ env.PROJECT_PATH }}/nginx/ssl/fullchain.pem" ]; then
