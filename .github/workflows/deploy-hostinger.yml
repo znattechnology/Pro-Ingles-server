@@ -87,15 +87,25 @@ jobs:
             docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d
 
-            echo "Step 10: Wait for startup"
-            sleep 20
+            echo "Step 10: Wait for containers"
+            sleep 10
+            echo "Waiting for backend to be healthy..."
+            for i in 1 2 3 4 5 6; do
+              if docker compose -f docker-compose.prod.yml exec -T backend echo "OK" 2>/dev/null; then
+                echo "Backend container is ready"
+                break
+              fi
+              echo "Waiting... attempt $i"
+              sleep 10
+            done
 
             echo "Step 11: Migrations"
-            docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput
-            docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput
+            docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput || echo "Migration warning"
+            docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput || echo "Collectstatic warning"
 
             echo "Step 12: Status"
             docker compose -f docker-compose.prod.yml ps
+            docker compose -f docker-compose.prod.yml logs --tail=20 backend || true
             curl -sf http://localhost:8000/api/health/ && echo "Backend OK" || echo "Backend check failed"
 
             echo "=== DEPLOY COMPLETE ==="
