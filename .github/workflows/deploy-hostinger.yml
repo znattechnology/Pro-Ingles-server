@@ -46,11 +46,14 @@ jobs:
 
             echo "Step 3: Git setup"
             if [ ! -d ".git" ]; then
+              echo "Initializing new git repo..."
               git init
-              git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git"
-            else
-              git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git"
             fi
+
+            echo "Configuring remote..."
+            git remote remove origin 2>/dev/null || true
+            git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git"
+            echo "Remote configured"
 
             echo "Step 4: Git pull"
             git fetch origin
