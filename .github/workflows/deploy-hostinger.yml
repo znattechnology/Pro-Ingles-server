@@ -105,7 +105,11 @@ jobs:
 
             echo "Step 12: Status"
             docker compose -f docker-compose.prod.yml ps
-            docker compose -f docker-compose.prod.yml logs --tail=20 backend || true
+            echo "=== BACKEND LOGS ==="
+            docker compose -f docker-compose.prod.yml logs --tail=100 backend 2>&1 || true
+            echo "=== END BACKEND LOGS ==="
+
+            echo "Step 13: Health check"
             curl -sf http://localhost:8000/api/health/ && echo "Backend OK" || echo "Backend check failed"
 
             echo "=== DEPLOY COMPLETE ==="
