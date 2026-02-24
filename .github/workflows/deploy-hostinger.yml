@@ -65,19 +65,30 @@ jobs:
             fi
 
             echo "DEBUG: Checking git repository..."
+            echo "DEBUG: git version: $(git --version 2>&1 || echo 'git not found')"
+            echo "DEBUG: ls -la .git: $(ls -la .git 2>&1 || echo 'No .git dir')"
+            echo "DEBUG: GH_TOKEN length: ${#GH_TOKEN}"
+
             if [ ! -d ".git" ]; then
               echo "First deploy - initializing repository..."
-              git init
-              git remote add origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
+              git init || { echo "ERROR: git init failed with code $?"; exit 1; }
+              echo "DEBUG: git init succeeded"
+              git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git" || { echo "ERROR: git remote add failed with code $?"; exit 1; }
+              echo "DEBUG: git remote add succeeded"
             else
-              echo "Updating repository..."
-              git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
+              echo "Updating repository... (.git directory exists)"
+              echo "DEBUG: Current remotes:"
+              git remote -v || echo "No remotes"
+              git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/znattechnology/Pro-Ingles-server.git" || { echo "ERROR: git remote set-url failed with code $?"; exit 1; }
+              echo "DEBUG: git remote set-url succeeded"
             fi
 
             echo "DEBUG: Fetching from origin..."
-            git fetch origin
+            git fetch origin || { echo "ERROR: git fetch failed with code $?"; exit 1; }
+            echo "DEBUG: git fetch succeeded"
+
             echo "DEBUG: Resetting to origin/main..."
-            git reset --hard origin/main
+            git reset --hard origin/main || { echo "ERROR: git reset failed with code $?"; exit 1; }
             echo "DEBUG: Git operations complete"
 
             # Restore .env after git operations
