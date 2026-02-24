@@ -43,15 +43,28 @@ jobs:
             echo "    TUWI BACKEND - DEPLOY HOSTINGER"
             echo "=========================================="
 
-            # Setup git repository
-            mkdir -p ${{ env.PROJECT_PATH }}
-            cd ${{ env.PROJECT_PATH }}
+            echo "DEBUG: Starting deployment script..."
+            echo "DEBUG: Current user: $(whoami)"
+            echo "DEBUG: Current directory: $(pwd)"
 
+            echo "DEBUG: Creating project directory..."
+            mkdir -p /opt/tuwi-backend
+            echo "DEBUG: mkdir completed"
+
+            echo "DEBUG: Changing to project directory..."
+            cd /opt/tuwi-backend
+            echo "DEBUG: Now in $(pwd)"
+
+            echo "DEBUG: Checking for .env backup..."
             # Backup .env before git operations
             if [ -f ".env" ]; then
+              echo "DEBUG: .env exists, backing up..."
               cp .env /tmp/.env.backup
+            else
+              echo "DEBUG: No .env file to backup"
             fi
 
+            echo "DEBUG: Checking git repository..."
             if [ ! -d ".git" ]; then
               echo "First deploy - initializing repository..."
               git init
@@ -61,38 +74,44 @@ jobs:
               git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
             fi
 
+            echo "DEBUG: Fetching from origin..."
             git fetch origin
+            echo "DEBUG: Resetting to origin/main..."
             git reset --hard origin/main
+            echo "DEBUG: Git operations complete"
 
             # Restore .env after git operations
             if [ -f "/tmp/.env.backup" ]; then
+              echo "DEBUG: Restoring .env from backup..."
               cp /tmp/.env.backup .env
               rm /tmp/.env.backup
             fi
 
             # Create SSL directory and self-signed cert if not exists
-            if [ ! -f "${{ env.PROJECT_PATH }}/nginx/ssl/fullchain.pem" ]; then
+            if [ ! -f "/opt/tuwi-backend/nginx/ssl/fullchain.pem" ]; then
               echo "Creating SSL certificates..."
-              mkdir -p ${{ env.PROJECT_PATH }}/nginx/ssl
+              mkdir -p /opt/tuwi-backend/nginx/ssl
               openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-                -keyout ${{ env.PROJECT_PATH }}/nginx/ssl/privkey.pem \
-                -out ${{ env.PROJECT_PATH }}/nginx/ssl/fullchain.pem \
-                -subj '/CN=${{ env.VPS_HOST }}/O=TuwiBackend/C=PT'
+                -keyout /opt/tuwi-backend/nginx/ssl/privkey.pem \
+                -out /opt/tuwi-backend/nginx/ssl/fullchain.pem \
+                -subj "/CN=72.61.190.180/O=TuwiBackend/C=PT"
             fi
 
             # Create certbot directories
-            mkdir -p ${{ env.PROJECT_PATH }}/nginx/certbot/conf
-            mkdir -p ${{ env.PROJECT_PATH }}/nginx/certbot/www
+            mkdir -p /opt/tuwi-backend/nginx/certbot/conf
+            mkdir -p /opt/tuwi-backend/nginx/certbot/www
 
-            # Check if .env exists, if not copy from production template
-            if [ ! -f "${{ env.PROJECT_PATH }}/.env" ]; then
+            # Check if .env exists, if not error
+            if [ ! -f "/opt/tuwi-backend/.env" ]; then
               echo "ERROR: .env file not found!"
               echo "Please create .env file on the server with production values"
               exit 1
             fi
 
+            echo "DEBUG: .env file exists, continuing..."
+
             # Docker operations
-            cd ${{ env.PROJECT_PATH }}
+            cd /opt/tuwi-backend
 
             echo "Stopping existing containers..."
             docker compose -f docker-compose.prod.yml down --remove-orphans || true
