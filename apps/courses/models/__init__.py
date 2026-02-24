@@ -36,6 +36,13 @@ from .resources import (
     ChapterResource
 )
 
+from .student_engagement import (
+    CourseWishlist,
+    CourseReview,
+    CourseNote,
+    CourseBookmark
+)
+
 # Make all models available at package level
 __all__ = [
     # Core models
@@ -58,4 +65,10 @@ __all__ = [
     
     # Resource models
     'ChapterResource',
+
+    # Student engagement models
+    'CourseWishlist',
+    'CourseReview',
+    'CourseNote',
+    'CourseBookmark',
 ]
