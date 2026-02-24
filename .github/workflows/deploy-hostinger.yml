@@ -33,6 +33,9 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           envs: GH_TOKEN
           script_stop: true
+          timeout: 300s
+          command_timeout: 30m
+          debug: true
           script: |
             set -e
 
