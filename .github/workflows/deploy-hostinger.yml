@@ -44,6 +44,11 @@ jobs:
             mkdir -p ${{ env.PROJECT_PATH }}
             cd ${{ env.PROJECT_PATH }}
 
+            # Backup .env before git operations
+            if [ -f ".env" ]; then
+              cp .env /tmp/.env.backup
+            fi
+
             if [ ! -d ".git" ]; then
               echo "First deploy - initializing repository..."
               git init
@@ -55,6 +60,12 @@ jobs:
 
             git fetch origin
             git reset --hard origin/main
+
+            # Restore .env after git operations
+            if [ -f "/tmp/.env.backup" ]; then
+              cp /tmp/.env.backup .env
+              rm /tmp/.env.backup
+            fi
 
             # Create SSL directory and self-signed cert if not exists
             if [ ! -f "${{ env.PROJECT_PATH }}/nginx/ssl/fullchain.pem" ]; then
