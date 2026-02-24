@@ -42,10 +42,11 @@ jobs:
               echo "First deploy - setting up directories..."
               mkdir -p ${{ env.PROJECT_PATH }}
               cd ${{ env.PROJECT_PATH }}
-              git clone https://github.com/${{ github.repository }}.git .
+              git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git .
             else
               cd ${{ env.PROJECT_PATH }}
               echo "Updating code from Git..."
+              git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
               git fetch origin
               git reset --hard origin/main
             fi
