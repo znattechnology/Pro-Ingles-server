@@ -9,7 +9,8 @@ from rest_framework import serializers
 from ....models import (
     Course, CourseSection, Chapter, ChapterComment,
     CourseEnrollment, Transaction, UserCourseProgress, ChapterProgress,
-    ChapterResource, ChapterQuiz, StudentQuizAttempt
+    ChapterResource, ChapterQuiz, StudentQuizAttempt,
+    CourseWishlist, CourseReview, StudentNote, StudentBookmark, CourseCertificate
 )
 from apps.users.serializers import UserProfileSerializer
 
@@ -818,7 +819,7 @@ class StudentQuizAttemptCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Set student from request user
         validated_data['student'] = self.context['request'].user
-        
+
         # Calculate attempt number
         chapter_quiz = validated_data['chapter_quiz']
         existing_attempts = StudentQuizAttempt.objects.filter(
@@ -826,10 +827,122 @@ class StudentQuizAttemptCreateSerializer(serializers.ModelSerializer):
             chapter_quiz=chapter_quiz
         ).count()
         validated_data['attempt_number'] = existing_attempts + 1
-        
+
         # Set completion timestamp if completed
         if validated_data.get('is_completed', False):
             from django.utils import timezone
             validated_data['completed_at'] = timezone.now()
-        
+
         return super().create(validated_data)
+
+
+# =============================================================================
+# STUDENT ENGAGEMENT SERIALIZERS
+# =============================================================================
+
+class CourseWishlistSerializer(serializers.ModelSerializer):
+    """
+    Serializer for course wishlist entries.
+    """
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    course_image = serializers.CharField(source='course.image', read_only=True)
+
+    class Meta:
+        model = CourseWishlist
+        fields = [
+            'id', 'user', 'course', 'course_title', 'course_image', 'added_at'
+        ]
+        read_only_fields = ['id', 'user', 'course_title', 'course_image', 'added_at']
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class CourseReviewSerializer(serializers.ModelSerializer):
+    """
+    Serializer for course reviews.
+    """
+    user_name = serializers.CharField(source='user.name', read_only=True)
+    user_avatar = serializers.CharField(source='user.avatar', read_only=True)
+    course_title = serializers.CharField(source='course.title', read_only=True)
+
+    class Meta:
+        model = CourseReview
+        fields = [
+            'id', 'user', 'user_name', 'user_avatar', 'course', 'course_title',
+            'rating', 'title', 'content', 'is_verified', 'helpful_count',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = [
+            'id', 'user', 'user_name', 'user_avatar', 'course_title',
+            'is_verified', 'helpful_count', 'created_at', 'updated_at'
+        ]
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class StudentNoteSerializer(serializers.ModelSerializer):
+    """
+    Serializer for student notes.
+    """
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    chapter_title = serializers.CharField(source='chapter.title', read_only=True, allow_null=True)
+
+    class Meta:
+        model = StudentNote
+        fields = [
+            'id', 'user', 'course', 'course_title', 'chapter', 'chapter_title',
+            'content', 'timestamp', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'user', 'course_title', 'chapter_title', 'created_at', 'updated_at']
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class StudentBookmarkSerializer(serializers.ModelSerializer):
+    """
+    Serializer for student bookmarks.
+    """
+    chapter_title = serializers.CharField(source='chapter.title', read_only=True)
+    course_id = serializers.CharField(source='chapter.section.course.id', read_only=True)
+    course_title = serializers.CharField(source='chapter.section.course.title', read_only=True)
+
+    class Meta:
+        model = StudentBookmark
+        fields = [
+            'id', 'user', 'chapter', 'chapter_title', 'course_id', 'course_title',
+            'timestamp', 'note', 'created_at'
+        ]
+        read_only_fields = ['id', 'user', 'chapter_title', 'course_id', 'course_title', 'created_at']
+
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class CourseCertificateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for course certificates.
+    """
+    user_name = serializers.CharField(source='user.name', read_only=True)
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    course_image = serializers.CharField(source='course.image', read_only=True)
+
+    class Meta:
+        model = CourseCertificate
+        fields = [
+            'id', 'user', 'user_name', 'course', 'course_title', 'course_image',
+            'certificate_number', 'issued_at', 'completion_percentage',
+            'final_grade', 'final_grade_letter', 'certificate_url',
+            'verification_code', 'created_at'
+        ]
+        read_only_fields = [
+            'id', 'user', 'user_name', 'course_title', 'course_image',
+            'certificate_number', 'issued_at', 'certificate_url',
+            'verification_code', 'created_at'
+        ]
