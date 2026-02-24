@@ -39,8 +39,9 @@ from .resources import (
 from .student_engagement import (
     CourseWishlist,
     CourseReview,
-    CourseNote,
-    CourseBookmark
+    StudentNote,
+    StudentBookmark,
+    CourseCertificate
 )
 
 # Make all models available at package level
@@ -69,6 +70,7 @@ __all__ = [
     # Student engagement models
     'CourseWishlist',
     'CourseReview',
-    'CourseNote',
-    'CourseBookmark',
+    'StudentNote',
+    'StudentBookmark',
+    'CourseCertificate',
 ]
