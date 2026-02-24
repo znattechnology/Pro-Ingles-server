@@ -72,19 +72,28 @@ jobs:
             echo "Step 7: Check .env"
             test -f .env || { echo "ERROR: .env not found"; exit 1; }
 
-            echo "Step 8: Docker"
+            echo "Step 8: Stop conflicting services"
+            systemctl stop nginx 2>/dev/null || true
+            systemctl stop apache2 2>/dev/null || true
+            systemctl disable nginx 2>/dev/null || true
+            systemctl disable apache2 2>/dev/null || true
+            fuser -k 80/tcp 2>/dev/null || true
+            fuser -k 443/tcp 2>/dev/null || true
+            sleep 2
+
+            echo "Step 9: Docker"
             docker compose -f docker-compose.prod.yml down --remove-orphans || true
             docker compose -f docker-compose.prod.yml build
             docker compose -f docker-compose.prod.yml up -d
 
-            echo "Step 9: Wait for startup"
+            echo "Step 10: Wait for startup"
             sleep 20
 
-            echo "Step 10: Migrations"
+            echo "Step 11: Migrations"
             docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate --noinput
             docker compose -f docker-compose.prod.yml exec -T backend python manage.py collectstatic --noinput
 
-            echo "Step 11: Status"
+            echo "Step 12: Status"
             docker compose -f docker-compose.prod.yml ps
             curl -sf http://localhost:8000/api/health/ && echo "Backend OK" || echo "Backend check failed"
 
