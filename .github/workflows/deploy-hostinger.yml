@@ -40,12 +40,20 @@ jobs:
             echo "    TUWI BACKEND - DEPLOY HOSTINGER"
             echo "=========================================="
 
-            # Check if first deploy (setup directories)
-            if [ ! -d "${{ env.PROJECT_PATH }}" ]; then
-              echo "First deploy - setting up directories..."
+            # Check if first deploy (check for .git directory)
+            if [ ! -d "${{ env.PROJECT_PATH }}/.git" ]; then
+              echo "First deploy - cloning repository..."
               mkdir -p ${{ env.PROJECT_PATH }}
               cd ${{ env.PROJECT_PATH }}
+              # Backup .env if exists
+              if [ -f ".env" ]; then
+                cp .env /tmp/.env.backup
+              fi
               git clone https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git .
+              # Restore .env if backed up
+              if [ -f "/tmp/.env.backup" ]; then
+                cp /tmp/.env.backup .env
+              fi
             else
               cd ${{ env.PROJECT_PATH }}
               echo "Updating code from Git..."
