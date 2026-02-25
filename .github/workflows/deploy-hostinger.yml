@@ -63,11 +63,11 @@ jobs:
             test -f /tmp/.env.backup && cp /tmp/.env.backup .env && rm /tmp/.env.backup
 
             echo "Step 6: SSL setup"
+            mkdir -p nginx/ssl nginx/certbot/conf nginx/certbot/www
+            # Create temporary self-signed cert if none exists (needed for nginx to start)
             if [ ! -f "nginx/ssl/fullchain.pem" ]; then
-              mkdir -p nginx/ssl
-              openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/privkey.pem -out nginx/ssl/fullchain.pem -subj "/CN=72.61.190.180/O=TuwiBackend/C=PT"
+              openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx/ssl/privkey.pem -out nginx/ssl/fullchain.pem -subj "/CN=proenglish.cloud/O=ProEnglish/C=PT"
             fi
-            mkdir -p nginx/certbot/conf nginx/certbot/www
 
             echo "Step 7: Check .env"
             test -f .env || { echo "ERROR: .env not found"; exit 1; }
@@ -111,5 +111,41 @@ jobs:
 
             echo "Step 13: Health check"
             curl -sf http://localhost:8000/api/health/ && echo "Backend OK" || echo "Backend check failed"
+
+            echo "Step 14: Let's Encrypt SSL"
+            # Check if we already have a valid Let's Encrypt certificate
+            if [ -f "/etc/letsencrypt/live/proenglish.cloud/fullchain.pem" ]; then
+              echo "Let's Encrypt certificate exists, copying..."
+              cp /etc/letsencrypt/live/proenglish.cloud/fullchain.pem nginx/ssl/fullchain.pem
+              cp /etc/letsencrypt/live/proenglish.cloud/privkey.pem nginx/ssl/privkey.pem
+              docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload || true
+            else
+              echo "Obtaining new Let's Encrypt certificate..."
+              # Install certbot if not present
+              which certbot || apt-get update && apt-get install -y certbot
+
+              # Stop nginx temporarily to free port 80
+              docker compose -f docker-compose.prod.yml stop nginx || true
+
+              # Get certificate using standalone mode
+              certbot certonly --standalone --non-interactive --agree-tos \
+                --email admin@proenglish.cloud \
+                -d proenglish.cloud -d api.proenglish.cloud || echo "Certbot warning - may need manual setup"
+
+              # Copy certificates if obtained
+              if [ -f "/etc/letsencrypt/live/proenglish.cloud/fullchain.pem" ]; then
+                cp /etc/letsencrypt/live/proenglish.cloud/fullchain.pem nginx/ssl/fullchain.pem
+                cp /etc/letsencrypt/live/proenglish.cloud/privkey.pem nginx/ssl/privkey.pem
+                echo "SSL certificates installed successfully"
+              fi
+
+              # Restart nginx
+              docker compose -f docker-compose.prod.yml start nginx || true
+            fi
+
+            echo "Step 15: Final health check"
+            sleep 5
+            curl -sf http://localhost:8000/api/health/ && echo "Backend OK" || echo "Backend check failed"
+            curl -sk https://proenglish.cloud/api/health/ && echo "HTTPS OK" || echo "HTTPS check - may need DNS propagation"
 
             echo "=== DEPLOY COMPLETE ==="
