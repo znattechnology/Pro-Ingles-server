@@ -44,6 +44,12 @@ from .student_engagement import (
     CourseCertificate
 )
 
+from .grading import (
+    CourseGradingConfig,
+    StudentCourseGrade,
+    GradeHistory
+)
+
 # Make all models available at package level
 __all__ = [
     # Core models
@@ -73,4 +79,9 @@ __all__ = [
     'StudentNote',
     'StudentBookmark',
     'CourseCertificate',
+
+    # Grading models
+    'CourseGradingConfig',
+    'StudentCourseGrade',
+    'GradeHistory',
 ]
