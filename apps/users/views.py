@@ -108,8 +108,84 @@ class UserRegistrationView(generics.CreateAPIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
     Custom JWT token obtain view with additional user data and rate limiting (10 attempts per minute per IP).
+    Sets HttpOnly cookies for cross-domain authentication.
     """
     serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            # Get tokens from response data
+            access_token = response.data.get('access')
+            refresh_token = response.data.get('refresh')
+
+            # Cookie settings for cross-domain authentication
+            # SameSite=None requires Secure=True (HTTPS)
+            is_secure = not settings.DEBUG
+            samesite = 'None' if is_secure else 'Lax'
+
+            # Set access token cookie (short-lived)
+            if access_token:
+                response.set_cookie(
+                    key='access_token',
+                    value=access_token,
+                    max_age=60 * 60,  # 1 hour
+                    httponly=True,
+                    secure=is_secure,
+                    samesite=samesite,
+                    path='/',
+                )
+
+            # Set refresh token cookie (long-lived)
+            if refresh_token:
+                response.set_cookie(
+                    key='refresh_token',
+                    value=refresh_token,
+                    max_age=60 * 60 * 24 * 7,  # 7 days
+                    httponly=True,
+                    secure=is_secure,
+                    samesite=samesite,
+                    path='/',
+                )
+
+        return response
+
+
+class CustomTokenRefreshView(TokenRefreshView):
+    """
+    Custom JWT token refresh view that sets HttpOnly cookies.
+    Also supports reading refresh token from cookie if not in request body.
+    """
+
+    def post(self, request, *args, **kwargs):
+        # If refresh token not in body, try to get from cookie
+        if 'refresh' not in request.data and request.COOKIES.get('refresh_token'):
+            request._full_data = request.data.copy()
+            request._full_data['refresh'] = request.COOKIES.get('refresh_token')
+
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code == 200:
+            access_token = response.data.get('access')
+
+            # Cookie settings for cross-domain authentication
+            is_secure = not settings.DEBUG
+            samesite = 'None' if is_secure else 'Lax'
+
+            # Set new access token cookie
+            if access_token:
+                response.set_cookie(
+                    key='access_token',
+                    value=access_token,
+                    max_age=60 * 60,  # 1 hour
+                    httponly=True,
+                    secure=is_secure,
+                    samesite=samesite,
+                    path='/',
+                )
+
+        return response
 
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
@@ -519,24 +595,47 @@ class GoogleOAuthLoginView(generics.GenericAPIView):
 
 class LogoutView(generics.GenericAPIView):
     """
-    View for user logout - blacklists the refresh token.
+    View for user logout - blacklists the refresh token and clears HttpOnly cookies.
     """
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def post(self, request):
         try:
-            refresh_token = request.data.get("refresh_token")
+            # Try to get refresh token from request body or cookie
+            refresh_token = request.data.get("refresh_token") or request.COOKIES.get('refresh_token')
             if refresh_token:
                 token = RefreshToken(refresh_token)
                 token.blacklist()
-            
-            return Response({
+
+            # Create response and clear HttpOnly cookies
+            response = Response({
                 'message': 'Logout realizado com sucesso.'
             })
+
+            # Clear cookies with same settings used to set them
+            is_secure = not settings.DEBUG
+            samesite = 'None' if is_secure else 'Lax'
+
+            response.delete_cookie(
+                key='access_token',
+                path='/',
+                samesite=samesite,
+            )
+            response.delete_cookie(
+                key='refresh_token',
+                path='/',
+                samesite=samesite,
+            )
+
+            return response
         except Exception as e:
-            return Response({
+            # Still clear cookies even on error
+            response = Response({
                 'message': 'Logout realizado com sucesso.'
-            })  # Always return success for logout
+            })
+            response.delete_cookie('access_token', path='/')
+            response.delete_cookie('refresh_token', path='/')
+            return response
 
 
 class AdminUsersListView(generics.ListAPIView):
