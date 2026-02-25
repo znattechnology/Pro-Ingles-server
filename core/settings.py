@@ -263,6 +263,18 @@ CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', default=False, cast=bo
 CORS_ALLOW_PRIVATE_NETWORK = config('CORS_ALLOW_PRIVATE_NETWORK', default=False, cast=bool)
 
 # =============================================================================
+# COOKIE SETTINGS FOR CROSS-DOMAIN AUTHENTICATION
+# =============================================================================
+
+# For cross-domain cookies to work (Vercel frontend -> different domain backend):
+# - SameSite must be 'None' to allow cross-site cookies
+# - Secure must be True when SameSite is 'None' (requires HTTPS)
+SESSION_COOKIE_SAMESITE = config('SESSION_COOKIE_SAMESITE', default='Lax')
+SESSION_COOKIE_SECURE = config('SESSION_COOKIE_SECURE', default=not DEBUG, cast=bool)
+CSRF_COOKIE_SAMESITE = config('CSRF_COOKIE_SAMESITE', default='Lax')
+CSRF_COOKIE_SECURE = config('CSRF_COOKIE_SECURE', default=not DEBUG, cast=bool)
+
+# =============================================================================
 # INTERNATIONALIZATION
 # =============================================================================
 
