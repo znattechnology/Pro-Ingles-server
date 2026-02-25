@@ -121,25 +121,42 @@ jobs:
               docker compose -f docker-compose.prod.yml exec -T nginx nginx -s reload || true
             else
               echo "Obtaining new Let's Encrypt certificate..."
-              # Install certbot if not present
-              which certbot || apt-get update && apt-get install -y certbot
 
-              # Stop nginx temporarily to free port 80
+              # Install certbot if not present
+              if ! command -v certbot &> /dev/null; then
+                echo "Installing certbot..."
+                apt-get update
+                apt-get install -y certbot
+              fi
+
+              # Stop nginx container to free port 80
+              echo "Stopping nginx to free port 80..."
               docker compose -f docker-compose.prod.yml stop nginx || true
+              sleep 3
+
+              # Kill any process using port 80
+              fuser -k 80/tcp 2>/dev/null || true
+              sleep 2
 
               # Get certificate using standalone mode
+              echo "Running certbot..."
               certbot certonly --standalone --non-interactive --agree-tos \
                 --email admin@proenglish.cloud \
-                -d proenglish.cloud -d api.proenglish.cloud || echo "Certbot warning - may need manual setup"
+                -d proenglish.cloud -d api.proenglish.cloud \
+                --preferred-challenges http \
+                || echo "Certbot warning - may need manual setup"
 
               # Copy certificates if obtained
               if [ -f "/etc/letsencrypt/live/proenglish.cloud/fullchain.pem" ]; then
                 cp /etc/letsencrypt/live/proenglish.cloud/fullchain.pem nginx/ssl/fullchain.pem
                 cp /etc/letsencrypt/live/proenglish.cloud/privkey.pem nginx/ssl/privkey.pem
                 echo "SSL certificates installed successfully"
+              else
+                echo "WARNING: Let's Encrypt certificate not obtained. Using self-signed certificate."
               fi
 
               # Restart nginx
+              echo "Starting nginx..."
               docker compose -f docker-compose.prod.yml start nginx || true
             fi
 
