@@ -35,6 +35,9 @@ drf-spectacular>=0.26.3
 # AI & OpenAI Integration
 openai>=1.107.0
 
+# HTTP Client
+requests>=2.31.0
+
 # WebSocket Support
 channels>=4.0.0
 channels-redis>=4.1.0
