@@ -20,6 +20,7 @@ class CoursesListView(generics.ListAPIView):
     GET /api/v1/practice/courses/
 
     List all available courses for practice selection and teacher management.
+    Supports include_stats=true to return units_count, lessons_count, challenges_count.
     """
     permission_classes = [IsAuthenticated]
     serializer_class = CourseListSerializer
@@ -28,6 +29,7 @@ class CoursesListView(generics.ListAPIView):
         # Get query parameters
         include_drafts = self.request.query_params.get('include_drafts', 'true').lower() == 'true'
         course_type = self.request.query_params.get('course_type', 'practice')
+        include_stats = self.request.query_params.get('include_stats', 'false').lower() == 'true'
 
         # Base query for practice courses
         queryset = Course.objects.filter(course_type=course_type)
@@ -36,7 +38,55 @@ class CoursesListView(generics.ListAPIView):
         if not include_drafts and not self.request.user.is_staff:
             queryset = queryset.filter(is_published=True)
 
+        # Annotate with stats if requested
+        if include_stats:
+            queryset = queryset.annotate(
+                units_count=Count('practice_units', distinct=True),
+                lessons_count=Count('practice_units__lessons', distinct=True),
+                challenges_count=Count('practice_units__lessons__challenges', distinct=True)
+            )
+
         return queryset.order_by('-created_at')
+
+    def list(self, request, *args, **kwargs):
+        """Override list to include stats in response."""
+        queryset = self.get_queryset()
+        include_stats = request.query_params.get('include_stats', 'false').lower() == 'true'
+
+        # Serialize normally first
+        serializer = self.get_serializer(queryset, many=True)
+        data = serializer.data
+
+        # If stats requested, add them to each course
+        if include_stats:
+            # Create a map of course stats from annotated queryset
+            stats_map = {}
+            for course in queryset:
+                course_id = str(course.id)
+                stats_map[course_id] = {
+                    'units_count': getattr(course, 'units_count', 0),
+                    'lessons_count': getattr(course, 'lessons_count', 0),
+                    'challenges_count': getattr(course, 'challenges_count', 0),
+                }
+
+            # Add stats to serialized data
+            for item in data:
+                # CourseListSerializer uses 'courseId' field (which is a property that returns id)
+                course_id = str(item.get('courseId') or item.get('id') or '')
+                if course_id in stats_map:
+                    item['units_count'] = stats_map[course_id]['units_count']
+                    item['lessons_count'] = stats_map[course_id]['lessons_count']
+                    item['challenges_count'] = stats_map[course_id]['challenges_count']
+                else:
+                    item['units_count'] = 0
+                    item['lessons_count'] = 0
+                    item['challenges_count'] = 0
+
+                # Also add 'id' field for frontend compatibility (it expects both id and courseId)
+                if 'id' not in item and 'courseId' in item:
+                    item['id'] = item['courseId']
+
+        return Response(data)
 
 
 @api_view(['GET'])
