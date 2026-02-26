@@ -9,7 +9,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from django.conf import settings
-from .models import User, UserAddress, NotificationSettings
+from .models import User, UserAddress, NotificationSettings, UserFeedback, FeedbackPromptLog, UserEngagementMetrics
 from apps.core.models import Address
 
 
@@ -308,3 +308,116 @@ class SocialUserInfoSerializer(serializers.Serializer):
     picture = serializers.URLField(required=False)
     locale = serializers.CharField(required=False)
     verified_email = serializers.BooleanField(required=False)
+
+
+# ============================================================================
+# FEEDBACK SERIALIZERS
+# ============================================================================
+
+class UserFeedbackSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user feedback submissions.
+    """
+    user_name = serializers.CharField(source='user.name', read_only=True)
+
+    class Meta:
+        model = UserFeedback
+        fields = [
+            'id', 'user', 'user_name', 'feedback_type', 'rating', 'nps_score',
+            'comment', 'trigger', 'context_data', 'allow_public', 'allow_contact',
+            'is_reviewed', 'admin_notes', 'created_at'
+        ]
+        read_only_fields = ['id', 'user', 'user_name', 'created_at']
+
+
+class SubmitFeedbackSerializer(serializers.Serializer):
+    """
+    Serializer for submitting feedback.
+    """
+    feedback_type = serializers.ChoiceField(
+        choices=UserFeedback.FEEDBACK_TYPE_CHOICES,
+        default='general'
+    )
+    rating = serializers.IntegerField(
+        min_value=1, max_value=5,
+        required=False,
+        allow_null=True
+    )
+    nps_score = serializers.IntegerField(
+        min_value=0, max_value=10,
+        required=False,
+        allow_null=True
+    )
+    comment = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=2000
+    )
+    trigger = serializers.ChoiceField(
+        choices=UserFeedback.TRIGGER_CHOICES,
+        default='manual'
+    )
+    context_data = serializers.JSONField(
+        required=False,
+        default=dict
+    )
+    allow_public = serializers.BooleanField(default=False)
+    allow_contact = serializers.BooleanField(default=False)
+
+    def validate(self, attrs):
+        # Require at least rating or comment
+        if not attrs.get('rating') and not attrs.get('comment') and not attrs.get('nps_score'):
+            raise serializers.ValidationError(
+                "Please provide at least a rating, NPS score, or comment."
+            )
+        return attrs
+
+
+class FeedbackPromptLogSerializer(serializers.ModelSerializer):
+    """
+    Serializer for feedback prompt logs.
+    """
+    class Meta:
+        model = FeedbackPromptLog
+        fields = [
+            'id', 'user', 'trigger', 'status', 'feedback', 'context_data', 'created_at'
+        ]
+        read_only_fields = ['id', 'user', 'created_at']
+
+
+class UserEngagementMetricsSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user engagement metrics.
+    """
+    should_show_prompt = serializers.SerializerMethodField()
+    prompt_trigger = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserEngagementMetrics
+        fields = [
+            'total_lessons_completed', 'total_courses_completed',
+            'total_ai_sessions', 'total_ai_minutes',
+            'total_days_active', 'current_streak', 'longest_streak',
+            'total_feedbacks_given', 'last_feedback_at', 'last_prompt_at',
+            'first_lesson_at', 'last_activity_at',
+            'should_show_prompt', 'prompt_trigger'
+        ]
+
+    def get_should_show_prompt(self, obj):
+        should_show, _ = obj.should_show_feedback_prompt()
+        return should_show
+
+    def get_prompt_trigger(self, obj):
+        _, trigger = obj.should_show_feedback_prompt()
+        return trigger
+
+
+class FeedbackStatusSerializer(serializers.Serializer):
+    """
+    Serializer for checking feedback prompt status.
+    """
+    should_show_prompt = serializers.BooleanField()
+    trigger = serializers.CharField(allow_null=True)
+    last_feedback_at = serializers.DateTimeField(allow_null=True)
+    total_feedbacks_given = serializers.IntegerField()
+    engagement_summary = serializers.DictField()

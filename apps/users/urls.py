@@ -50,4 +50,14 @@ urlpatterns = [
     path('admin/users/<uuid:id>/role/', views.AdminUserRoleUpdateView.as_view(), name='admin_user_role_update'),
     path('admin/users/<uuid:id>/status/', views.AdminUserToggleStatusView.as_view(), name='admin_user_toggle_status'),
     path('admin/users/<uuid:id>/delete/', views.AdminUserDeleteView.as_view(), name='admin_user_delete'),
+
+    # Feedback endpoints
+    path('feedback/status/', views.FeedbackStatusView.as_view(), name='feedback_status'),
+    path('feedback/submit/', views.SubmitFeedbackView.as_view(), name='feedback_submit'),
+    path('feedback/dismiss/', views.DismissFeedbackPromptView.as_view(), name='feedback_dismiss'),
+    path('feedback/my-feedback/', views.UserFeedbackListView.as_view(), name='my_feedback'),
+    path('feedback/testimonials/', views.PublicTestimonialsView.as_view(), name='public_testimonials'),
+    path('feedback/admin/list/', views.AdminFeedbackListView.as_view(), name='admin_feedback_list'),
+    path('feedback/admin/stats/', views.AdminFeedbackStatsView.as_view(), name='admin_feedback_stats'),
+    path('feedback/admin/<uuid:id>/', views.AdminFeedbackUpdateView.as_view(), name='admin_feedback_update'),
 ]

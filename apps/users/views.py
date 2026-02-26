@@ -1011,16 +1011,16 @@ class AdminUserDeleteView(generics.DestroyAPIView):
         }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
     def delete(self, request, *args, **kwargs):
-        
+
         try:
             user = self.get_object()
-            
+
             # Prevent admin from deleting themselves
             if user.id == request.user.id:
                 return Response({
                     'error': 'You cannot delete your own account.'
                 }, status=status.HTTP_400_BAD_REQUEST)
-            
+
             # Store user info for response
             user_info = {
                 'id': str(user.id),
@@ -1028,16 +1028,358 @@ class AdminUserDeleteView(generics.DestroyAPIView):
                 'email': user.email,
                 'role': user.role,
             }
-            
+
             # Delete user (will cascade to related objects)
             user.delete()
-            
+
             return Response({
                 'message': f'User {user_info["name"]} deleted successfully.',
                 'user_info': user_info
             })
-            
+
         except User.DoesNotExist:
             return Response({
                 'error': 'User not found.'
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+# ============================================================================
+# FEEDBACK VIEWS
+# ============================================================================
+
+class FeedbackStatusView(generics.GenericAPIView):
+    """
+    Check if user should see a feedback prompt.
+
+    GET /api/users/feedback/status/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from .models import UserEngagementMetrics
+        from .serializers import FeedbackStatusSerializer
+
+        # Get or create engagement metrics
+        metrics, created = UserEngagementMetrics.objects.get_or_create(
+            user=request.user
+        )
+
+        should_show, trigger = metrics.should_show_feedback_prompt()
+
+        data = {
+            'should_show_prompt': should_show,
+            'trigger': trigger,
+            'last_feedback_at': metrics.last_feedback_at,
+            'total_feedbacks_given': metrics.total_feedbacks_given,
+            'engagement_summary': {
+                'lessons_completed': metrics.total_lessons_completed,
+                'courses_completed': metrics.total_courses_completed,
+                'ai_sessions': metrics.total_ai_sessions,
+                'days_active': metrics.total_days_active,
+                'current_streak': metrics.current_streak,
+            }
+        }
+
+        return Response(FeedbackStatusSerializer(data).data)
+
+
+class SubmitFeedbackView(generics.CreateAPIView):
+    """
+    Submit user feedback.
+
+    POST /api/users/feedback/submit/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        from .models import UserFeedback, UserEngagementMetrics, FeedbackPromptLog
+        from .serializers import SubmitFeedbackSerializer, UserFeedbackSerializer
+        from django.utils import timezone
+
+        serializer = SubmitFeedbackSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Create feedback
+        feedback = UserFeedback.objects.create(
+            user=request.user,
+            **serializer.validated_data
+        )
+
+        # Update engagement metrics
+        metrics, _ = UserEngagementMetrics.objects.get_or_create(
+            user=request.user
+        )
+        metrics.total_feedbacks_given += 1
+        metrics.last_feedback_at = timezone.now()
+        metrics.save()
+
+        # Log the feedback completion if there was a prompt
+        trigger = serializer.validated_data.get('trigger', 'manual')
+        if trigger != 'manual':
+            FeedbackPromptLog.objects.create(
+                user=request.user,
+                trigger=trigger,
+                status='completed',
+                feedback=feedback,
+                context_data=serializer.validated_data.get('context_data', {})
+            )
+
+        return Response({
+            'message': 'Thank you for your feedback!',
+            'feedback': UserFeedbackSerializer(feedback).data
+        }, status=status.HTTP_201_CREATED)
+
+
+class DismissFeedbackPromptView(generics.GenericAPIView):
+    """
+    Dismiss a feedback prompt without submitting feedback.
+
+    POST /api/users/feedback/dismiss/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        from .models import UserEngagementMetrics, FeedbackPromptLog
+        from django.utils import timezone
+
+        trigger = request.data.get('trigger', 'prompt')
+        action = request.data.get('action', 'dismissed')  # 'dismissed' or 'skipped'
+
+        # Update last prompt time
+        metrics, _ = UserEngagementMetrics.objects.get_or_create(
+            user=request.user
+        )
+        metrics.last_prompt_at = timezone.now()
+        metrics.save()
+
+        # Log the dismissal
+        FeedbackPromptLog.objects.create(
+            user=request.user,
+            trigger=trigger,
+            status=action,
+            context_data=request.data.get('context_data', {})
+        )
+
+        return Response({
+            'message': 'Feedback prompt dismissed.',
+            'next_prompt_available_in': '3 days'
+        })
+
+
+class UserFeedbackListView(generics.ListAPIView):
+    """
+    List user's own feedback submissions.
+
+    GET /api/users/feedback/my-feedback/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from .models import UserFeedback
+        from .serializers import UserFeedbackSerializer
+
+        feedbacks = UserFeedback.objects.filter(
+            user=request.user
+        ).order_by('-created_at')[:20]
+
+        return Response({
+            'count': feedbacks.count(),
+            'feedbacks': UserFeedbackSerializer(feedbacks, many=True).data
+        })
+
+
+class AdminFeedbackListView(generics.ListAPIView):
+    """
+    Admin view to list all feedbacks with filters.
+
+    GET /api/users/feedback/admin/list/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from .models import UserFeedback
+        from .serializers import UserFeedbackSerializer
+
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        queryset = UserFeedback.objects.all().order_by('-created_at')
+
+        # Apply filters
+        feedback_type = request.query_params.get('type')
+        if feedback_type:
+            queryset = queryset.filter(feedback_type=feedback_type)
+
+        rating = request.query_params.get('rating')
+        if rating:
+            queryset = queryset.filter(rating=int(rating))
+
+        allow_public = request.query_params.get('allow_public')
+        if allow_public:
+            queryset = queryset.filter(allow_public=allow_public.lower() == 'true')
+
+        is_reviewed = request.query_params.get('is_reviewed')
+        if is_reviewed:
+            queryset = queryset.filter(is_reviewed=is_reviewed.lower() == 'true')
+
+        # Pagination
+        limit = int(request.query_params.get('limit', 50))
+        offset = int(request.query_params.get('offset', 0))
+
+        total = queryset.count()
+        feedbacks = queryset[offset:offset + limit]
+
+        return Response({
+            'total': total,
+            'limit': limit,
+            'offset': offset,
+            'feedbacks': UserFeedbackSerializer(feedbacks, many=True).data
+        })
+
+
+class PublicTestimonialsView(generics.ListAPIView):
+    """
+    Get public testimonials for landing page.
+
+    GET /api/users/feedback/testimonials/
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from .models import UserFeedback
+
+        # Get feedbacks that users allowed to be public
+        feedbacks = UserFeedback.objects.filter(
+            allow_public=True,
+            rating__gte=4,  # Only good ratings
+            comment__isnull=False
+        ).exclude(comment='').order_by('-created_at')[:10]
+
+        # Return anonymized data
+        testimonials = []
+        for feedback in feedbacks:
+            name = feedback.user.name
+            # Anonymize name: "João Silva" -> "João S."
+            parts = name.split()
+            if len(parts) > 1:
+                anon_name = f"{parts[0]} {parts[-1][0]}."
+            else:
+                anon_name = f"{parts[0][0]}."
+
+            testimonials.append({
+                'id': str(feedback.id),
+                'name': anon_name,
+                'rating': feedback.rating,
+                'comment': feedback.comment,
+                'feedback_type': feedback.feedback_type,
+                'created_at': feedback.created_at
+            })
+
+        return Response({
+            'count': len(testimonials),
+            'testimonials': testimonials
+        })
+
+
+class AdminFeedbackUpdateView(generics.UpdateAPIView):
+    """
+    Admin view to update feedback (mark as reviewed, add admin notes).
+
+    PATCH /api/users/feedback/admin/<uuid:id>/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def patch(self, request, id):
+        from .models import UserFeedback
+        from .serializers import UserFeedbackSerializer
+
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            feedback = UserFeedback.objects.get(id=id)
+        except UserFeedback.DoesNotExist:
+            return Response({
+                'error': 'Feedback not found.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Update allowed fields
+        if 'is_reviewed' in request.data:
+            feedback.is_reviewed = request.data['is_reviewed']
+        if 'admin_notes' in request.data:
+            feedback.admin_notes = request.data['admin_notes']
+        if 'allow_public' in request.data:
+            feedback.allow_public = request.data['allow_public']
+
+        feedback.save()
+
+        return Response({
+            'message': 'Feedback updated successfully.',
+            'feedback': UserFeedbackSerializer(feedback).data
+        })
+
+
+class AdminFeedbackStatsView(generics.GenericAPIView):
+    """
+    Admin view to get feedback statistics.
+
+    GET /api/users/feedback/admin/stats/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        from .models import UserFeedback
+        from django.db.models import Avg, Count
+
+        if request.user.role != 'admin':
+            return Response({
+                'error': 'Access denied. Admin privileges required.'
+            }, status=status.HTTP_403_FORBIDDEN)
+
+        # Get total counts
+        total = UserFeedback.objects.count()
+        reviewed = UserFeedback.objects.filter(is_reviewed=True).count()
+        pending_review = UserFeedback.objects.filter(is_reviewed=False).count()
+        public_testimonials = UserFeedback.objects.filter(allow_public=True).count()
+
+        # Get average rating
+        avg_rating = UserFeedback.objects.filter(rating__isnull=False).aggregate(
+            avg=Avg('rating')
+        )['avg'] or 0
+
+        # Get counts by type
+        by_type = UserFeedback.objects.values('feedback_type').annotate(
+            count=Count('id')
+        ).order_by('-count')
+
+        # Get counts by rating
+        by_rating = UserFeedback.objects.filter(rating__isnull=False).values('rating').annotate(
+            count=Count('id')
+        ).order_by('rating')
+
+        # Get counts by trigger
+        by_trigger = UserFeedback.objects.values('trigger').annotate(
+            count=Count('id')
+        ).order_by('-count')
+
+        # Recent feedbacks (last 7 days)
+        from django.utils import timezone
+        from datetime import timedelta
+        recent_date = timezone.now() - timedelta(days=7)
+        recent_count = UserFeedback.objects.filter(created_at__gte=recent_date).count()
+
+        return Response({
+            'total': total,
+            'reviewed': reviewed,
+            'pending_review': pending_review,
+            'public_testimonials': public_testimonials,
+            'average_rating': round(avg_rating, 2),
+            'recent_count': recent_count,
+            'by_type': list(by_type),
+            'by_rating': list(by_rating),
+            'by_trigger': list(by_trigger),
+        })

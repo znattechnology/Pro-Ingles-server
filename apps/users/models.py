@@ -411,3 +411,268 @@ class EmailVerification(BaseModel):
         """Increment the number of attempts."""
         self.attempts += 1
         self.save(update_fields=['attempts'])
+
+
+class UserFeedback(BaseModel):
+    """
+    User feedback submissions.
+
+    Stores feedback from users about their experience with the platform.
+    """
+
+    FEEDBACK_TYPE_CHOICES = [
+        ('general', 'General Feedback'),
+        ('feature', 'Feature Request'),
+        ('bug', 'Bug Report'),
+        ('lesson', 'Lesson Feedback'),
+        ('ai_tutor', 'AI Tutor Feedback'),
+        ('content', 'Content Quality'),
+        ('testimonial', 'Testimonial'),
+    ]
+
+    TRIGGER_CHOICES = [
+        ('first_lesson', 'After First Lesson'),
+        ('milestone_lessons', 'Milestone Lessons Completed'),
+        ('course_complete', 'Course Completed'),
+        ('ai_sessions', 'AI Tutor Sessions'),
+        ('days_active', 'Days Active'),
+        ('manual', 'User Initiated'),
+        ('prompt', 'System Prompt'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='feedbacks'
+    )
+
+    # Feedback content
+    feedback_type = models.CharField(
+        max_length=20,
+        choices=FEEDBACK_TYPE_CHOICES,
+        default='general'
+    )
+    rating = models.PositiveSmallIntegerField(
+        help_text="Rating from 1 to 5",
+        null=True,
+        blank=True
+    )
+    nps_score = models.PositiveSmallIntegerField(
+        help_text="Net Promoter Score (0-10)",
+        null=True,
+        blank=True
+    )
+    comment = models.TextField(
+        blank=True,
+        help_text="User's feedback comment"
+    )
+
+    # Context
+    trigger = models.CharField(
+        max_length=30,
+        choices=TRIGGER_CHOICES,
+        default='manual',
+        help_text="What triggered this feedback request"
+    )
+    context_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Additional context (lessons completed, course, etc.)"
+    )
+
+    # Permissions
+    allow_public = models.BooleanField(
+        default=False,
+        help_text="User allows this feedback to be used as testimonial"
+    )
+    allow_contact = models.BooleanField(
+        default=False,
+        help_text="User allows follow-up contact"
+    )
+
+    # Status
+    is_reviewed = models.BooleanField(
+        default=False,
+        help_text="Whether admin has reviewed this feedback"
+    )
+    admin_notes = models.TextField(
+        blank=True,
+        help_text="Admin notes about this feedback"
+    )
+
+    class Meta:
+        verbose_name = 'User Feedback'
+        verbose_name_plural = 'User Feedbacks'
+        db_table = 'user_feedbacks'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['feedback_type']),
+            models.Index(fields=['rating']),
+            models.Index(fields=['trigger']),
+            models.Index(fields=['allow_public']),
+            models.Index(fields=['is_reviewed']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"Feedback from {self.user.name} - {self.feedback_type} ({self.rating}/5)"
+
+
+class FeedbackPromptLog(BaseModel):
+    """
+    Tracks when feedback prompts were shown to users.
+
+    Used to prevent showing prompts too frequently and track engagement.
+    """
+
+    PROMPT_STATUS_CHOICES = [
+        ('shown', 'Prompt Shown'),
+        ('dismissed', 'User Dismissed'),
+        ('completed', 'Feedback Completed'),
+        ('skipped', 'User Skipped'),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='feedback_prompt_logs'
+    )
+
+    trigger = models.CharField(
+        max_length=30,
+        help_text="What triggered this prompt"
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=PROMPT_STATUS_CHOICES,
+        default='shown'
+    )
+
+    # Related feedback if completed
+    feedback = models.ForeignKey(
+        UserFeedback,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='prompt_logs'
+    )
+
+    # Context when prompt was shown
+    context_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Context when prompt was shown (lessons count, etc.)"
+    )
+
+    class Meta:
+        verbose_name = 'Feedback Prompt Log'
+        verbose_name_plural = 'Feedback Prompt Logs'
+        db_table = 'feedback_prompt_logs'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['trigger']),
+            models.Index(fields=['status']),
+            models.Index(fields=['created_at']),
+        ]
+
+    def __str__(self):
+        return f"Prompt for {self.user.name} - {self.trigger} ({self.status})"
+
+
+class UserEngagementMetrics(BaseModel):
+    """
+    Tracks user engagement metrics for smart feedback triggers.
+
+    Updated automatically as user interacts with the platform.
+    """
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='engagement_metrics'
+    )
+
+    # Lesson metrics
+    total_lessons_completed = models.PositiveIntegerField(default=0)
+    total_courses_completed = models.PositiveIntegerField(default=0)
+
+    # AI Tutor metrics
+    total_ai_sessions = models.PositiveIntegerField(default=0)
+    total_ai_minutes = models.PositiveIntegerField(default=0)
+
+    # Activity metrics
+    total_days_active = models.PositiveIntegerField(default=0)
+    current_streak = models.PositiveIntegerField(default=0)
+    longest_streak = models.PositiveIntegerField(default=0)
+
+    # Feedback metrics
+    total_feedbacks_given = models.PositiveIntegerField(default=0)
+    last_feedback_at = models.DateTimeField(null=True, blank=True)
+    last_prompt_at = models.DateTimeField(null=True, blank=True)
+
+    # Timestamps
+    first_lesson_at = models.DateTimeField(null=True, blank=True)
+    last_activity_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'User Engagement Metrics'
+        verbose_name_plural = 'User Engagement Metrics'
+        db_table = 'user_engagement_metrics'
+        indexes = [
+            models.Index(fields=['total_lessons_completed']),
+            models.Index(fields=['total_ai_sessions']),
+            models.Index(fields=['total_days_active']),
+            models.Index(fields=['last_feedback_at']),
+            models.Index(fields=['last_prompt_at']),
+        ]
+
+    def __str__(self):
+        return f"Engagement metrics for {self.user.name}"
+
+    def should_show_feedback_prompt(self):
+        """
+        Determine if user should see a feedback prompt.
+
+        Returns tuple: (should_show, trigger_type)
+        """
+        from datetime import timedelta
+
+        now = timezone.now()
+
+        # Don't show if gave feedback in last 7 days
+        if self.last_feedback_at and (now - self.last_feedback_at) < timedelta(days=7):
+            return False, None
+
+        # Don't show if prompt shown in last 3 days
+        if self.last_prompt_at and (now - self.last_prompt_at) < timedelta(days=3):
+            return False, None
+
+        # Trigger: First lesson completed
+        if self.total_lessons_completed == 1 and self.total_feedbacks_given == 0:
+            return True, 'first_lesson'
+
+        # Trigger: Milestone lessons (5, 10, 25, 50, 100)
+        milestones = [5, 10, 25, 50, 100]
+        for milestone in milestones:
+            if self.total_lessons_completed == milestone:
+                return True, 'milestone_lessons'
+
+        # Trigger: First course completed
+        if self.total_courses_completed == 1 and self.total_feedbacks_given == 0:
+            return True, 'course_complete'
+
+        # Trigger: AI Tutor usage (5, 10, 20 sessions)
+        ai_milestones = [5, 10, 20]
+        for milestone in ai_milestones:
+            if self.total_ai_sessions == milestone:
+                return True, 'ai_sessions'
+
+        # Trigger: Days active (7, 14, 30 days)
+        day_milestones = [7, 14, 30]
+        for milestone in day_milestones:
+            if self.total_days_active == milestone:
+                return True, 'days_active'
+
+        return False, None
