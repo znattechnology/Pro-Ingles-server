@@ -47,7 +47,7 @@ urlpatterns = [
     path('api/v1/cms/', include('apps.cms.urls')),
 
     # Chatbot (public, no auth required)
-    path('api/chatbot/', include('apps.chatbot.urls')),
+    path('api/v1/chatbot/', include('apps.chatbot.urls')),
 ]
 
 # Serve media files in development
