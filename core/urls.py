@@ -45,6 +45,9 @@ urlpatterns = [
     # Other endpoints
     path('api/v1/subscriptions/', include('apps.subscriptions.urls')),
     path('api/v1/cms/', include('apps.cms.urls')),
+
+    # Chatbot (public, no auth required)
+    path('api/chatbot/', include('apps.chatbot.urls')),
 ]
 
 # Serve media files in development

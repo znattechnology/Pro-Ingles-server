@@ -60,6 +60,7 @@ LOCAL_APPS = [
     'apps.subscriptions',
     'apps.cms',
     'apps.platform_admin',  # Platform admin dashboard and management
+    'apps.chatbot',  # Intelligent landing page chatbot
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
