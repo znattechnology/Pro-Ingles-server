@@ -71,7 +71,7 @@ from .serializers import (
     EmailVerificationSerializer, GoogleOAuthSerializer,
     GoogleOAuthURLSerializer
 )
-# from .services import GoogleOAuthService  # Temporarily disabled
+from .services import GoogleOAuthService
 from .email_service import EmailVerificationService
 
 
@@ -614,16 +614,107 @@ def resend_verification_email(request):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
-# Temporarily disabled - Google OAuth views
-"""
 class GoogleOAuthURLView(generics.GenericAPIView):
-    # Generate Google OAuth authorization URL.
-    pass
+    """
+    Generate Google OAuth authorization URL.
+    """
+    serializer_class = GoogleOAuthURLSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        """Handle GET request for OAuth URL generation."""
+        return self._generate_auth_url(request)
+
+    def post(self, request):
+        """Handle POST request for OAuth URL generation."""
+        return self._generate_auth_url(request)
+
+    def _generate_auth_url(self, request):
+        """Generate the OAuth URL."""
+        oauth_service = GoogleOAuthService()
+
+        try:
+            auth_url = oauth_service.generate_auth_url(
+                state=request.data.get('state') or request.query_params.get('state'),
+                redirect_uri=request.data.get('redirect_uri') or request.query_params.get('redirect_uri')
+            )
+
+            return Response({
+                'auth_url': auth_url
+            })
+
+        except Exception as e:
+            return Response({
+                'error': f'Failed to generate OAuth URL: {str(e)}'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
 
 class GoogleOAuthLoginView(generics.GenericAPIView):
-    # Authenticate user with Google OAuth.
-    pass
-"""
+    """
+    Authenticate user with Google OAuth.
+    """
+    serializer_class = GoogleOAuthSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        oauth_service = GoogleOAuthService()
+
+        try:
+            # Authenticate user using OAuth service
+            user, tokens = oauth_service.authenticate_user(**serializer.validated_data)
+
+            # Update last login
+            user.last_login_at = timezone.now()
+            user.save(update_fields=['last_login_at'])
+
+            # Build response
+            response = Response({
+                'message': 'Login successful',
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'name': user.name,
+                    'role': user.role,
+                    'avatar': user.avatar if user.avatar else None,
+                    'email_verified': user.email_verified,
+                    'google_id': user.google_id,
+                },
+                'tokens': tokens
+            })
+
+            # Set HttpOnly cookies for cross-domain authentication
+            is_secure = not settings.DEBUG
+            samesite = 'None' if is_secure else 'Lax'
+
+            response.set_cookie(
+                key='access_token',
+                value=tokens['access'],
+                max_age=60 * 60,  # 1 hour
+                httponly=True,
+                secure=is_secure,
+                samesite=samesite,
+                path='/',
+            )
+
+            response.set_cookie(
+                key='refresh_token',
+                value=tokens['refresh'],
+                max_age=60 * 60 * 24 * 7,  # 7 days
+                httponly=True,
+                secure=is_secure,
+                samesite=samesite,
+                path='/',
+            )
+
+            return response
+
+        except Exception as e:
+            return Response({
+                'error': f'Authentication failed: {str(e)}'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LogoutView(generics.GenericAPIView):

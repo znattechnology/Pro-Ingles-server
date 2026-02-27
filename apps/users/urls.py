@@ -39,9 +39,9 @@ urlpatterns = [
     # Transactions
     path('transactions/', user_transactions, name='user_transactions'),
     
-    # Google OAuth - temporarily disabled
-    # path('oauth/google/url/', views.GoogleOAuthURLView.as_view(), name='google_oauth_url'),
-    # path('oauth/google/login/', views.GoogleOAuthLoginView.as_view(), name='google_oauth_login'),
+    # Google OAuth
+    path('oauth/google/url/', views.GoogleOAuthURLView.as_view(), name='google_oauth_url'),
+    path('oauth/google/login/', views.GoogleOAuthLoginView.as_view(), name='google_oauth_login'),
     
     # Admin endpoints
     path('admin/users/', views.AdminUsersListView.as_view(), name='admin_users_list'),
