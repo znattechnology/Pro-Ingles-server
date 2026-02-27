@@ -28,8 +28,41 @@ try:
 except ImportError:
     S3_AVAILABLE = False
 
+from rest_framework.throttling import UserRateThrottle
 from apps.cms.views import AdminWritePermissionMixin
 from .models import User, UserAddress, NotificationSettings, EmailVerification
+
+
+# ============================================================
+# Custom Permission Classes for Feedback System
+# ============================================================
+
+class IsAdminUser(permissions.BasePermission):
+    """
+    Permission class that checks if the user is an admin.
+    More robust than checking request.user.role directly.
+    """
+    message = "Acesso negado. Privilégios de administrador necessários."
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        # Check multiple ways to determine admin status
+        return (
+            getattr(request.user, 'role', None) == 'admin' or
+            getattr(request.user, 'is_staff', False) or
+            getattr(request.user, 'is_superuser', False)
+        )
+
+
+class FeedbackSubmitThrottle(UserRateThrottle):
+    """Rate limiting for feedback submissions - 10 per hour per user"""
+    rate = '10/hour'
+
+
+class FeedbackDismissThrottle(UserRateThrottle):
+    """Rate limiting for feedback dismissals - 20 per hour per user"""
+    rate = '20/hour'
 from .serializers import (
     UserRegistrationSerializer, CustomTokenObtainPairSerializer,
     UserProfileSerializer, PasswordChangeSerializer,
@@ -74,7 +107,7 @@ class UserRegistrationView(generics.CreateAPIView):
         # Do NOT generate JWT tokens - user must verify email first
         
         return Response({
-            'message': 'Usuário registrado com sucesso. Verifique seu email para ativar a conta.',
+            'message': 'Utilizador registado com sucesso. Verifique o seu email para ativar a conta.',
             'email': user.email,
             'requires_verification': True
         }, status=status.HTTP_201_CREATED)
@@ -1090,6 +1123,7 @@ class SubmitFeedbackView(generics.CreateAPIView):
     POST /api/users/feedback/submit/
     """
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [FeedbackSubmitThrottle]
 
     def post(self, request):
         from .models import UserFeedback, UserEngagementMetrics, FeedbackPromptLog
@@ -1137,13 +1171,30 @@ class DismissFeedbackPromptView(generics.GenericAPIView):
     POST /api/users/feedback/dismiss/
     """
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [FeedbackDismissThrottle]
 
     def post(self, request):
         from .models import UserEngagementMetrics, FeedbackPromptLog
         from django.utils import timezone
+        import json
 
         trigger = request.data.get('trigger', 'prompt')
         action = request.data.get('action', 'dismissed')  # 'dismissed' or 'skipped'
+
+        # Validate action
+        if action not in ('dismissed', 'skipped'):
+            action = 'dismissed'
+
+        # Validate and limit context_data size
+        context_data = request.data.get('context_data', {})
+        if not isinstance(context_data, dict):
+            context_data = {}
+        # Limit context_data to 10KB
+        try:
+            if len(json.dumps(context_data)) > 10240:
+                context_data = {'error': 'context_data too large'}
+        except (TypeError, ValueError):
+            context_data = {}
 
         # Update last prompt time
         metrics, _ = UserEngagementMetrics.objects.get_or_create(
@@ -1157,7 +1208,7 @@ class DismissFeedbackPromptView(generics.GenericAPIView):
             user=request.user,
             trigger=trigger,
             status=action,
-            context_data=request.data.get('context_data', {})
+            context_data=context_data
         )
 
         return Response({
@@ -1194,18 +1245,13 @@ class AdminFeedbackListView(generics.ListAPIView):
 
     GET /api/users/feedback/admin/list/
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get(self, request):
         from .models import UserFeedback
         from .serializers import UserFeedbackSerializer
 
-        if request.user.role != 'admin':
-            return Response({
-                'error': 'Access denied. Admin privileges required.'
-            }, status=status.HTTP_403_FORBIDDEN)
-
-        queryset = UserFeedback.objects.all().order_by('-created_at')
+        queryset = UserFeedback.objects.all().select_related('user').order_by('-created_at')
 
         # Apply filters
         feedback_type = request.query_params.get('type')
@@ -1251,25 +1297,37 @@ class PublicTestimonialsView(generics.ListAPIView):
         from .models import UserFeedback
 
         # Get feedbacks that users allowed to be public
+        # Ensure rating is not null and comment exists
         feedbacks = UserFeedback.objects.filter(
             allow_public=True,
-            rating__gte=4,  # Only good ratings
+            rating__gte=4,  # Only good ratings (4 or 5)
+            rating__isnull=False,  # Ensure rating exists
             comment__isnull=False
-        ).exclude(comment='').order_by('-created_at')[:10]
+        ).exclude(
+            comment=''
+        ).select_related('user').order_by('-created_at')[:10]
 
         # Return anonymized data
         testimonials = []
         for feedback in feedbacks:
-            name = feedback.user.name
-            # Anonymize name: "João Silva" -> "João S."
-            parts = name.split()
-            if len(parts) > 1:
-                anon_name = f"{parts[0]} {parts[-1][0]}."
-            else:
-                anon_name = f"{parts[0][0]}."
+            name = getattr(feedback.user, 'name', '') or ''
+            name = name.strip()
 
+            # Anonymize name safely: "João Silva" -> "João S."
+            if not name:
+                anon_name = "Utilizador"
+            else:
+                parts = name.split()
+                if len(parts) > 1:
+                    anon_name = f"{parts[0]} {parts[-1][0]}."
+                elif len(parts) == 1 and len(parts[0]) > 0:
+                    anon_name = f"{parts[0][0]}."
+                else:
+                    anon_name = "Utilizador"
+
+            # Don't expose internal UUID - use sequential index instead
             testimonials.append({
-                'id': str(feedback.id),
+                'id': len(testimonials) + 1,  # Sequential ID instead of UUID
                 'name': anon_name,
                 'rating': feedback.rating,
                 'comment': feedback.comment,
@@ -1288,37 +1346,65 @@ class AdminFeedbackUpdateView(generics.UpdateAPIView):
     Admin view to update feedback (mark as reviewed, add admin notes).
 
     PATCH /api/users/feedback/admin/<uuid:id>/
+
+    Note: Admin can only REMOVE allow_public (set to False), not add it.
+    Only the user can grant public permission.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def patch(self, request, id):
         from .models import UserFeedback
         from .serializers import UserFeedbackSerializer
+        import logging
 
-        if request.user.role != 'admin':
-            return Response({
-                'error': 'Access denied. Admin privileges required.'
-            }, status=status.HTTP_403_FORBIDDEN)
+        logger = logging.getLogger(__name__)
 
         try:
-            feedback = UserFeedback.objects.get(id=id)
+            feedback = UserFeedback.objects.select_related('user').get(id=id)
         except UserFeedback.DoesNotExist:
             return Response({
                 'error': 'Feedback not found.'
             }, status=status.HTTP_404_NOT_FOUND)
 
+        changes = []
+
         # Update allowed fields
         if 'is_reviewed' in request.data:
-            feedback.is_reviewed = request.data['is_reviewed']
+            old_value = feedback.is_reviewed
+            feedback.is_reviewed = bool(request.data['is_reviewed'])
+            if old_value != feedback.is_reviewed:
+                changes.append(f"is_reviewed: {old_value} -> {feedback.is_reviewed}")
+
         if 'admin_notes' in request.data:
-            feedback.admin_notes = request.data['admin_notes']
+            notes = str(request.data['admin_notes'])[:2000]  # Limit to 2000 chars
+            if feedback.admin_notes != notes:
+                changes.append("admin_notes updated")
+                feedback.admin_notes = notes
+
+        # SECURITY: Admin can only REMOVE public permission, not ADD it
+        # This protects user privacy - only users can consent to public display
         if 'allow_public' in request.data:
-            feedback.allow_public = request.data['allow_public']
+            new_value = bool(request.data['allow_public'])
+            if feedback.allow_public and not new_value:
+                # Admin is removing public permission - allowed
+                feedback.allow_public = False
+                changes.append("allow_public: True -> False (removed by admin)")
+            elif not feedback.allow_public and new_value:
+                # Admin trying to add public permission - NOT allowed
+                return Response({
+                    'error': 'Não é possível tornar público sem consentimento do utilizador. Apenas o utilizador pode autorizar a publicação do seu feedback.'
+                }, status=status.HTTP_403_FORBIDDEN)
 
         feedback.save()
 
+        # Log admin action for audit
+        if changes:
+            logger.info(
+                f"Admin {request.user.email} updated feedback {id}: {', '.join(changes)}"
+            )
+
         return Response({
-            'message': 'Feedback updated successfully.',
+            'message': 'Feedback actualizado com sucesso.',
             'feedback': UserFeedbackSerializer(feedback).data
         })
 
@@ -1329,16 +1415,11 @@ class AdminFeedbackStatsView(generics.GenericAPIView):
 
     GET /api/users/feedback/admin/stats/
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminUser]
 
     def get(self, request):
         from .models import UserFeedback
         from django.db.models import Avg, Count
-
-        if request.user.role != 'admin':
-            return Response({
-                'error': 'Access denied. Admin privileges required.'
-            }, status=status.HTTP_403_FORBIDDEN)
 
         # Get total counts
         total = UserFeedback.objects.count()
