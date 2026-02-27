@@ -90,7 +90,21 @@ class Course(BaseModel):
         default='video',
         help_text="Type of course: video lessons or practice laboratory"
     )
-    
+
+    # Access level - defines minimum subscription plan required
+    access_level = models.CharField(
+        max_length=20,
+        choices=CourseChoices.ACCESS_LEVEL_CHOICES,
+        default='free',
+        help_text="Minimum subscription plan required to access this course"
+    )
+
+    # Flag for featured/highlighted courses
+    is_featured = models.BooleanField(
+        default=False,
+        help_text="Whether this course is featured/highlighted on the platform"
+    )
+
     class Meta:
         db_table = 'courses'
         verbose_name = 'Course'
@@ -102,11 +116,14 @@ class Course(BaseModel):
             models.Index(fields=['level']),
             models.Index(fields=['status']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['access_level']),
+            models.Index(fields=['is_featured']),
             # Composite indexes for common query patterns
             models.Index(fields=['status', 'category'], name='course_status_category_idx'),
             models.Index(fields=['teacher', 'status'], name='course_teacher_status_idx'),
             models.Index(fields=['status', 'created_at'], name='course_status_date_idx'),
             models.Index(fields=['category', 'level'], name='course_category_level_idx'),
+            models.Index(fields=['status', 'access_level'], name='course_status_access_idx'),
         ]
         ordering = ['-created_at']
     
@@ -118,7 +135,99 @@ class Course(BaseModel):
         if self.teacher and not self.teacherName:
             self.teacherName = self.teacher.name
         super().save(*args, **kwargs)
-    
+
+    def user_has_access(self, user) -> bool:
+        """
+        Check if a user has access to this course based on their subscription.
+
+        Returns True if:
+        - Course is free (access_level='free')
+        - User's plan type matches or exceeds the required access level
+        - User is the teacher/owner of the course
+        - User is admin/staff
+
+        Args:
+            user: The User instance to check access for
+
+        Returns:
+            bool: True if user has access, False otherwise
+        """
+        # Course is free - everyone has access
+        if self.access_level == 'free':
+            return True
+
+        # User is the course teacher - always has access
+        if self.teacher_id == user.id:
+            return True
+
+        # Admin/staff always have access
+        if getattr(user, 'is_staff', False) or getattr(user, 'is_superuser', False):
+            return True
+
+        if getattr(user, 'role', None) == 'admin':
+            return True
+
+        # Check user's subscription
+        try:
+            from apps.subscriptions.models import UserSubscription
+            subscription = UserSubscription.objects.filter(
+                user=user,
+                is_active=True
+            ).select_related('plan').first()
+
+            if not subscription or not subscription.plan:
+                return False
+
+            user_plan_type = subscription.plan.plan_type
+
+            # Access level hierarchy: FREE < PREMIUM < PREMIUM_PLUS
+            # Normalize both values to uppercase for comparison
+            access_hierarchy = {
+                'FREE': 0,
+                'PREMIUM': 1,
+                'PREMIUM_PLUS': 2,
+            }
+
+            required_level = access_hierarchy.get(self.access_level.upper(), 0)
+            user_level = access_hierarchy.get(user_plan_type.upper() if user_plan_type else '', 0)
+
+            return user_level >= required_level
+
+        except ImportError:
+            # Subscriptions module not available - deny access for non-free courses
+            import logging
+            logging.getLogger(__name__).warning(
+                f"Subscriptions module not available when checking access for course {self.id}"
+            )
+            return False
+        except AttributeError as e:
+            # User or plan object has unexpected structure
+            import logging
+            logging.getLogger(__name__).warning(
+                f"AttributeError in user_has_access for course {self.id}: {e}"
+            )
+            return False
+
+    @property
+    def access_level_display(self) -> str:
+        """Return human-readable access level."""
+        labels = {
+            'free': 'Gratuito',
+            'premium': 'Premium',
+            'premium_plus': 'Premium Plus',
+        }
+        return labels.get(self.access_level, 'Gratuito')
+
+    @property
+    def is_free(self) -> bool:
+        """Check if course is free."""
+        return self.access_level == 'free'
+
+    @property
+    def is_premium(self) -> bool:
+        """Check if course requires premium or higher."""
+        return self.access_level in ('premium', 'premium_plus')
+
     @property
     def total_sections(self):
         """Return total number of sections in this course."""

@@ -155,16 +155,23 @@ class CourseListSerializer(serializers.ModelSerializer):
     """
     teacherId = serializers.CharField(source='teacher.id', read_only=True)
     total_enrollments = serializers.SerializerMethodField()
-    
+    access_level_display = serializers.ReadOnlyField()
+    is_free = serializers.ReadOnlyField()
+    is_premium = serializers.ReadOnlyField()
+    user_has_access = serializers.SerializerMethodField()
+
     class Meta:
         model = Course
         fields = [
             'courseId', 'title', 'description', 'category', 'image',
-            'level', 'status', 'template', 'teacher', 'teacherId', 'teacherName', 
-            'total_enrollments', 'created_at', 'updated_at'
+            'level', 'status', 'template', 'teacher', 'teacherId', 'teacherName',
+            'total_enrollments', 'access_level', 'access_level_display',
+            'is_free', 'is_premium', 'is_featured', 'user_has_access',
+            'created_at', 'updated_at'
         ]
         read_only_fields = [
             'courseId', 'teacher', 'teacherId', 'teacherName', 'total_enrollments',
+            'access_level_display', 'is_free', 'is_premium', 'user_has_access',
             'created_at', 'updated_at'
         ]
     
@@ -188,7 +195,15 @@ class CourseListSerializer(serializers.ModelSerializer):
         if hasattr(obj, '_enrollment_count'):
             return obj._enrollment_count
         return getattr(obj, 'total_enrollments', 0)
-    
+
+    def get_user_has_access(self, obj):
+        """Check if current user has access to this course based on subscription."""
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            # For unauthenticated users, only free courses are accessible
+            return obj.access_level == 'free'
+        return obj.user_has_access(request.user)
+
     @classmethod
     def optimize_queryset(cls, queryset, include_enrollment_count=False):
         """Optimize queryset for list view."""
@@ -214,18 +229,25 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     total_sections = serializers.SerializerMethodField()
     total_chapters = serializers.SerializerMethodField()
     total_enrollments = serializers.SerializerMethodField()
-    
+    access_level_display = serializers.ReadOnlyField()
+    is_free = serializers.ReadOnlyField()
+    is_premium = serializers.ReadOnlyField()
+    user_has_access = serializers.SerializerMethodField()
+
     class Meta:
         model = Course
         fields = [
             'courseId', 'title', 'description', 'category', 'image',
             'level', 'status', 'template', 'teacher', 'teacherId', 'teacherName',
             'sections', 'enrollments', 'total_sections', 'total_chapters',
-            'total_enrollments', 'created_at', 'updated_at'
+            'total_enrollments', 'access_level', 'access_level_display',
+            'is_free', 'is_premium', 'is_featured', 'user_has_access',
+            'created_at', 'updated_at'
         ]
         read_only_fields = [
             'courseId', 'teacher', 'teacherId', 'teacherName', 'sections', 'enrollments',
             'total_sections', 'total_chapters', 'total_enrollments',
+            'access_level_display', 'is_free', 'is_premium', 'user_has_access',
             'created_at', 'updated_at'
         ]
     
@@ -286,7 +308,15 @@ class CourseDetailSerializer(serializers.ModelSerializer):
         if hasattr(obj, '_enrollments_count'):
             return obj._enrollments_count
         return getattr(obj, 'total_enrollments', 0)
-    
+
+    def get_user_has_access(self, obj):
+        """Check if current user has access to this course based on subscription."""
+        request = self.context.get('request')
+        if not request or not request.user or not request.user.is_authenticated:
+            # For unauthenticated users, only free courses are accessible
+            return obj.access_level == 'free'
+        return obj.user_has_access(request.user)
+
     @classmethod
     def optimize_queryset(cls, queryset, include_sections=True, include_enrollments=True):
         """Optimize queryset for detail view."""
@@ -540,22 +570,57 @@ class TransactionSerializer(serializers.ModelSerializer):
 class TransactionCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for creating transactions during course purchase.
+
+    SECURITY: Validates user has proper subscription access before creating transaction.
     """
     courseId = serializers.UUIDField(source='course.id', write_only=True)
-    
+
     class Meta:
         model = Transaction
         fields = [
             'transactionId', 'courseId', 'amount', 'paymentProvider'
         ]
-    
+
+    def validate(self, attrs):
+        """
+        SECURITY: Validate subscription access before allowing transaction creation.
+        This is a defense-in-depth check - the view should also check access.
+        """
+        course_data = attrs.get('course')
+        if course_data:
+            try:
+                course = Course.objects.get(id=course_data['id'])
+                user = self.context['request'].user
+
+                # Check if user has subscription access for premium courses
+                if course.access_level != 'free' and not course.user_has_access(user):
+                    access_messages = {
+                        'premium': 'Este curso requer um plano Premium ou superior.',
+                        'premium_plus': 'Este curso é exclusivo para assinantes Premium Plus.',
+                    }
+                    message = access_messages.get(
+                        course.access_level,
+                        'Não tem a subscrição necessária para este curso.'
+                    )
+                    raise serializers.ValidationError({
+                        'courseId': message,
+                        'code': 'SUBSCRIPTION_REQUIRED',
+                        'required_plan': course.access_level
+                    })
+            except Course.DoesNotExist:
+                raise serializers.ValidationError({
+                    'courseId': 'Curso não encontrado.'
+                })
+
+        return attrs
+
     def create(self, validated_data):
         course_data = validated_data.pop('course')
         course = Course.objects.get(id=course_data['id'])
-        
+
         validated_data['user'] = self.context['request'].user
         validated_data['course'] = course
-        
+
         return super().create(validated_data)
 
 

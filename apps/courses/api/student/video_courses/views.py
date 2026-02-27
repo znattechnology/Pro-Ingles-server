@@ -31,7 +31,8 @@ class EnrollmentRequiredMixin:
 
     The mixin checks:
     1. User is authenticated
-    2. User has an active enrollment in the course
+    2. User has an active and non-expired enrollment in the course
+    3. User has the required subscription level for premium courses
 
     To use, add this mixin BEFORE the base class:
         class MyView(EnrollmentRequiredMixin, generics.RetrieveAPIView):
@@ -40,29 +41,55 @@ class EnrollmentRequiredMixin:
 
     def check_enrollment(self, course):
         """
-        Check if the current user is enrolled in the course.
+        Check if the current user is enrolled in the course and has proper subscription.
+
+        SECURITY: Uses atomic check to prevent race conditions.
 
         Args:
             course: The Course model instance
 
         Raises:
-            PermissionDenied: If user is not enrolled
+            PermissionDenied: If user is not enrolled or doesn't have proper subscription
         """
+        from django.utils import timezone
+
         user = self.request.user
 
         if not user.is_authenticated:
-            raise PermissionDenied("Autenticação necessária para acessar este conteúdo.")
+            raise PermissionDenied("Autenticação necessária para aceder a este conteúdo.")
 
-        # Check for active enrollment
+        # SECURITY: Atomic check for enrollment with expiration validation
         from ....models import CourseEnrollment
-        if not CourseEnrollment.objects.filter(
-            user=user,
-            course=course,
-            is_active=True
-        ).exists():
-            raise PermissionDenied(
-                "Você precisa estar matriculado neste curso para acessar este conteúdo."
+        try:
+            enrollment = CourseEnrollment.objects.select_for_update().get(
+                user=user,
+                course=course,
+                is_active=True
             )
+
+            # Check if enrollment has expired
+            if enrollment.expires_at and timezone.now() > enrollment.expires_at:
+                raise PermissionDenied(
+                    "A sua matrícula neste curso expirou. Renove para continuar a aceder."
+                )
+
+        except CourseEnrollment.DoesNotExist:
+            raise PermissionDenied(
+                "Precisa estar inscrito neste curso para aceder a este conteúdo."
+            )
+
+        # SECURITY: Check subscription access for non-free courses
+        # This is checked AFTER enrollment to prevent information leakage
+        if not course.user_has_access(user):
+            access_messages = {
+                'premium': 'Este curso requer um plano Premium ou superior. A sua subscrição pode ter expirado.',
+                'premium_plus': 'Este curso é exclusivo para assinantes Premium Plus.',
+            }
+            message = access_messages.get(
+                course.access_level,
+                'Não tem permissão para aceder a este conteúdo.'
+            )
+            raise PermissionDenied(message)
 
     def get_course_from_chapter(self, chapter):
         """Extract course from chapter object."""
@@ -75,6 +102,60 @@ class EnrollmentRequiredMixin:
     def get_course_from_resource(self, resource):
         """Extract course from resource object."""
         return resource.chapter.section.course
+
+
+class SubscriptionAccessMixin:
+    """
+    Mixin that checks subscription access for course content without requiring enrollment.
+
+    SECURITY: This mixin is for views that list content (sections, chapters).
+    For free courses: allows unauthenticated access
+    For premium courses: requires authentication and valid subscription
+
+    Unlike EnrollmentRequiredMixin, this doesn't require enrollment, just subscription.
+    Use this for browsing course structure (sections, chapter lists).
+    Use EnrollmentRequiredMixin for accessing actual content (chapter details, videos).
+    """
+
+    def check_subscription_access(self, course):
+        """
+        Check if the current user has subscription access to the course.
+
+        Args:
+            course: The Course model instance
+
+        Returns:
+            bool: True if user has access, False otherwise
+
+        Raises:
+            PermissionDenied: If premium course and user lacks subscription
+        """
+        # Free courses are accessible to everyone
+        if course.access_level == 'free':
+            return True
+
+        user = self.request.user
+
+        # Premium courses require authentication
+        if not user.is_authenticated:
+            raise PermissionDenied(
+                "Este curso requer uma subscrição. Faça login para verificar seu acesso."
+            )
+
+        # Check subscription access
+        if not course.user_has_access(user):
+            access_messages = {
+                'premium': 'Este curso requer um plano Premium ou superior.',
+                'premium_plus': 'Este curso é exclusivo para assinantes Premium Plus.',
+            }
+            message = access_messages.get(
+                course.access_level,
+                'Não tem a subscrição necessária para aceder a este conteúdo.'
+            )
+            raise PermissionDenied(message)
+
+        return True
+
 
 from ....models import (
     Course, CourseSection, Chapter, ChapterComment,
@@ -109,7 +190,10 @@ class CourseListView(generics.ListAPIView):
 
     Query Parameters for GET:
     - category: Filter by category ('all' for no filter)
-    - ordering: Sort order (-created_at, title, level)
+    - access_level: Filter by access level ('free', 'premium', 'premium_plus', 'all')
+    - is_featured: Filter by featured status ('true', 'false')
+    - level: Filter by course difficulty level ('Beginner', 'Intermediate', 'Advanced')
+    - ordering: Sort order (-created_at, title, level, -is_featured)
     - include_description: Include description field (default: true)
     - include_enrollment_count: Include enrollment count (default: false)
     - page: Page number (default: 1)
@@ -127,6 +211,27 @@ class CourseListView(generics.ListAPIView):
         category = self.request.query_params.get('category')
         if category and category != 'all':
             queryset = queryset.filter(category=category)
+
+        # Apply access_level filter
+        access_level = self.request.query_params.get('access_level')
+        if access_level and access_level != 'all':
+            valid_levels = ['free', 'premium', 'premium_plus']
+            if access_level in valid_levels:
+                queryset = queryset.filter(access_level=access_level)
+
+        # Apply is_featured filter
+        is_featured = self.request.query_params.get('is_featured')
+        if is_featured == 'true':
+            queryset = queryset.filter(is_featured=True)
+        elif is_featured == 'false':
+            queryset = queryset.filter(is_featured=False)
+
+        # Apply level filter
+        level = self.request.query_params.get('level')
+        if level:
+            valid_levels = ['Beginner', 'Intermediate', 'Advanced']
+            if level in valid_levels:
+                queryset = queryset.filter(level=level)
 
         # Use optimized queryset from serializer
         include_enrollment_count = self.request.query_params.get('include_enrollment_count', 'false').lower() == 'true'
@@ -168,24 +273,43 @@ class CourseListView(generics.ListAPIView):
 class CourseDetailView(generics.RetrieveAPIView):
     """
     Retrieve course details for students.
-    
+
     GET /api/v1/student/video-courses/{id}/ - Get course details
+
+    SECURITY: For premium courses, unauthenticated users and users without
+    subscription only see limited preview (section titles, no chapter details).
     """
     queryset = Course.objects.filter(status='Published', course_type='video')
     serializer_class = CourseDetailSerializer
     permission_classes = [permissions.AllowAny]
     lookup_field = 'id'
     lookup_url_kwarg = 'courseId'
-    
+
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        
+
+        # SECURITY: Check if user has access to this course
+        user = request.user
+        user_has_access = False
+
+        if user and user.is_authenticated:
+            user_has_access = instance.user_has_access(user)
+        else:
+            # Unauthenticated users only have access to free courses
+            user_has_access = instance.access_level == 'free'
+
         # Get fresh instance with optimizations based on query parameters
         include_sections = request.query_params.get('include_sections', 'true').lower() == 'true'
         include_enrollments = request.query_params.get('include_enrollments', 'true').lower() == 'true'
         include_chapters = request.query_params.get('include_chapters', 'true').lower() == 'true'
         include_comments = request.query_params.get('include_chapter_comments', 'false').lower() == 'true'
-        
+
+        # SECURITY: Limit content for users without subscription access
+        if not user_has_access and instance.access_level != 'free':
+            # Show only basic course info and section titles (no chapters)
+            include_chapters = False
+            include_comments = False
+
         # Re-fetch with optimizations
         optimized_queryset = CourseDetailSerializer.optimize_queryset(
             Course.objects.filter(id=instance.id, status='Published', course_type='video'),
@@ -193,11 +317,11 @@ class CourseDetailView(generics.RetrieveAPIView):
             include_enrollments=include_enrollments
         )
         instance = optimized_queryset.first()
-        
+
         if not instance:
             from rest_framework.exceptions import NotFound
             raise NotFound("Curso não encontrado ou não está publicado")
-        
+
         # Set prefetch flags for serializer
         if include_sections:
             instance._prefetched_sections = True
@@ -207,20 +331,30 @@ class CourseDetailView(generics.RetrieveAPIView):
                     section._prefetched_chapters = True
         if include_enrollments:
             instance._prefetched_enrollments = True
-        
+
         # Prepare context
         context = {'request': request}
         context['include_sections'] = include_sections
         context['include_enrollments'] = include_enrollments
         context['include_chapters'] = include_chapters
         context['include_chapter_comments'] = include_comments
-        
+        context['user_has_subscription_access'] = user_has_access
+
         serializer = self.get_serializer(instance, context=context)
-        
-        return Response({
+
+        # Add access information to response
+        response_data = {
             'message': 'Curso recuperado com sucesso',
-            'data': serializer.data
-        })
+            'data': serializer.data,
+            'access_info': {
+                'has_access': user_has_access,
+                'access_level': instance.access_level,
+                'access_level_display': instance.access_level_display,
+                'content_limited': not user_has_access and instance.access_level != 'free'
+            }
+        }
+
+        return Response(response_data)
 
 
 @api_view(['POST'])
@@ -228,19 +362,48 @@ class CourseDetailView(generics.RetrieveAPIView):
 def create_transaction(request):
     """
     Create transaction and enroll user in course.
-    
+
     POST /api/v1/courses/transactions/create/
-    
+
     Maps to Express: POST /transactions
+
+    SECURITY: Verifies user has required subscription before enrollment.
     """
     serializer = TransactionCreateSerializer(data=request.data, context={'request': request})
     serializer.is_valid(raise_exception=True)
-    
+
+    # SECURITY FIX: Get course and verify subscription access BEFORE enrollment
+    course_id = request.data.get('courseId')
+    if course_id:
+        try:
+            course = Course.objects.get(id=course_id)
+            # Check if user has subscription access for non-free courses
+            if not course.user_has_access(request.user):
+                access_messages = {
+                    'premium': 'Este curso requer um plano Premium ou superior.',
+                    'premium_plus': 'Este curso é exclusivo para assinantes Premium Plus.',
+                }
+                message = access_messages.get(
+                    course.access_level,
+                    'Não tem a subscrição necessária para aceder a este curso.'
+                )
+                return Response({
+                    'error': 'Acesso negado',
+                    'message': message,
+                    'code': 'SUBSCRIPTION_REQUIRED',
+                    'required_plan': course.access_level,
+                    'upgrade_required': True
+                }, status=status.HTTP_403_FORBIDDEN)
+        except Course.DoesNotExist:
+            return Response({
+                'error': 'Curso não encontrado'
+            }, status=status.HTTP_404_NOT_FOUND)
+
     with transaction.atomic():
         # Create transaction
         new_transaction = serializer.save()
-        
-        # Create enrollment
+
+        # Create enrollment (user already verified to have access)
         enrollment, created = CourseEnrollment.objects.get_or_create(
             user=request.user,
             course=new_transaction.course
@@ -455,58 +618,94 @@ def update_user_course_progress(request, userId, courseId):
 
 # Course Section Views (Read-only for students)
 
-class CourseSectionListView(generics.ListAPIView):
+class CourseSectionListView(SubscriptionAccessMixin, generics.ListAPIView):
     """
     List sections for a published course.
+
+    SECURITY: Checks subscription access for premium courses.
+    Free courses: accessible to everyone
+    Premium courses: requires valid subscription
     """
     serializer_class = CourseSectionSerializer
     permission_classes = [permissions.AllowAny]
-    
+
     def get_queryset(self):
         course_id = self.kwargs['courseId']
         include_comments = self.request.query_params.get('include_comments', 'false').lower() == 'true'
-        
+
         # Only sections from published video courses
         queryset = CourseSection.objects.filter(
             course__id=course_id,
             course__status='Published',
             course__course_type='video'
         )
-        
+
         # Optimize based on requirements
         if include_comments:
             queryset = queryset.prefetch_related('chapters__comments__user')
         else:
             queryset = queryset.prefetch_related('chapters')
-        
+
         return queryset.order_by('order')
 
+    def list(self, request, *args, **kwargs):
+        """Override list to check subscription access before returning sections."""
+        course_id = self.kwargs['courseId']
+        try:
+            course = Course.objects.get(id=course_id, status='Published', course_type='video')
+        except Course.DoesNotExist:
+            return Response({
+                'error': 'Curso não encontrado'
+            }, status=status.HTTP_404_NOT_FOUND)
 
-class CourseSectionDetailView(generics.RetrieveAPIView):
+        # SECURITY: Check subscription access
+        self.check_subscription_access(course)
+
+        return super().list(request, *args, **kwargs)
+
+
+class CourseSectionDetailView(SubscriptionAccessMixin, generics.RetrieveAPIView):
     """
     Retrieve a course section details.
+
+    SECURITY: Checks subscription access for premium courses.
     """
     serializer_class = CourseSectionSerializer
     permission_classes = [permissions.AllowAny]
     lookup_field = 'id'
     lookup_url_kwarg = 'sectionId'
-    
+
     def get_queryset(self):
         return CourseSection.objects.filter(
             course__status='Published',
             course__course_type='video'
         ).select_related('course')
 
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to check subscription access before returning section."""
+        instance = self.get_object()
+        course = instance.course
+
+        # SECURITY: Check subscription access
+        self.check_subscription_access(course)
+
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 # Chapter Views (Read-only for students)
 
-class ChapterListView(generics.ListAPIView):
+class ChapterListView(SubscriptionAccessMixin, generics.ListAPIView):
     """
     List chapters for a section.
+
+    SECURITY: Checks subscription access for premium courses.
+    Free courses: accessible to everyone
+    Premium courses: requires valid subscription
     """
     serializer_class = ChapterSerializer
     permission_classes = [permissions.AllowAny]
-    
+
     def get_queryset(self):
         section_id = self.kwargs['sectionId']
         return Chapter.objects.filter(
@@ -514,6 +713,25 @@ class ChapterListView(generics.ListAPIView):
             section__course__status='Published',
             section__course__course_type='video'
         ).order_by('order')
+
+    def list(self, request, *args, **kwargs):
+        """Override list to check subscription access before returning chapters."""
+        section_id = self.kwargs['sectionId']
+        try:
+            section = CourseSection.objects.select_related('course').get(
+                id=section_id,
+                course__status='Published',
+                course__course_type='video'
+            )
+        except CourseSection.DoesNotExist:
+            return Response({
+                'error': 'Secção não encontrada'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # SECURITY: Check subscription access
+        self.check_subscription_access(section.course)
+
+        return super().list(request, *args, **kwargs)
 
 
 class ChapterDetailView(EnrollmentRequiredMixin, generics.RetrieveAPIView):
@@ -1004,9 +1222,16 @@ def get_student_quiz_summary(request, chapterId):
 @permission_classes([permissions.IsAuthenticated])
 def check_course_enrollment_status(request, courseId):
     """
-    Check if user is enrolled in a specific course.
-    
+    Check if user is enrolled in a specific course and has access.
+
     GET /api/v1/student/video-courses/{courseId}/enrollment-status/
+
+    Returns:
+    - is_enrolled: Whether user is enrolled
+    - has_access: Whether user's subscription allows access
+    - can_enroll: Whether user can enroll (has required subscription)
+    - access_level: Course's required access level
+    - access_level_display: Human-readable access level
     """
     try:
         course = Course.objects.get(id=courseId, status='Published', course_type='video')
@@ -1014,14 +1239,17 @@ def check_course_enrollment_status(request, courseId):
         return Response({
             'error': 'Curso não encontrado ou não está publicado'
         }, status=404)
-    
+
     # Check if user is enrolled
     is_enrolled = CourseEnrollment.objects.filter(
         user=request.user,
         course=course,
         is_active=True
     ).exists()
-    
+
+    # Check subscription access
+    has_access = course.user_has_access(request.user)
+
     # Get enrollment details if enrolled
     enrollment_data = None
     if is_enrolled:
@@ -1034,13 +1262,33 @@ def check_course_enrollment_status(request, courseId):
             }
         except CourseEnrollment.DoesNotExist:
             pass
-    
+
+    # Determine if user can enroll (needs proper subscription for non-free courses)
+    can_enroll = has_access and not is_enrolled
+
+    # Get subscription info for premium courses
+    subscription_info = None
+    if not has_access:
+        required_plan = 'Premium' if course.access_level == 'premium' else 'Premium Plus'
+        subscription_info = {
+            'required_plan': required_plan,
+            'message': f'Este curso requer o plano {required_plan} ou superior.'
+        }
+
     return Response({
         'message': 'Status de inscrição verificado com sucesso',
         'data': {
             'course_id': str(courseId),
+            'course_title': course.title,
             'is_enrolled': is_enrolled,
-            'enrollment_details': enrollment_data
+            'has_access': has_access,
+            'can_enroll': can_enroll,
+            'access_level': course.access_level,
+            'access_level_display': course.access_level_display,
+            'is_free': course.is_free,
+            'is_premium': course.is_premium,
+            'enrollment_details': enrollment_data,
+            'subscription_info': subscription_info
         }
     })
 
@@ -1057,18 +1305,56 @@ def get_featured_courses(request):
 
     GET /api/v1/student/video-courses/featured/
 
-    Returns courses with high enrollment and good ratings.
+    Query params:
+    - limit: Number of courses to return (default: 6, max: 20)
+    - access_level: Filter by access level ('free', 'premium', 'premium_plus', 'all')
+
+    Returns courses marked as featured (is_featured=True).
+    Falls back to highest enrollment courses if no featured courses exist.
     """
-    # Featured: Published video courses with most enrollments
-    courses = Course.objects.filter(
+    # SECURITY: Validate and cap limit
+    try:
+        limit = min(int(request.query_params.get('limit', 6)), 20)
+        if limit < 1:
+            limit = 6
+    except (ValueError, TypeError):
+        limit = 6
+
+    # Base query: Published video courses marked as featured
+    queryset = Course.objects.filter(
         status='Published',
-        course_type='video'
-    ).annotate(
+        course_type='video',
+        is_featured=True
+    )
+
+    # Apply access_level filter
+    access_level = request.query_params.get('access_level')
+    if access_level and access_level != 'all':
+        valid_levels = ['free', 'premium', 'premium_plus']
+        if access_level in valid_levels:
+            queryset = queryset.filter(access_level=access_level)
+
+    # Annotate with enrollment count for ordering
+    queryset = queryset.annotate(
         enrollment_count=Count('enrollments')
-    ).order_by('-enrollment_count')[:6]
+    ).order_by('-enrollment_count')[:limit]
+
+    # Fallback: if no featured courses, get most popular
+    if not queryset.exists():
+        fallback_queryset = Course.objects.filter(
+            status='Published',
+            course_type='video'
+        )
+        # Apply same access_level filter to fallback
+        if access_level and access_level != 'all' and access_level in ['free', 'premium', 'premium_plus']:
+            fallback_queryset = fallback_queryset.filter(access_level=access_level)
+
+        queryset = fallback_queryset.annotate(
+            enrollment_count=Count('enrollments')
+        ).order_by('-enrollment_count')[:limit]
 
     serializer = CourseListSerializer(
-        courses,
+        queryset,
         many=True,
         context={'request': request, 'include_enrollment_count': True}
     )
@@ -1089,6 +1375,8 @@ def get_popular_courses(request):
 
     Query params:
     - limit: Number of courses to return (default: 10, max: 50)
+    - access_level: Filter by access level ('free', 'premium', 'premium_plus', 'all')
+    - category: Filter by category
     """
     # SECURITY: Validate and cap limit to prevent DoS
     try:
@@ -1098,10 +1386,24 @@ def get_popular_courses(request):
     except (ValueError, TypeError):
         limit = 10
 
-    courses = Course.objects.filter(
+    queryset = Course.objects.filter(
         status='Published',
         course_type='video'
-    ).annotate(
+    )
+
+    # Apply access_level filter
+    access_level = request.query_params.get('access_level')
+    if access_level and access_level != 'all':
+        valid_levels = ['free', 'premium', 'premium_plus']
+        if access_level in valid_levels:
+            queryset = queryset.filter(access_level=access_level)
+
+    # Apply category filter
+    category = request.query_params.get('category')
+    if category and category != 'all':
+        queryset = queryset.filter(category=category)
+
+    courses = queryset.annotate(
         enrollment_count=Count('enrollments'),
         avg_rating=Avg('reviews__rating')
     ).order_by('-enrollment_count', '-avg_rating')[:limit]
@@ -1130,6 +1432,8 @@ def search_courses(request):
     - q: Search query (searches title and description)
     - category: Filter by category
     - level: Filter by level
+    - access_level: Filter by access level ('free', 'premium', 'premium_plus')
+    - is_featured: Filter by featured status ('true', 'false')
     - limit: Number of results (default: 20, max: 100)
 
     SECURITY:
@@ -1139,6 +1443,8 @@ def search_courses(request):
     query = request.query_params.get('q', '').strip()
     category = request.query_params.get('category')
     level = request.query_params.get('level')
+    access_level = request.query_params.get('access_level')
+    is_featured = request.query_params.get('is_featured')
 
     # SECURITY: Validate and cap limit to prevent DoS
     try:
@@ -1168,7 +1474,21 @@ def search_courses(request):
         courses = courses.filter(category=category)
 
     if level:
-        courses = courses.filter(level=level)
+        valid_levels = ['Beginner', 'Intermediate', 'Advanced']
+        if level in valid_levels:
+            courses = courses.filter(level=level)
+
+    # Apply access_level filter
+    if access_level and access_level != 'all':
+        valid_access_levels = ['free', 'premium', 'premium_plus']
+        if access_level in valid_access_levels:
+            courses = courses.filter(access_level=access_level)
+
+    # Apply is_featured filter
+    if is_featured == 'true':
+        courses = courses.filter(is_featured=True)
+    elif is_featured == 'false':
+        courses = courses.filter(is_featured=False)
 
     courses = courses.annotate(
         enrollment_count=Count('enrollments')
