@@ -11,18 +11,18 @@ from django.db import models
 # Shared choices for course models
 class CourseChoices:
     """Course-specific choices and constants."""
-    
+
     LEVEL_CHOICES = [
         ('Beginner', 'Beginner'),
         ('Intermediate', 'Intermediate'),
         ('Advanced', 'Advanced'),
     ]
-    
+
     STATUS_CHOICES = [
         ('Draft', 'Draft'),
         ('Published', 'Published'),
     ]
-    
+
     TEMPLATE_CHOICES = [
         ('general', 'Inglês Geral'),
         ('oil-gas', 'Inglês para Petróleo & Gás'),
@@ -35,10 +35,17 @@ class CourseChoices:
         ('medical', 'Inglês Médico'),
         ('legal', 'Inglês Jurídico'),
     ]
-    
+
     COURSE_TYPE_CHOICES = [
         ('video', 'Curso de Vídeo'),
         ('practice', 'Curso do Laboratório'),
+    ]
+
+    # Níveis de acesso do curso - define qual plano mínimo é necessário
+    ACCESS_LEVEL_CHOICES = [
+        ('free', 'Gratuito - Disponível para todos'),
+        ('premium', 'Premium - Requer plano Premium ou superior'),
+        ('premium_plus', 'Premium Plus - Exclusivo para Premium Plus'),
     ]
 
 
