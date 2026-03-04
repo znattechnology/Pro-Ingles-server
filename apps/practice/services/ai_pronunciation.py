@@ -308,9 +308,35 @@ class AIPronunciationAnalyzer:
             )
             
             return response.content
-            
+
         except Exception as e:
             print(f"TTS generation error: {e}")
+            return b""
+
+    def generate_reference_audio_sync(self, text: str, voice: str = "alloy") -> bytes:
+        """
+        Synchronous version of generate_reference_audio for use in Django views.
+
+        Args:
+            text: Text to convert to speech
+            voice: TTS voice (alloy, echo, fable, onyx, nova, shimmer)
+
+        Returns:
+            Audio bytes for reference pronunciation
+        """
+
+        try:
+            response = self.client.audio.speech.create(
+                model="tts-1",
+                voice=voice,
+                input=text,
+                response_format="mp3"
+            )
+
+            return response.content
+
+        except Exception as e:
+            print(f"TTS generation error (sync): {e}")
             return b""
 
 
