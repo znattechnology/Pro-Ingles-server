@@ -121,41 +121,49 @@ class ChallengeProgressSerializer(serializers.ModelSerializer):
 class PracticeChallengeSerializer(serializers.ModelSerializer):
     """
     Practice Challenge serializer - individual exercises.
-    
+
     Maps to frontend challenges structure from client project.
     Includes challenge options and user progress.
+    Options are randomized to prevent memorization of positions.
     """
     id = serializers.UUIDField(read_only=True)
     options = serializers.SerializerMethodField()
     challenge_progress = serializers.SerializerMethodField()
     completed = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = PracticeChallenge
         fields = [
-            'id', 'lesson', 'type', 'question', 'order', 
+            'id', 'lesson', 'type', 'question', 'order',
             'options', 'challenge_progress', 'completed'
         ]
-    
+
     def get_options(self, obj):
-        """Get challenge options, hiding correct answers unless completed"""
+        """Get challenge options, hiding correct answers unless completed.
+        Options are returned in random order to prevent memorization."""
+        import random
+
         user = self.context.get('request').user if self.context.get('request') else None
-        
+
+        # Get all options and convert to list for shuffling
+        options_list = list(obj.options.all())
+        random.shuffle(options_list)
+
         if not user:
             # Anonymous user - hide correct answers
-            return ChallengeOptionSerializer(obj.options.all(), many=True).data
-            
+            return ChallengeOptionSerializer(options_list, many=True).data
+
         # Check if user completed this challenge
         try:
             progress = ChallengeProgress.objects.get(user=user, challenge=obj)
             if progress.completed:
                 # Show correct answers for completed challenges (practice mode)
-                return ChallengeOptionWithAnswerSerializer(obj.options.all(), many=True).data
+                return ChallengeOptionWithAnswerSerializer(options_list, many=True).data
         except ChallengeProgress.DoesNotExist:
             pass
-            
+
         # Hide correct answers for incomplete challenges
-        return ChallengeOptionSerializer(obj.options.all(), many=True).data
+        return ChallengeOptionSerializer(options_list, many=True).data
     
     def get_challenge_progress(self, obj):
         """Get user's progress for this challenge"""
@@ -187,35 +195,49 @@ class PracticeChallengeSerializer(serializers.ModelSerializer):
 class PracticeLessonSerializer(serializers.ModelSerializer):
     """
     Practice Lesson serializer - learning sessions.
-    
+
     Maps to frontend lessons structure from client project.
     Includes challenges and completion status.
+    Challenges are returned in random order.
     """
     id = serializers.UUIDField(read_only=True)
-    challenges = PracticeChallengeSerializer(many=True, read_only=True)
+    challenges = serializers.SerializerMethodField()
     completed = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = PracticeLesson
         fields = ['id', 'unit', 'title', 'order', 'challenges', 'completed']
-    
+
+    def get_challenges(self, obj):
+        """Get challenges in random order."""
+        import random
+
+        challenges_list = list(obj.challenges.all())
+        random.shuffle(challenges_list)
+
+        return PracticeChallengeSerializer(
+            challenges_list,
+            many=True,
+            context=self.context
+        ).data
+
     def get_completed(self, obj):
         """Check if user completed all challenges in this lesson"""
         user = self.context.get('request').user if self.context.get('request') else None
-        
+
         if not user:
             return False
-            
+
         if obj.challenges.count() == 0:
             return False
-            
+
         # Check if all challenges are completed
         completed_count = ChallengeProgress.objects.filter(
             user=user,
             challenge__lesson=obj,
             completed=True
         ).count()
-        
+
         return completed_count == obj.challenges.count()
 
 
@@ -311,18 +333,34 @@ class UserProgressUpdateSerializer(serializers.ModelSerializer):
 class LessonDetailSerializer(serializers.ModelSerializer):
     """
     Detailed lesson serializer - for quiz page.
-    
+
     Used for the lesson/quiz page, includes all challenges with options.
     Maps to the getLesson query from client project.
+    Challenges are returned in random order so users cannot predict the next question.
     """
     id = serializers.UUIDField(read_only=True)
-    challenges = PracticeChallengeSerializer(many=True, read_only=True)
+    challenges = serializers.SerializerMethodField()
     unit = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = PracticeLesson
         fields = ['id', 'title', 'order', 'unit', 'challenges']
-    
+
+    def get_challenges(self, obj):
+        """Get challenges in random order to prevent prediction of next question."""
+        import random
+
+        # Get all challenges and convert to list for shuffling
+        challenges_list = list(obj.challenges.all())
+        random.shuffle(challenges_list)
+
+        # Serialize with context for user progress
+        return PracticeChallengeSerializer(
+            challenges_list,
+            many=True,
+            context=self.context
+        ).data
+
     def get_unit(self, obj):
         """Get unit details"""
         return {
