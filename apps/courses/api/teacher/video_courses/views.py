@@ -12,7 +12,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from apps.courses.api.teacher.decorators import teacher_required, course_owner_required
 from rest_framework.views import APIView
-from django.db import transaction
+from django.db import models, transaction
 from django.db.models import Q
 
 from apps.courses.models import (
@@ -359,13 +359,20 @@ class CourseSectionListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         course_id = self.kwargs['courseId']
         course = get_object_or_404(Course, id=course_id)
-        
+
         # Check if user owns this course
         if course.teacher != self.request.user:
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("Apenas o professor pode adicionar seções")
-        
-        serializer.save(course=course)
+
+        # Auto-set order to next available position if not provided
+        if not serializer.validated_data.get('order'):
+            max_order = CourseSection.objects.filter(course=course).aggregate(
+                max_order=models.Max('order')
+            )['max_order'] or 0
+            serializer.save(course=course, order=max_order + 1)
+        else:
+            serializer.save(course=course)
 
 
 class CourseSectionDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -406,13 +413,20 @@ class ChapterListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         section_id = self.kwargs['sectionId']
         section = get_object_or_404(CourseSection, id=section_id)
-        
+
         # Check if user owns this course
         if section.course.teacher != self.request.user:
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("Apenas o professor pode adicionar capítulos")
-        
-        serializer.save(section=section)
+
+        # Auto-set order to next available position if not provided
+        if not serializer.validated_data.get('order'):
+            max_order = Chapter.objects.filter(section=section).aggregate(
+                max_order=models.Max('order')
+            )['max_order'] or 0
+            serializer.save(section=section, order=max_order + 1)
+        else:
+            serializer.save(section=section)
 
 
 class ChapterDetailView(generics.RetrieveUpdateDestroyAPIView):
