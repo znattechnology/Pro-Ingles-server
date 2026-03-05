@@ -56,6 +56,7 @@ class ChapterChoices:
         ('Text', 'Text'),
         ('Quiz', 'Quiz'),
         ('Video', 'Video'),
+        ('Exercise', 'Exercise'),
     ]
 
 
