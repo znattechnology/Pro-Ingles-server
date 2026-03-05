@@ -42,4 +42,19 @@ urlpatterns = [
          views.ChapterQuizDetailView.as_view(), name='chapter_quiz_detail'),
     
     # Quiz attempts and summaries moved to student API
+
+    # Course image upload (presigned URL approach)
+    path('<uuid:courseId>/get-image-upload-url/', views.get_course_image_upload_url, name='get_course_image_upload_url'),
+    path('<uuid:courseId>/update-image-url/', views.update_course_image_url, name='update_course_image_url'),
+
+    # Course image upload (direct upload approach)
+    path('<uuid:courseId>/upload-image/', views.upload_course_image, name='upload_course_image'),
+
+    # Video upload presigned URL
+    path('<uuid:courseId>/sections/<uuid:sectionId>/chapters/<uuid:chapterId>/get-upload-url/',
+         views.get_upload_video_url, name='get_upload_video_url'),
+
+    # Resource upload presigned URL
+    path('<uuid:courseId>/sections/<uuid:sectionId>/chapters/<uuid:chapterId>/get-resource-upload-url/',
+         views.get_resource_upload_url, name='get_resource_upload_url'),
 ]

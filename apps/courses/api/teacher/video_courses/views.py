@@ -822,6 +822,155 @@ def upload_course_image(request, courseId):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+@teacher_required
+@course_owner_required
+def get_course_image_upload_url(request, courseId):
+    """
+    Generate presigned URL for course image upload to S3.
+
+    POST /api/v1/teacher/video-courses/{courseId}/get-image-upload-url/
+
+    Similar to video upload but for course cover images.
+    Uses decorators for proper authentication and ownership verification.
+    """
+    print(f"🖼️ Course image upload URL request for course: {courseId}")
+    print(f"   Request data: {request.data}")
+    print(f"   User: {request.user}")
+
+    # Get file details
+    fileName = request.data.get('fileName') or request.data.get('file_name')
+    fileType = request.data.get('fileType') or request.data.get('file_type')
+
+    if not fileName or not fileType:
+        return Response({
+            'error': 'O nome e o tipo do ficheiro são obrigatórios'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    # Validate image file type
+    allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if fileType not in allowed_types:
+        return Response({
+            'error': 'Tipo de arquivo não suportado. Use JPG, PNG ou WebP.'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Course ownership is already verified by @course_owner_required decorator
+        course = get_object_or_404(Course, id=courseId)
+        print(f"   Found course: {course.title}")
+
+        import boto3
+        import uuid
+        from django.conf import settings
+        from botocore.exceptions import ClientError
+
+        if not all([settings.AWS_ACCESS_KEY_ID, settings.AWS_SECRET_ACCESS_KEY, settings.AWS_STORAGE_BUCKET_NAME]):
+            print("❌ S3 configuration incomplete")
+            return Response({
+                'error': 'Configuração S3 incompleta no servidor'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        # Create S3 client
+        s3_client = boto3.client(
+            's3',
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_S3_REGION_NAME
+        )
+
+        # Generate unique filename and S3 key
+        file_extension = fileName.split('.')[-1].lower()
+        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        s3_key = f'courses/images/{unique_filename}'
+
+        print(f"   Generated S3 key: {s3_key}")
+
+        # Generate presigned URL for PUT operation
+        upload_url = s3_client.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': settings.AWS_STORAGE_BUCKET_NAME,
+                'Key': s3_key,
+                'ContentType': fileType,
+                'CacheControl': 'max-age=86400'
+            },
+            ExpiresIn=3600  # 1 hour expiration
+        )
+
+        # Generate final image URL (using CloudFront if available)
+        if getattr(settings, 'AWS_CLOUDFRONT_DOMAIN', ''):
+            image_url = f"{settings.AWS_CLOUDFRONT_DOMAIN}/courses/images/{unique_filename}"
+        else:
+            image_url = f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/courses/images/{unique_filename}"
+
+        print(f"✅ Generated presigned URL successfully")
+
+        return Response({
+            'message': 'URL de upload de imagem gerado com sucesso',
+            'data': {
+                'uploadUrl': upload_url,
+                'imageUrl': image_url
+            }
+        })
+
+    except ClientError as e:
+        print(f"❌ S3 ClientError: {str(e)}")
+        return Response({
+            'error': f'Erro S3: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        import traceback
+        print(f"❌ Exception: {str(e)}")
+        print(f"   Traceback: {traceback.format_exc()}")
+        return Response({
+            'error': f'Erro ao gerar URL de upload de imagem: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['PUT'])
+@permission_classes([permissions.IsAuthenticated])
+@teacher_required
+@course_owner_required
+def update_course_image_url(request, courseId):
+    """
+    Update course image URL in database after successful S3 upload.
+
+    PUT /api/v1/teacher/video-courses/{courseId}/update-image-url/
+    """
+    print(f"🖼️ Update course image URL for course: {courseId}")
+
+    image_url = request.data.get('imageUrl') or request.data.get('image_url')
+
+    if not image_url:
+        return Response({
+            'error': 'URL da imagem é obrigatório'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        # Course ownership is already verified by @course_owner_required decorator
+        course = get_object_or_404(Course, id=courseId)
+
+        # Update course image
+        course.image = image_url
+        course.save()
+
+        print(f"✅ Course image updated: {image_url}")
+
+        return Response({
+            'message': 'Imagem do curso atualizada com sucesso',
+            'data': {
+                'imageUrl': image_url
+            }
+        })
+
+    except Exception as e:
+        print(f"❌ Exception: {str(e)}")
+        return Response({
+            'error': f'Erro ao atualizar imagem do curso: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 # =============================================================================
 # 🆕 PHASE 1 BRIDGE ENDPOINTS - Chapter Enhancement API
 # =============================================================================
