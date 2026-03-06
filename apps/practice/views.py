@@ -1240,27 +1240,27 @@ class PracticeChallengeCreateView(generics.ListCreateAPIView):
     """
     serializer_class = PracticeChallengeSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_queryset(self):
         lesson_id = self.request.GET.get('lesson')
         if lesson_id:
             return PracticeChallenge.objects.filter(lesson_id=lesson_id).order_by('order')
         return PracticeChallenge.objects.all().order_by('order')
-    
+
     def list(self, request, *args, **kwargs):
         # Same format as challenges_list_simple
         lesson_id = request.GET.get('lesson')
         if not lesson_id:
             return Response(
-                {"error": "lesson parameter is required"}, 
+                {"error": "lesson parameter is required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         try:
             challenges = PracticeChallenge.objects.filter(
                 lesson_id=lesson_id
             ).order_by('order')
-            
+
             serializer = self.get_serializer(challenges, many=True)
             return Response({
                 "message": "Challenges retrieved successfully",
@@ -1268,15 +1268,34 @@ class PracticeChallengeCreateView(generics.ListCreateAPIView):
             })
         except Exception as e:
             return Response(
-                {"error": f"Error fetching challenges: {str(e)}"}, 
+                {"error": f"Error fetching challenges: {str(e)}"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+    def create(self, request, *args, **kwargs):
+        options_data = request.data.pop('options', []) if isinstance(request.data, dict) else []
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        challenge = serializer.save()
+
+        for idx, option in enumerate(options_data):
+            ChallengeOption.objects.create(
+                challenge=challenge,
+                text=option.get('text', ''),
+                is_correct=option.get('is_correct', option.get('correct', False)),
+                image_url=option.get('image_url', '') or '',
+                audio_url=option.get('audio_url', '') or '',
+                order=option.get('order', idx + 1),
+            )
+
+        result_serializer = self.get_serializer(challenge)
+        return Response(result_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class PracticeChallengeUpdateView(generics.RetrieveUpdateDestroyAPIView):
     """
     GET/PUT/PATCH/DELETE /api/v1/practice/challenges/{challenge_id}/
-    
+
     Update or delete practice challenge (Teacher only).
     """
     queryset = PracticeChallenge.objects.all()
@@ -1284,6 +1303,30 @@ class PracticeChallengeUpdateView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     lookup_field = 'id'
     lookup_url_kwarg = 'challenge_id'
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        options_data = request.data.pop('options', None) if isinstance(request.data, dict) else None
+
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        challenge = serializer.save()
+
+        if options_data is not None:
+            challenge.options.all().delete()
+            for idx, option in enumerate(options_data):
+                ChallengeOption.objects.create(
+                    challenge=challenge,
+                    text=option.get('text', ''),
+                    is_correct=option.get('is_correct', option.get('correct', False)),
+                    image_url=option.get('image_url', '') or '',
+                    audio_url=option.get('audio_url', '') or '',
+                    order=option.get('order', idx + 1),
+                )
+
+        result_serializer = self.get_serializer(challenge)
+        return Response(result_serializer.data)
 
 
 class ChallengeOptionCreateView(generics.CreateAPIView):
